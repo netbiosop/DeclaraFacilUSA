@@ -122,8 +122,8 @@
    "size": 2207
   },
   "taxapp/updater.py": {
-   "sha256": "f3b835eab021fbe01a83c47f2b657aa24e57f4cb798b614ba944f004b8669224",
-   "size": 19048
+   "sha256": "aacf56ed0a2d5c48391b3fa9ab199f38352ab9939f4150ac729e2e2a299d5a9a",
+   "size": 19465
   },
   "data/actualizaciones.json": {
    "sha256": "4d3a8efab884bbb8240f892c4a4afcf48fce6e049f56a85542d45cefbe7f548b",

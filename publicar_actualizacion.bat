@@ -57,14 +57,18 @@ if not defined GIT (
 )
 %GH% auth setup-git >nul 2>nul
 
-REM ---- tipo de publicacion
+REM ---- tipo de publicacion: si la base (__base__) todavia no tiene instalador publicado, va completa
+for /f "tokens=2 delims==" %%b in ('findstr /b /c:"__base__" taxapp\__init__.py') do set "BASEV=%%b"
+set "BASEV=%BASEV: =%"
+set "BASEV=%BASEV:"=%"
+if not defined BASEV set "BASEV=%VER%"
 set "MODE=1"
-%GH% release list --repo %REPO% --limit 1 > "%TEMP%\dfusa_rel.txt" 2>nul
-for %%A in ("%TEMP%\dfusa_rel.txt") do if %%~zA==0 set "MODE=2"
+%GH% release view v%BASEV% --repo %REPO% >nul 2>nul
+if errorlevel 1 set "MODE=2"
 if "%MODE%"=="2" (
     echo.
-    echo Todavia no hay instalador publicado: se publicara el instalador completo.
-    echo No installer published yet: the full installer will be published.
+    echo El programa base %BASEV% todavia no tiene instalador publicado: se publicara el instalador completo.
+    echo Base %BASEV% has no published installer yet: the full installer will be published.
     goto mode_ok
 )
 echo.

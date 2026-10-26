@@ -88,8 +88,8 @@ def parse_version(v: str) -> tuple:
     return tuple(int(n) for n in nums[:4]) + (0,) * (3 - min(3, len(nums[:4])))
 
 
-def is_newer(remote: str, local: str = __version__) -> bool:
-    return parse_version(remote) > parse_version(local)
+def is_newer(remote: str, local: str = None) -> bool:
+    return parse_version(remote) > parse_version(local or __version__)
 
 
 def is_installed_app() -> bool:
@@ -366,6 +366,15 @@ def _fetch(url: str, token: str = "", accept: str = "*/*") -> bytes:
         raise UpdateError(tr("Sin conexión con GitHub: {e}", e=e)) from e
 
 
+def _raw_file(repo: str, commit: str, rel: str, token: str = "") -> bytes:
+    """Contenido de un archivo del repositorio en un commit exacto (raw.githubusercontent.com; si esa direccion
+    estuviera bloqueada en la red, se usa la API de GitHub)."""
+    try:
+        return _fetch(f"https://raw.githubusercontent.com/{repo}/{commit}/{rel}", token)
+    except UpdateError:
+        return _fetch(f"{API}/repos/{repo}/contents/{rel}?ref={commit}", token, "application/vnd.github.raw")
+
+
 def check_code(cfg: UpdateConfig = None) -> Optional[CodeUpdate]:
     """Version de codigo publicada en GitHub si es mas nueva que la que se esta usando; si no, None."""
     cfg = cfg or load_config()
@@ -376,7 +385,7 @@ def check_code(cfg: UpdateConfig = None) -> Optional[CodeUpdate]:
     if not re.fullmatch(r"[0-9a-f]{40}", sha):
         raise UpdateError(_("Respuesta inesperada de GitHub."))
     try:
-        man = json.loads(_fetch(f"https://raw.githubusercontent.com/{cfg.repo}/{sha}/{MANIFEST}", tok).decode("utf-8"))
+        man = json.loads(_raw_file(cfg.repo, sha, MANIFEST, tok).decode("utf-8"))
     except ValueError as e:
         raise UpdateError(_("El manifiesto de actualización no es válido.")) from e
     ver = str(man.get("version", "0"))
@@ -413,7 +422,7 @@ def apply_code(upd: CodeUpdate, cfg: UpdateConfig = None, progress: Callable[[in
         if rel not in upd.changed and local.is_file():
             shutil.copyfile(local, target)
         else:
-            data = _fetch(f"https://raw.githubusercontent.com/{cfg.repo}/{upd.commit}/{rel}", tok)
+            data = _raw_file(cfg.repo, upd.commit, rel, tok)
             if hashlib.sha256(data).hexdigest() != info["sha256"]:
                 shutil.rmtree(tmp, ignore_errors=True)
                 raise UpdateError(tr("El archivo {f} no coincide con su huella SHA-256; actualización cancelada.", f=rel))
