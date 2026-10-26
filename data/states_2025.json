@@ -1,0 +1,2767 @@
+{
+ "year": 2025,
+ "source": "Tax Foundation, State Individual Income Tax Rates and Brackets 2025 (+ cambios retroactivos documentados)",
+ "states": {
+  "AK": {
+   "name": "Alaska",
+   "type": "none",
+   "notes": [
+    "Este estado no cobra impuesto estatal sobre la renta personal."
+   ]
+  },
+  "AL": {
+   "name": "Alabama",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.02
+     ],
+     [
+      500,
+      0.04
+     ],
+     [
+      3000,
+      0.05
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.02
+     ],
+     [
+      1000,
+      0.04
+     ],
+     [
+      6000,
+      0.05
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 3000,
+    "mfj": 8500,
+    "hoh": 5200
+   },
+   "exemption": {
+    "per_person": 1500,
+    "dependent": 1000
+   },
+   "special": [
+    "AL_fed_tax_deduction",
+    "AL_std_phase",
+    "AL_dependent_phase"
+   ],
+   "notes": [
+    "Permite deducir el impuesto federal pagado.",
+    "La deduccion estandar y la exencion por dependiente bajan segun el AGI."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false
+  },
+  "AR": {
+   "name": "Arkansas",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.02
+     ],
+     [
+      4500,
+      0.039
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.02
+     ],
+     [
+      4500,
+      0.039
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 2410,
+    "mfj": 4820
+   },
+   "exemption": {
+    "per_person": 29,
+    "dependent": 29
+   },
+   "exemption_is_credit": true,
+   "notes": [
+    "Arkansas usa tablas especiales para ingresos bajos (< ~$92,300); aqui se usa la tabla general (estimacion)."
+   ],
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": []
+  },
+  "AZ": {
+   "name": "Arizona",
+   "type": "flat",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.025
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.025
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 15000,
+    "mfj": 30000,
+    "hoh": 22500
+   },
+   "exemption": {
+    "per_person": 0,
+    "dependent": 100
+   },
+   "exemption_is_credit": true,
+   "special": [
+    "AZ_dependent_credit"
+   ],
+   "notes": [
+    "Deduccion estandar segun Tax Foundation 2025 ($15,000/$30,000, ligada al codigo federal vigente). Verifique si AZ adopto los montos OBBBA.",
+    "Credito por dependiente: $100 (menor de 17) o $25 (17+)."
+   ],
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false
+  },
+  "CA": {
+   "name": "California",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.01
+     ],
+     [
+      10756,
+      0.02
+     ],
+     [
+      25499,
+      0.04
+     ],
+     [
+      40245,
+      0.06
+     ],
+     [
+      55866,
+      0.08
+     ],
+     [
+      70606,
+      0.093
+     ],
+     [
+      360659,
+      0.103
+     ],
+     [
+      432787,
+      0.113
+     ],
+     [
+      721314,
+      0.123
+     ],
+     [
+      1000000,
+      0.133
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.01
+     ],
+     [
+      21512,
+      0.02
+     ],
+     [
+      50998,
+      0.04
+     ],
+     [
+      80490,
+      0.06
+     ],
+     [
+      111732,
+      0.08
+     ],
+     [
+      141212,
+      0.093
+     ],
+     [
+      721318,
+      0.103
+     ],
+     [
+      865574,
+      0.113
+     ],
+     [
+      1000000,
+      0.123
+     ],
+     [
+      1442628,
+      0.133
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 5540,
+    "mfj": 11080,
+    "hoh": 11080
+   },
+   "exemption": {
+    "per_person": 149,
+    "dependent": 461
+   },
+   "exemption_is_credit": true,
+   "special": [
+    "CA_exemption_phaseout"
+   ],
+   "ss_rule": "exempt",
+   "notes": [
+    "Incluye el impuesto de salud mental del 1% sobre ingresos > $1M.",
+    "Jefe de familia (HOH) usa aqui la tabla de soltero (aproximacion; CA tiene tabla propia de HOH).",
+    "Tramos 2025 segun Tax Foundation (anchos 2024 ajustados); verifique la tabla oficial FTB 2025."
+   ],
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "exempts_retirement": false
+  },
+  "CO": {
+   "name": "Colorado",
+   "type": "flat",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.044
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.044
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 0,
+    "mfj": 0
+   },
+   "exemption": {
+    "per_person": 0,
+    "dependent": 0
+   },
+   "uses_federal_deduction": true,
+   "ss_rule": "CO",
+   "notes": [
+    "Parte del ingreso tributable federal (incluye la deduccion federal).",
+    "Seguro Social: exento para 65+ (aproximacion del modelo)."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "exempts_retirement": false,
+   "special": []
+  },
+  "CT": {
+   "name": "Connecticut",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.02
+     ],
+     [
+      10000,
+      0.045
+     ],
+     [
+      50000,
+      0.055
+     ],
+     [
+      100000,
+      0.06
+     ],
+     [
+      200000,
+      0.065
+     ],
+     [
+      250000,
+      0.069
+     ],
+     [
+      500000,
+      0.0699
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.02
+     ],
+     [
+      20000,
+      0.045
+     ],
+     [
+      100000,
+      0.055
+     ],
+     [
+      200000,
+      0.06
+     ],
+     [
+      400000,
+      0.065
+     ],
+     [
+      500000,
+      0.069
+     ],
+     [
+      1000000,
+      0.0699
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 0,
+    "mfj": 0
+   },
+   "exemption": {
+    "per_person": 0,
+    "dependent": 0
+   },
+   "special": [
+    "CT_exemption"
+   ],
+   "ss_rule": "CT",
+   "brackets_hoh": [
+    [
+     0,
+     0.02
+    ],
+    [
+     16000,
+     0.045
+    ],
+    [
+     80000,
+     0.055
+    ],
+    [
+     160000,
+     0.06
+    ],
+    [
+     320000,
+     0.065
+    ],
+    [
+     400000,
+     0.069
+    ],
+    [
+     800000,
+     0.0699
+    ]
+   ],
+   "notes": [
+    "Exencion personal: $15,000 (soltero), $19,000 (HOH), $24,000 (MFJ), se reduce con el AGI.",
+    "No se modelan la 'recaptura' de tramos ni los creditos personales de CT (estimacion)."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "exempts_retirement": false
+  },
+  "DC": {
+   "name": "District of Columbia",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.04
+     ],
+     [
+      10000,
+      0.06
+     ],
+     [
+      40000,
+      0.065
+     ],
+     [
+      60000,
+      0.085
+     ],
+     [
+      250000,
+      0.0925
+     ],
+     [
+      500000,
+      0.0975
+     ],
+     [
+      1000000,
+      0.1075
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.04
+     ],
+     [
+      10000,
+      0.06
+     ],
+     [
+      40000,
+      0.065
+     ],
+     [
+      60000,
+      0.085
+     ],
+     [
+      250000,
+      0.0925
+     ],
+     [
+      500000,
+      0.0975
+     ],
+     [
+      1000000,
+      0.1075
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 0,
+    "mfj": 0
+   },
+   "exemption": {
+    "per_person": 0,
+    "dependent": 0
+   },
+   "std_from_federal": true,
+   "notes": [
+    "Deduccion estandar ligada a la federal."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": []
+  },
+  "DE": {
+   "name": "Delaware",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0
+     ],
+     [
+      2000,
+      0.022
+     ],
+     [
+      5000,
+      0.039
+     ],
+     [
+      10000,
+      0.048
+     ],
+     [
+      20000,
+      0.052
+     ],
+     [
+      25000,
+      0.0555
+     ],
+     [
+      60000,
+      0.066
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0
+     ],
+     [
+      2000,
+      0.022
+     ],
+     [
+      5000,
+      0.039
+     ],
+     [
+      10000,
+      0.048
+     ],
+     [
+      20000,
+      0.052
+     ],
+     [
+      25000,
+      0.0555
+     ],
+     [
+      60000,
+      0.066
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 3250,
+    "mfj": 6500
+   },
+   "exemption": {
+    "per_person": 110,
+    "dependent": 110
+   },
+   "exemption_is_credit": true,
+   "notes": [
+    "Algunas ciudades (Wilmington) cobran impuesto local sobre salarios."
+   ],
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": []
+  },
+  "FL": {
+   "name": "Florida",
+   "type": "none",
+   "notes": [
+    "Este estado no cobra impuesto estatal sobre la renta personal."
+   ]
+  },
+  "GA": {
+   "name": "Georgia",
+   "type": "flat",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.0519
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.0519
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 12000,
+    "mfj": 24000,
+    "hoh": 12000
+   },
+   "exemption": {
+    "per_person": 0,
+    "dependent": 4000
+   },
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": [],
+   "notes": [
+    "Tasa reducida a 5.19% retroactiva a 2025 (HB 111)."
+   ]
+  },
+  "HI": {
+   "name": "Hawaii",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.014
+     ],
+     [
+      9600,
+      0.032
+     ],
+     [
+      14400,
+      0.055
+     ],
+     [
+      19200,
+      0.064
+     ],
+     [
+      24000,
+      0.068
+     ],
+     [
+      36000,
+      0.072
+     ],
+     [
+      48000,
+      0.076
+     ],
+     [
+      125000,
+      0.079
+     ],
+     [
+      175000,
+      0.0825
+     ],
+     [
+      225000,
+      0.09
+     ],
+     [
+      275000,
+      0.1
+     ],
+     [
+      325000,
+      0.11
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.014
+     ],
+     [
+      19200,
+      0.032
+     ],
+     [
+      28800,
+      0.055
+     ],
+     [
+      38400,
+      0.064
+     ],
+     [
+      48000,
+      0.068
+     ],
+     [
+      72000,
+      0.072
+     ],
+     [
+      96000,
+      0.076
+     ],
+     [
+      250000,
+      0.079
+     ],
+     [
+      350000,
+      0.0825
+     ],
+     [
+      450000,
+      0.09
+     ],
+     [
+      550000,
+      0.1
+     ],
+     [
+      650000,
+      0.11
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 4400,
+    "mfj": 8800
+   },
+   "exemption": {
+    "per_person": 1144,
+    "dependent": 1144
+   },
+   "notes": [
+    "HOH usa aqui la tabla de soltero (aproximacion)."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": []
+  },
+  "IA": {
+   "name": "Iowa",
+   "type": "flat",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.038
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.038
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 0,
+    "mfj": 0
+   },
+   "exemption": {
+    "per_person": 40,
+    "dependent": 40
+   },
+   "uses_federal_deduction": true,
+   "exemption_is_credit": true,
+   "notes": [
+    "Algunos distritos escolares cobran un recargo (surtax) sobre el impuesto estatal."
+   ],
+   "std_is_credit": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": []
+  },
+  "ID": {
+   "name": "Idaho",
+   "type": "flat",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.0
+     ],
+     [
+      4673,
+      0.053
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.0
+     ],
+     [
+      9346,
+      0.053
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 0,
+    "mfj": 0
+   },
+   "exemption": {
+    "per_person": 0,
+    "dependent": 0
+   },
+   "uses_federal_deduction": true,
+   "notes": [
+    "Tasa reducida a 5.3% retroactiva a 2025 (HB 40).",
+    "Parte del ingreso tributable federal."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": []
+  },
+  "IL": {
+   "name": "Illinois",
+   "type": "flat",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.0495
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.0495
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 0,
+    "mfj": 0
+   },
+   "exemption": {
+    "per_person": 2850,
+    "dependent": 2850
+   },
+   "exempts_retirement": true,
+   "special": [
+    "IL_exemption_limit"
+   ],
+   "notes": [
+    "Exenta jubilaciones calificadas y Seguro Social.",
+    "Sin exencion si AGI > $250,000 ($500,000 MFJ)."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt"
+  },
+  "IN": {
+   "name": "Indiana",
+   "type": "flat",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.03
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.03
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 0,
+    "mfj": 0
+   },
+   "exemption": {
+    "per_person": 1000,
+    "dependent": 2500
+   },
+   "notes": [
+    "Exencion de $1,000 por persona; dependientes hijos +$1,500 (total $2,500 aqui).",
+    "Todos los condados cobran impuesto local sobre la renta (ver 'Impuestos locales')."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": []
+  },
+  "KS": {
+   "name": "Kansas",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.052
+     ],
+     [
+      23000,
+      0.0558
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.052
+     ],
+     [
+      46000,
+      0.0558
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 3605,
+    "mfj": 8240
+   },
+   "exemption": {
+    "per_person": 9160,
+    "dependent": 2320
+   },
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": [],
+   "notes": []
+  },
+  "KY": {
+   "name": "Kentucky",
+   "type": "flat",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.04
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.04
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 3270,
+    "mfj": 3270,
+    "hoh": 3270
+   },
+   "exemption": {
+    "per_person": 0,
+    "dependent": 0
+   },
+   "notes": [
+    "La deduccion estandar de KY no se duplica para MFJ.",
+    "Muchas ciudades/condados cobran impuesto ocupacional local."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": []
+  },
+  "LA": {
+   "name": "Louisiana",
+   "type": "flat",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.03
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.03
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 12500,
+    "mfj": 25000,
+    "hoh": 25000
+   },
+   "exemption": {
+    "per_person": 0,
+    "dependent": 0
+   },
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": [],
+   "notes": []
+  },
+  "MA": {
+   "name": "Massachusetts",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.05
+     ],
+     [
+      1083150,
+      0.09
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.05
+     ],
+     [
+      1083150,
+      0.09
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 0,
+    "mfj": 0
+   },
+   "exemption": {
+    "per_person": 4400,
+    "dependent": 1000,
+    "hoh_person": 6800
+   },
+   "notes": [
+    "4% adicional (surtax) sobre ingresos > umbral (~$1.08M).",
+    "Ganancias de corto plazo tributan 8.5% en MA (no modelado)."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": []
+  },
+  "MD": {
+   "name": "Maryland",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.02
+     ],
+     [
+      1000,
+      0.03
+     ],
+     [
+      2000,
+      0.04
+     ],
+     [
+      3000,
+      0.0475
+     ],
+     [
+      100000,
+      0.05
+     ],
+     [
+      125000,
+      0.0525
+     ],
+     [
+      150000,
+      0.055
+     ],
+     [
+      250000,
+      0.0575
+     ],
+     [
+      500000,
+      0.0625
+     ],
+     [
+      1000000,
+      0.065
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.02
+     ],
+     [
+      1000,
+      0.03
+     ],
+     [
+      2000,
+      0.04
+     ],
+     [
+      3000,
+      0.0475
+     ],
+     [
+      150000,
+      0.05
+     ],
+     [
+      175000,
+      0.0525
+     ],
+     [
+      225000,
+      0.055
+     ],
+     [
+      300000,
+      0.0575
+     ],
+     [
+      600000,
+      0.0625
+     ],
+     [
+      1200000,
+      0.065
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 3350,
+    "mfj": 6700,
+    "hoh": 6700
+   },
+   "exemption": {
+    "per_person": 3200,
+    "dependent": 3200
+   },
+   "hoh_uses": "mfj",
+   "special": [
+    "MD_exemption_phaseout",
+    "MD_capgains_surtax"
+   ],
+   "notes": [
+    "Deduccion estandar fija $3,350 / $6,700 desde 2025 (Ley BRFA 2025).",
+    "Recargo de 2% sobre ganancias de capital si AGI federal > $350,000.",
+    "Todos los condados y Baltimore City cobran impuesto local (ver 'Impuestos locales').",
+    "Tramos de 6.25% y 6.5% agregados retroactivamente a 2025."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "ss_rule": "exempt",
+   "exempts_retirement": false
+  },
+  "ME": {
+   "name": "Maine",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.058
+     ],
+     [
+      26800,
+      0.0675
+     ],
+     [
+      63450,
+      0.0715
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.058
+     ],
+     [
+      53600,
+      0.0675
+     ],
+     [
+      126900,
+      0.0715
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 15000,
+    "mfj": 30000
+   },
+   "exemption": {
+    "per_person": 5150,
+    "dependent": 0
+   },
+   "notes": [
+    "Deduccion estandar segun Tax Foundation 2025 ($15,000/$30,000). Verifique si ME adopto los montos OBBBA.",
+    "Credito reembolsable por dependiente ($305/$610) no incluido automaticamente; agreguelo en 'otros creditos estatales'."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": []
+  },
+  "MI": {
+   "name": "Michigan",
+   "type": "flat",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.0425
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.0425
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 0,
+    "mfj": 0
+   },
+   "exemption": {
+    "per_person": 5800,
+    "dependent": 5800
+   },
+   "notes": [
+    "24 ciudades cobran impuesto local (Detroit 2.4%, Grand Rapids 1.5%, etc.)."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": []
+  },
+  "MN": {
+   "name": "Minnesota",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.0535
+     ],
+     [
+      32570,
+      0.068
+     ],
+     [
+      106990,
+      0.0785
+     ],
+     [
+      198630,
+      0.0985
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.0535
+     ],
+     [
+      47620,
+      0.068
+     ],
+     [
+      189180,
+      0.0785
+     ],
+     [
+      330410,
+      0.0985
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 14950,
+    "mfj": 29900
+   },
+   "exemption": {
+    "per_person": 0,
+    "dependent": 5200
+   },
+   "special": [
+    "MN_std_phaseout"
+   ],
+   "std_phaseout": {
+    "start": 238950,
+    "start_mfs": 119475,
+    "second": 330300,
+    "second_mfs": 165150
+   },
+   "ss_rule": "MN",
+   "notes": [
+    "Seguro Social: se excluye si AGI < ~$100k (aproximacion).",
+    "HOH usa tabla de soltero (aproximacion)."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "exempts_retirement": false
+  },
+  "MO": {
+   "name": "Missouri",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0
+     ],
+     [
+      1313,
+      0.02
+     ],
+     [
+      2626,
+      0.025
+     ],
+     [
+      3939,
+      0.03
+     ],
+     [
+      5252,
+      0.035
+     ],
+     [
+      6565,
+      0.04
+     ],
+     [
+      7878,
+      0.045
+     ],
+     [
+      9191,
+      0.047
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0
+     ],
+     [
+      1313,
+      0.02
+     ],
+     [
+      2626,
+      0.025
+     ],
+     [
+      3939,
+      0.03
+     ],
+     [
+      5252,
+      0.035
+     ],
+     [
+      6565,
+      0.04
+     ],
+     [
+      7878,
+      0.045
+     ],
+     [
+      9191,
+      0.047
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 0,
+    "mfj": 0
+   },
+   "exemption": {
+    "per_person": 0,
+    "dependent": 0
+   },
+   "std_from_federal": true,
+   "special": [
+    "MO_fed_tax_deduction",
+    "MO_capgains_exempt"
+   ],
+   "notes": [
+    "Deduccion estandar = federal.",
+    "Deduccion parcial del impuesto federal segun AGI.",
+    "Ganancias de capital exentas desde 2025.",
+    "Kansas City y St. Louis cobran 1% sobre ingresos."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false
+  },
+  "MS": {
+   "name": "Mississippi",
+   "type": "flat",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.0
+     ],
+     [
+      10000,
+      0.044
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.0
+     ],
+     [
+      10000,
+      0.044
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 2300,
+    "mfj": 4600,
+    "hoh": 3400
+   },
+   "exemption": {
+    "per_person": 6000,
+    "dependent": 1500,
+    "hoh_person": 9500
+   },
+   "exempts_retirement": true,
+   "notes": [
+    "Primeros $10,000 al 0%.",
+    "Exenta jubilaciones y Seguro Social."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "special": []
+  },
+  "MT": {
+   "name": "Montana",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.047
+     ],
+     [
+      21100,
+      0.059
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.047
+     ],
+     [
+      42200,
+      0.059
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 0,
+    "mfj": 0
+   },
+   "exemption": {
+    "per_person": 0,
+    "dependent": 0
+   },
+   "uses_federal_deduction": true,
+   "ss_rule": "taxable",
+   "notes": [
+    "Parte del ingreso tributable federal.",
+    "MT grava ganancias de capital con tasas menores (no modelado)."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "exempts_retirement": false,
+   "special": []
+  },
+  "NC": {
+   "name": "North Carolina",
+   "type": "flat",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.0425
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.0425
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 12750,
+    "mfj": 25500,
+    "hoh": 19125
+   },
+   "exemption": {
+    "per_person": 0,
+    "dependent": 0
+   },
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": [],
+   "notes": []
+  },
+  "ND": {
+   "name": "North Dakota",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0
+     ],
+     [
+      48475,
+      0.0195
+     ],
+     [
+      244825,
+      0.025
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0
+     ],
+     [
+      80975,
+      0.0195
+     ],
+     [
+      298075,
+      0.025
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 0,
+    "mfj": 0
+   },
+   "exemption": {
+    "per_person": 0,
+    "dependent": 0
+   },
+   "uses_federal_deduction": true,
+   "notes": [
+    "Parte del ingreso tributable federal.",
+    "HOH usa tabla de soltero (aproximacion)."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": []
+  },
+  "NE": {
+   "name": "Nebraska",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.0246
+     ],
+     [
+      4030,
+      0.0351
+     ],
+     [
+      24120,
+      0.0501
+     ],
+     [
+      38870,
+      0.052
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.0246
+     ],
+     [
+      8040,
+      0.0351
+     ],
+     [
+      48250,
+      0.0501
+     ],
+     [
+      77730,
+      0.052
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 8600,
+    "mfj": 17200
+   },
+   "exemption": {
+    "per_person": 171,
+    "dependent": 171
+   },
+   "exemption_is_credit": true,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": [],
+   "notes": []
+  },
+  "NH": {
+   "name": "New Hampshire",
+   "type": "none",
+   "notes": [
+    "Sin impuesto sobre salarios. El impuesto a intereses y dividendos fue derogado desde 2025."
+   ]
+  },
+  "NJ": {
+   "name": "New Jersey",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.014
+     ],
+     [
+      20000,
+      0.0175
+     ],
+     [
+      35000,
+      0.035
+     ],
+     [
+      40000,
+      0.05525
+     ],
+     [
+      75000,
+      0.0637
+     ],
+     [
+      500000,
+      0.0897
+     ],
+     [
+      1000000,
+      0.1075
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.014
+     ],
+     [
+      20000,
+      0.0175
+     ],
+     [
+      50000,
+      0.0245
+     ],
+     [
+      70000,
+      0.035
+     ],
+     [
+      80000,
+      0.05525
+     ],
+     [
+      150000,
+      0.0637
+     ],
+     [
+      500000,
+      0.0897
+     ],
+     [
+      1000000,
+      0.1075
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 0,
+    "mfj": 0
+   },
+   "exemption": {
+    "per_person": 1000,
+    "dependent": 1500
+   },
+   "hoh_uses": "mfj",
+   "notes": [
+    "Sin deduccion estandar. HOH usa la tabla de casados.",
+    "La deduccion por impuesto a la propiedad (hasta $15,000) y la exclusion de jubilacion pueden agregarse como 'deducciones estatales adicionales'."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": []
+  },
+  "NM": {
+   "name": "New Mexico",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.015
+     ],
+     [
+      5500,
+      0.032
+     ],
+     [
+      16500,
+      0.043
+     ],
+     [
+      33500,
+      0.047
+     ],
+     [
+      66500,
+      0.049
+     ],
+     [
+      210000,
+      0.059
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.015
+     ],
+     [
+      8000,
+      0.032
+     ],
+     [
+      25000,
+      0.043
+     ],
+     [
+      50000,
+      0.047
+     ],
+     [
+      100000,
+      0.049
+     ],
+     [
+      315000,
+      0.059
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 0,
+    "mfj": 0
+   },
+   "exemption": {
+    "per_person": 0,
+    "dependent": 0
+   },
+   "uses_federal_deduction": true,
+   "special": [
+    "NM_dependent_deduction"
+   ],
+   "ss_rule": "NM",
+   "notes": [
+    "Deduccion de $4,000 por cada dependiente excepto uno.",
+    "Seguro Social exento si AGI <= $100k ($150k MFJ)."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "exempts_retirement": false
+  },
+  "NV": {
+   "name": "Nevada",
+   "type": "none",
+   "notes": [
+    "Este estado no cobra impuesto estatal sobre la renta personal."
+   ]
+  },
+  "NY": {
+   "name": "New York",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.04
+     ],
+     [
+      8500,
+      0.045
+     ],
+     [
+      11700,
+      0.0525
+     ],
+     [
+      13900,
+      0.055
+     ],
+     [
+      80650,
+      0.06
+     ],
+     [
+      215400,
+      0.0685
+     ],
+     [
+      1077550,
+      0.0965
+     ],
+     [
+      5000000,
+      0.103
+     ],
+     [
+      25000000,
+      0.109
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.04
+     ],
+     [
+      17150,
+      0.045
+     ],
+     [
+      23600,
+      0.0525
+     ],
+     [
+      27900,
+      0.055
+     ],
+     [
+      161550,
+      0.06
+     ],
+     [
+      323200,
+      0.0685
+     ],
+     [
+      2155350,
+      0.0965
+     ],
+     [
+      5000000,
+      0.103
+     ],
+     [
+      25000000,
+      0.109
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 8000,
+    "mfj": 16050,
+    "hoh": 11200
+   },
+   "exemption": {
+    "per_person": 0,
+    "dependent": 1000
+   },
+   "brackets_hoh": [
+    [
+     0,
+     0.04
+    ],
+    [
+     12800,
+     0.045
+    ],
+    [
+     17650,
+     0.0525
+    ],
+    [
+     20900,
+     0.055
+    ],
+    [
+     107650,
+     0.06
+    ],
+    [
+     269300,
+     0.0685
+    ],
+    [
+     1616450,
+     0.0965
+    ],
+    [
+     5000000,
+     0.103
+    ],
+    [
+     25000000,
+     0.109
+    ]
+   ],
+   "notes": [
+    "No se modela la 'recaptura' de tramos para ingresos altos (> $107,650).",
+    "NYC y Yonkers cobran impuesto local adicional (ver 'Impuestos locales')."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": []
+  },
+  "OH": {
+   "name": "Ohio",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.0,
+      0.0
+     ],
+     [
+      26050,
+      0.0275,
+      342.0
+     ],
+     [
+      100000,
+      0.03125,
+      2394.32
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.0,
+      0.0
+     ],
+     [
+      26050,
+      0.0275,
+      342.0
+     ],
+     [
+      100000,
+      0.03125,
+      2394.32
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 0,
+    "mfj": 0
+   },
+   "exemption": {
+    "per_person": 2400,
+    "dependent": 2400
+   },
+   "special": [
+    "OH_exemption"
+   ],
+   "notes": [
+    "Tabla del ORC 5747.02 para 2025: $342 + 2.75% sobre $26,050; $2,394.32 + 3.125% sobre $100,000.",
+    "Exencion: $2,400 (AGI<=$40k), $2,150 (<=$80k), $1,900 (>$80k).",
+    "Muchas ciudades y distritos escolares cobran impuesto local."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false
+  },
+  "OK": {
+   "name": "Oklahoma",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.0025
+     ],
+     [
+      1000,
+      0.0075
+     ],
+     [
+      2500,
+      0.0175
+     ],
+     [
+      3750,
+      0.0275
+     ],
+     [
+      4900,
+      0.0375
+     ],
+     [
+      7200,
+      0.0475
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.0025
+     ],
+     [
+      2000,
+      0.0075
+     ],
+     [
+      5000,
+      0.0175
+     ],
+     [
+      7500,
+      0.0275
+     ],
+     [
+      9800,
+      0.0375
+     ],
+     [
+      14400,
+      0.0475
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 6350,
+    "mfj": 12700,
+    "hoh": 9350
+   },
+   "exemption": {
+    "per_person": 1000,
+    "dependent": 1000
+   },
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": [],
+   "notes": []
+  },
+  "OR": {
+   "name": "Oregon",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.0475
+     ],
+     [
+      4400,
+      0.0675
+     ],
+     [
+      11050,
+      0.0875
+     ],
+     [
+      125000,
+      0.099
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.0475
+     ],
+     [
+      8800,
+      0.0675
+     ],
+     [
+      22100,
+      0.0875
+     ],
+     [
+      250000,
+      0.099
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 2800,
+    "mfj": 5600
+   },
+   "exemption": {
+    "per_person": 250,
+    "dependent": 250
+   },
+   "exemption_is_credit": true,
+   "hoh_uses": "mfj",
+   "special": [
+    "OR_fed_tax_subtraction",
+    "OR_credit_limit"
+   ],
+   "fed_tax_cap": 8500,
+   "notes": [
+    "Permite restar parte del impuesto federal (tope aprox. $8,500, se reduce con AGI alto).",
+    "Credito por exencion no permitido si AGI > $100k ($200k MFJ).",
+    "Portland Metro y condado Multnomah cobran impuestos locales a ingresos altos."
+   ],
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "ss_rule": "exempt",
+   "exempts_retirement": false
+  },
+  "PA": {
+   "name": "Pennsylvania",
+   "type": "flat",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.0307
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.0307
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 0,
+    "mfj": 0
+   },
+   "exemption": {
+    "per_person": 0,
+    "dependent": 0
+   },
+   "special": [
+    "PA_base"
+   ],
+   "exempts_retirement": true,
+   "notes": [
+    "Base propia: salarios, intereses, dividendos, ganancias netas y negocio; sin deducciones ni exenciones.",
+    "Jubilacion, Seguro Social y desempleo exentos.",
+    "Casi todos los municipios cobran EIT local (~1%); Filadelfia cobra Wage Tax."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt"
+  },
+  "RI": {
+   "name": "Rhode Island",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.0375
+     ],
+     [
+      79900,
+      0.0475
+     ],
+     [
+      181650,
+      0.0599
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.0375
+     ],
+     [
+      79900,
+      0.0475
+     ],
+     [
+      181650,
+      0.0599
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 10900,
+    "mfj": 21800
+   },
+   "exemption": {
+    "per_person": 5100,
+    "dependent": 5100
+   },
+   "special": [
+    "RI_phaseout"
+   ],
+   "phaseout_range": [
+    254250,
+    283250
+   ],
+   "ss_rule": "RI",
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "exempts_retirement": false,
+   "notes": []
+  },
+  "SC": {
+   "name": "South Carolina",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0
+     ],
+     [
+      3560,
+      0.03
+     ],
+     [
+      17830,
+      0.062
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0
+     ],
+     [
+      3560,
+      0.03
+     ],
+     [
+      17830,
+      0.062
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 15000,
+    "mfj": 30000,
+    "hoh": 22500
+   },
+   "exemption": {
+    "per_person": 0,
+    "dependent": 4790
+   },
+   "notes": [
+    "SC parte del ingreso tributable federal; deduccion segun Tax Foundation 2025. Verifique.",
+    "Tasa maxima 6.2% en 2025 segun Tax Foundation (el presupuesto FY2026 pudo reducirla a 6.0%)."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": []
+  },
+  "SD": {
+   "name": "South Dakota",
+   "type": "none",
+   "notes": [
+    "Este estado no cobra impuesto estatal sobre la renta personal."
+   ]
+  },
+  "TN": {
+   "name": "Tennessee",
+   "type": "none",
+   "notes": [
+    "Este estado no cobra impuesto estatal sobre la renta personal."
+   ]
+  },
+  "TX": {
+   "name": "Texas",
+   "type": "none",
+   "notes": [
+    "Este estado no cobra impuesto estatal sobre la renta personal."
+   ]
+  },
+  "UT": {
+   "name": "Utah",
+   "type": "flat",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.045
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.045
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 0,
+    "mfj": 0
+   },
+   "exemption": {
+    "per_person": 0,
+    "dependent": 2046
+   },
+   "special": [
+    "UT_taxpayer_credit"
+   ],
+   "ss_rule": "taxable",
+   "ut_phase_base": {
+    "single": 18213,
+    "mfj": 36426
+   },
+   "notes": [
+    "Tasa reducida a 4.5% retroactiva a 2025 (HB 106).",
+    "Credito del contribuyente: 6% de la deduccion federal + exenciones de dependientes, reducido 1.3% del ingreso sobre el umbral.",
+    "Seguro Social tributa pero existe un credito especifico (no modelado)."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "exempts_retirement": false
+  },
+  "VA": {
+   "name": "Virginia",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.02
+     ],
+     [
+      3000,
+      0.03
+     ],
+     [
+      5000,
+      0.05
+     ],
+     [
+      17000,
+      0.0575
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.02
+     ],
+     [
+      3000,
+      0.03
+     ],
+     [
+      5000,
+      0.05
+     ],
+     [
+      17000,
+      0.0575
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 8500,
+    "mfj": 17000,
+    "hoh": 8500
+   },
+   "exemption": {
+    "per_person": 930,
+    "dependent": 930
+   },
+   "notes": [
+    "Deduccion por edad (65+) dependiente de ingresos no modelada."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "special": []
+  },
+  "VT": {
+   "name": "Vermont",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.0335
+     ],
+     [
+      47900,
+      0.066
+     ],
+     [
+      116000,
+      0.076
+     ],
+     [
+      242000,
+      0.0875
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.0335
+     ],
+     [
+      79950,
+      0.066
+     ],
+     [
+      193300,
+      0.076
+     ],
+     [
+      294600,
+      0.0875
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 7400,
+    "mfj": 14850
+   },
+   "exemption": {
+    "per_person": 5100,
+    "dependent": 5100
+   },
+   "special": [
+    "VT_min_tax"
+   ],
+   "extra_std_65_blind": 1200,
+   "ss_rule": "VT",
+   "notes": [
+    "Si el AGI federal > $150,000 se paga el mayor entre el impuesto calculado y 3% del AGI."
+   ],
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "exempts_retirement": false
+  },
+  "WA": {
+   "name": "Washington",
+   "type": "capgains_only",
+   "deduction": 278000,
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.07
+     ],
+     [
+      1000000,
+      0.09
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.07
+     ],
+     [
+      1000000,
+      0.09
+     ]
+    ]
+   },
+   "notes": [
+    "Solo grava ganancias de capital a largo plazo sobre ~$278,000.",
+    "9% sobre ganancias > $1M (retroactivo a 2025)."
+   ]
+  },
+  "WI": {
+   "name": "Wisconsin",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.035
+     ],
+     [
+      14680,
+      0.044
+     ],
+     [
+      50480,
+      0.053
+     ],
+     [
+      323290,
+      0.0765
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.035
+     ],
+     [
+      19580,
+      0.044
+     ],
+     [
+      67300,
+      0.053
+     ],
+     [
+      431060,
+      0.0765
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 13560,
+    "mfj": 25110
+   },
+   "exemption": {
+    "per_person": 700,
+    "dependent": 700
+   },
+   "special": [
+    "WI_std_sliding"
+   ],
+   "wi_std_phase": {
+    "single": [
+     19549,
+     132549
+    ],
+    "mfj": [
+     28209,
+     155169
+    ]
+   },
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "ss_rule": "exempt",
+   "exempts_retirement": false,
+   "notes": [
+    "Tramo del 4.4% ampliado retroactivamente a 2025 por la Ley 15 de 2025 (verifique la tabla oficial)."
+   ]
+  },
+  "WV": {
+   "name": "West Virginia",
+   "type": "graduated",
+   "brackets": {
+    "single": [
+     [
+      0,
+      0.0222
+     ],
+     [
+      10000,
+      0.0296
+     ],
+     [
+      25000,
+      0.0333
+     ],
+     [
+      40000,
+      0.0444
+     ],
+     [
+      60000,
+      0.0482
+     ]
+    ],
+    "mfj": [
+     [
+      0,
+      0.0222
+     ],
+     [
+      10000,
+      0.0296
+     ],
+     [
+      25000,
+      0.0333
+     ],
+     [
+      40000,
+      0.0444
+     ],
+     [
+      60000,
+      0.0482
+     ]
+    ]
+   },
+   "std_deduction": {
+    "single": 0,
+    "mfj": 0
+   },
+   "exemption": {
+    "per_person": 2000,
+    "dependent": 2000
+   },
+   "ss_rule": "WV2025",
+   "exemption_is_credit": false,
+   "std_is_credit": false,
+   "uses_federal_deduction": false,
+   "std_from_federal": false,
+   "hoh_uses": "single",
+   "exempts_retirement": false,
+   "special": [],
+   "notes": []
+  },
+  "WY": {
+   "name": "Wyoming",
+   "type": "none",
+   "notes": [
+    "Este estado no cobra impuesto estatal sobre la renta personal."
+   ]
+  }
+ }
+}

@@ -1,0 +1,716 @@
+{
+ "AK": {
+  "name": "Alaska",
+  "form": null,
+  "agency": "Alaska Department of Revenue",
+  "url": "https://tax.alaska.gov",
+  "fips": "02",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 0.0,
+   "avg_local": 1.82,
+   "combined": 1.82,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "AL": {
+  "name": "Alabama",
+  "form": "Form 40",
+  "agency": "Alabama Department of Revenue",
+  "url": "https://www.revenue.alabama.gov",
+  "fips": "01",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 4.0,
+   "avg_local": 5.46,
+   "combined": 9.46,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "AR": {
+  "name": "Arkansas",
+  "form": "AR1000F",
+  "agency": "Arkansas DFA",
+  "url": "https://www.dfa.arkansas.gov",
+  "fips": "05",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.5,
+   "avg_local": 2.96,
+   "combined": 9.46,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "AZ": {
+  "name": "Arizona",
+  "form": "Form 140",
+  "agency": "Arizona Department of Revenue",
+  "url": "https://azdor.gov",
+  "fips": "04",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 5.6,
+   "avg_local": 2.92,
+   "combined": 8.52,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "CA": {
+  "name": "California",
+  "form": "Form 540",
+  "agency": "Franchise Tax Board",
+  "url": "https://www.ftb.ca.gov",
+  "fips": "06",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 7.25,
+   "avg_local": 1.74,
+   "combined": 8.99,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "CO": {
+  "name": "Colorado",
+  "form": "DR 0104",
+  "agency": "Colorado Department of Revenue",
+  "url": "https://tax.colorado.gov",
+  "fips": "08",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 2.9,
+   "avg_local": 4.99,
+   "combined": 7.89,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "CT": {
+  "name": "Connecticut",
+  "form": "CT-1040",
+  "agency": "Connecticut DRS",
+  "url": "https://portal.ct.gov/drs",
+  "fips": "09",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.35,
+   "avg_local": 0,
+   "combined": 6.35,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "DC": {
+  "name": "District of Columbia",
+  "form": "D-40",
+  "agency": "DC Office of Tax and Revenue",
+  "url": "https://otr.cfo.dc.gov",
+  "fips": "11",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.0,
+   "avg_local": 0,
+   "combined": 6.0,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "DE": {
+  "name": "Delaware",
+  "form": "PIT-RES",
+  "agency": "Delaware Division of Revenue",
+  "url": "https://revenue.delaware.gov",
+  "fips": "10",
+  "deadline_mmdd": "04-30",
+  "sales_tax": {
+   "state": 0,
+   "avg_local": 0,
+   "combined": 0,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "FL": {
+  "name": "Florida",
+  "form": null,
+  "agency": "Florida Department of Revenue",
+  "url": "https://floridarevenue.com",
+  "fips": "12",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.0,
+   "avg_local": 0.98,
+   "combined": 6.98,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "GA": {
+  "name": "Georgia",
+  "form": "Form 500",
+  "agency": "Georgia Department of Revenue",
+  "url": "https://dor.georgia.gov",
+  "fips": "13",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 4.0,
+   "avg_local": 3.49,
+   "combined": 7.49,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "HI": {
+  "name": "Hawaii",
+  "form": "Form N-11",
+  "agency": "Hawaii Department of Taxation",
+  "url": "https://tax.hawaii.gov",
+  "fips": "15",
+  "deadline_mmdd": "04-20",
+  "sales_tax": {
+   "state": 4.0,
+   "avg_local": 0.5,
+   "combined": 4.5,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "IA": {
+  "name": "Iowa",
+  "form": "IA 1040",
+  "agency": "Iowa Department of Revenue",
+  "url": "https://tax.iowa.gov",
+  "fips": "19",
+  "deadline_mmdd": "04-30",
+  "sales_tax": {
+   "state": 6.0,
+   "avg_local": 0.94,
+   "combined": 6.94,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "ID": {
+  "name": "Idaho",
+  "form": "Form 40",
+  "agency": "Idaho State Tax Commission",
+  "url": "https://tax.idaho.gov",
+  "fips": "16",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.0,
+   "avg_local": 0.03,
+   "combined": 6.03,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "IL": {
+  "name": "Illinois",
+  "form": "IL-1040",
+  "agency": "Illinois Department of Revenue",
+  "url": "https://tax.illinois.gov",
+  "fips": "17",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.25,
+   "avg_local": 2.71,
+   "combined": 8.96,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "IN": {
+  "name": "Indiana",
+  "form": "IT-40",
+  "agency": "Indiana Department of Revenue",
+  "url": "https://www.in.gov/dor",
+  "fips": "18",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 7.0,
+   "avg_local": 0,
+   "combined": 7.0,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "KS": {
+  "name": "Kansas",
+  "form": "K-40",
+  "agency": "Kansas Department of Revenue",
+  "url": "https://www.ksrevenue.gov",
+  "fips": "20",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.5,
+   "avg_local": 2.19,
+   "combined": 8.69,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "KY": {
+  "name": "Kentucky",
+  "form": "Form 740",
+  "agency": "Kentucky Department of Revenue",
+  "url": "https://revenue.ky.gov",
+  "fips": "21",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.0,
+   "avg_local": 0,
+   "combined": 6.0,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "LA": {
+  "name": "Louisiana",
+  "form": "IT-540",
+  "agency": "Louisiana Department of Revenue",
+  "url": "https://revenue.louisiana.gov",
+  "fips": "22",
+  "deadline_mmdd": "05-15",
+  "sales_tax": {
+   "state": 5.0,
+   "avg_local": 5.11,
+   "combined": 10.11,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "MA": {
+  "name": "Massachusetts",
+  "form": "Form 1",
+  "agency": "Massachusetts DOR",
+  "url": "https://www.mass.gov/dor",
+  "fips": "25",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.25,
+   "avg_local": 0,
+   "combined": 6.25,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "MD": {
+  "name": "Maryland",
+  "form": "Form 502",
+  "agency": "Comptroller of Maryland",
+  "url": "https://www.marylandtaxes.gov",
+  "fips": "24",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.0,
+   "avg_local": 0,
+   "combined": 6.0,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "ME": {
+  "name": "Maine",
+  "form": "1040ME",
+  "agency": "Maine Revenue Services",
+  "url": "https://www.maine.gov/revenue",
+  "fips": "23",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 5.5,
+   "avg_local": 0,
+   "combined": 5.5,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "MI": {
+  "name": "Michigan",
+  "form": "MI-1040",
+  "agency": "Michigan Department of Treasury",
+  "url": "https://www.michigan.gov/taxes",
+  "fips": "26",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.0,
+   "avg_local": 0,
+   "combined": 6.0,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "MN": {
+  "name": "Minnesota",
+  "form": "Form M1",
+  "agency": "Minnesota Department of Revenue",
+  "url": "https://www.revenue.state.mn.us",
+  "fips": "27",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.875,
+   "avg_local": 1.26,
+   "combined": 8.135,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "MO": {
+  "name": "Missouri",
+  "form": "MO-1040",
+  "agency": "Missouri Department of Revenue",
+  "url": "https://dor.mo.gov",
+  "fips": "29",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 4.225,
+   "avg_local": 4.22,
+   "combined": 8.445,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "MS": {
+  "name": "Mississippi",
+  "form": "Form 80-105",
+  "agency": "Mississippi DOR",
+  "url": "https://www.dor.ms.gov",
+  "fips": "28",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 7.0,
+   "avg_local": 0.06,
+   "combined": 7.06,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "MT": {
+  "name": "Montana",
+  "form": "Form 2",
+  "agency": "Montana Department of Revenue",
+  "url": "https://mtrevenue.gov",
+  "fips": "30",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 0,
+   "avg_local": 0,
+   "combined": 0,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "NC": {
+  "name": "North Carolina",
+  "form": "D-400",
+  "agency": "NC Department of Revenue",
+  "url": "https://www.ncdor.gov",
+  "fips": "37",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 4.75,
+   "avg_local": 2.25,
+   "combined": 7.0,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "ND": {
+  "name": "North Dakota",
+  "form": "ND-1",
+  "agency": "Office of State Tax Commissioner",
+  "url": "https://www.tax.nd.gov",
+  "fips": "38",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 5.0,
+   "avg_local": 2.09,
+   "combined": 7.09,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "NE": {
+  "name": "Nebraska",
+  "form": "Form 1040N",
+  "agency": "Nebraska Department of Revenue",
+  "url": "https://revenue.nebraska.gov",
+  "fips": "31",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 5.5,
+   "avg_local": 1.48,
+   "combined": 6.98,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "NH": {
+  "name": "New Hampshire",
+  "form": null,
+  "agency": "NH Department of Revenue Administration",
+  "url": "https://www.revenue.nh.gov",
+  "fips": "33",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 0,
+   "avg_local": 0,
+   "combined": 0,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "NJ": {
+  "name": "New Jersey",
+  "form": "NJ-1040",
+  "agency": "NJ Division of Taxation",
+  "url": "https://www.nj.gov/treasury/taxation",
+  "fips": "34",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.625,
+   "avg_local": -0.02,
+   "combined": 6.605,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "NM": {
+  "name": "New Mexico",
+  "form": "PIT-1",
+  "agency": "NM Taxation and Revenue",
+  "url": "https://www.tax.newmexico.gov",
+  "fips": "35",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 4.875,
+   "avg_local": 2.79,
+   "combined": 7.665,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "NV": {
+  "name": "Nevada",
+  "form": null,
+  "agency": "Nevada Department of Taxation",
+  "url": "https://tax.nv.gov",
+  "fips": "32",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.85,
+   "avg_local": 1.39,
+   "combined": 8.24,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "NY": {
+  "name": "New York",
+  "form": "IT-201",
+  "agency": "NY Department of Taxation and Finance",
+  "url": "https://www.tax.ny.gov",
+  "fips": "36",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 4.0,
+   "avg_local": 4.54,
+   "combined": 8.54,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "OH": {
+  "name": "Ohio",
+  "form": "IT 1040",
+  "agency": "Ohio Department of Taxation",
+  "url": "https://tax.ohio.gov",
+  "fips": "39",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 5.75,
+   "avg_local": 1.54,
+   "combined": 7.29,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "OK": {
+  "name": "Oklahoma",
+  "form": "Form 511",
+  "agency": "Oklahoma Tax Commission",
+  "url": "https://oklahoma.gov/tax",
+  "fips": "40",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 4.5,
+   "avg_local": 4.56,
+   "combined": 9.06,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "OR": {
+  "name": "Oregon",
+  "form": "Form OR-40",
+  "agency": "Oregon Department of Revenue",
+  "url": "https://www.oregon.gov/dor",
+  "fips": "41",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 0,
+   "avg_local": 0,
+   "combined": 0,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "PA": {
+  "name": "Pennsylvania",
+  "form": "PA-40",
+  "agency": "PA Department of Revenue",
+  "url": "https://www.revenue.pa.gov",
+  "fips": "42",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.0,
+   "avg_local": 0.34,
+   "combined": 6.34,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "RI": {
+  "name": "Rhode Island",
+  "form": "RI-1040",
+  "agency": "RI Division of Taxation",
+  "url": "https://tax.ri.gov",
+  "fips": "44",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 7.0,
+   "avg_local": 0,
+   "combined": 7.0,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "SC": {
+  "name": "South Carolina",
+  "form": "SC1040",
+  "agency": "SC Department of Revenue",
+  "url": "https://dor.sc.gov",
+  "fips": "45",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.0,
+   "avg_local": 1.49,
+   "combined": 7.49,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "SD": {
+  "name": "South Dakota",
+  "form": null,
+  "agency": "SD Department of Revenue",
+  "url": "https://dor.sd.gov",
+  "fips": "46",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 4.2,
+   "avg_local": 1.91,
+   "combined": 6.11,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "TN": {
+  "name": "Tennessee",
+  "form": null,
+  "agency": "Tennessee Department of Revenue",
+  "url": "https://www.tn.gov/revenue",
+  "fips": "47",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 7.0,
+   "avg_local": 2.61,
+   "combined": 9.61,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "TX": {
+  "name": "Texas",
+  "form": null,
+  "agency": "Texas Comptroller",
+  "url": "https://comptroller.texas.gov",
+  "fips": "48",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.25,
+   "avg_local": 1.95,
+   "combined": 8.2,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "UT": {
+  "name": "Utah",
+  "form": "TC-40",
+  "agency": "Utah State Tax Commission",
+  "url": "https://tax.utah.gov",
+  "fips": "49",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.1,
+   "avg_local": 1.32,
+   "combined": 7.42,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "VA": {
+  "name": "Virginia",
+  "form": "Form 760",
+  "agency": "Virginia Tax",
+  "url": "https://www.tax.virginia.gov",
+  "fips": "51",
+  "deadline_mmdd": "05-01",
+  "sales_tax": {
+   "state": 5.3,
+   "avg_local": 0.47,
+   "combined": 5.77,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "VT": {
+  "name": "Vermont",
+  "form": "IN-111",
+  "agency": "Vermont Department of Taxes",
+  "url": "https://tax.vermont.gov",
+  "fips": "50",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.0,
+   "avg_local": 0.39,
+   "combined": 6.39,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "WA": {
+  "name": "Washington",
+  "form": "Capital Gains Excise Tax Return",
+  "agency": "Washington DOR",
+  "url": "https://dor.wa.gov",
+  "fips": "53",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.5,
+   "avg_local": 3.01,
+   "combined": 9.51,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "WI": {
+  "name": "Wisconsin",
+  "form": "Form 1",
+  "agency": "Wisconsin Department of Revenue",
+  "url": "https://www.revenue.wi.gov",
+  "fips": "55",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 5.0,
+   "avg_local": 0.72,
+   "combined": 5.72,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "WV": {
+  "name": "West Virginia",
+  "form": "IT-140",
+  "agency": "WV State Tax Department",
+  "url": "https://tax.wv.gov",
+  "fips": "54",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 6.0,
+   "avg_local": 0.59,
+   "combined": 6.59,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ },
+ "WY": {
+  "name": "Wyoming",
+  "form": null,
+  "agency": "Wyoming Department of Revenue",
+  "url": "https://revenue.wyo.gov",
+  "fips": "56",
+  "deadline_mmdd": "04-15",
+  "sales_tax": {
+   "state": 4.0,
+   "avg_local": 1.56,
+   "combined": 5.56,
+   "source": "Tax Foundation, tasas al 1 de enero de 2026"
+  }
+ }
+}

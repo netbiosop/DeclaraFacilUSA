@@ -1,0 +1,5 @@
+# La aplicacion solo necesita Python 3.9+ con Tkinter (incluido en el instalador oficial de python.org).
+# Opcional: exportar el borrador en PDF
+reportlab>=4.0
+# Opcional: crear un ejecutable .exe
+# pyinstaller>=6.0

@@ -1,0 +1,428 @@
+{
+  "year": 2025,
+  "sources": [
+    "IRS Rev. Proc. 2024-40 (ajustes 2025)",
+    "IRS Rev. Proc. 2025-32 sec. 3 (deduccion estandar 2025 segun OBBBA)",
+    "One Big Beautiful Bill Act, P.L. 119-21 (4 de julio de 2025)"
+  ],
+  "brackets": {
+    "single": [
+      [
+        0,
+        0.1
+      ],
+      [
+        11925,
+        0.12
+      ],
+      [
+        48475,
+        0.22
+      ],
+      [
+        103350,
+        0.24
+      ],
+      [
+        197300,
+        0.32
+      ],
+      [
+        250525,
+        0.35
+      ],
+      [
+        626350,
+        0.37
+      ]
+    ],
+    "mfj": [
+      [
+        0,
+        0.1
+      ],
+      [
+        23850,
+        0.12
+      ],
+      [
+        96950,
+        0.22
+      ],
+      [
+        206700,
+        0.24
+      ],
+      [
+        394600,
+        0.32
+      ],
+      [
+        501050,
+        0.35
+      ],
+      [
+        751600,
+        0.37
+      ]
+    ],
+    "mfs": [
+      [
+        0,
+        0.1
+      ],
+      [
+        11925,
+        0.12
+      ],
+      [
+        48475,
+        0.22
+      ],
+      [
+        103350,
+        0.24
+      ],
+      [
+        197300,
+        0.32
+      ],
+      [
+        250525,
+        0.35
+      ],
+      [
+        375800,
+        0.37
+      ]
+    ],
+    "hoh": [
+      [
+        0,
+        0.1
+      ],
+      [
+        17000,
+        0.12
+      ],
+      [
+        64850,
+        0.22
+      ],
+      [
+        103350,
+        0.24
+      ],
+      [
+        197300,
+        0.32
+      ],
+      [
+        250500,
+        0.35
+      ],
+      [
+        626350,
+        0.37
+      ]
+    ]
+  },
+  "standard_deduction": {
+    "single": 15750,
+    "mfj": 31500,
+    "mfs": 15750,
+    "hoh": 23625,
+    "qss": 31500
+  },
+  "additional_std": {
+    "married": 1600,
+    "unmarried": 2000
+  },
+  "dependent_std": {
+    "min": 1350,
+    "earned_plus": 450
+  },
+  "capital_gains": {
+    "zero_max": {
+      "single": 48350,
+      "mfj": 96700,
+      "mfs": 48350,
+      "hoh": 64750
+    },
+    "fifteen_max": {
+      "single": 533400,
+      "mfj": 600050,
+      "mfs": 300000,
+      "hoh": 566700
+    }
+  },
+  "ctc": {
+    "per_child": 2200,
+    "refundable_max": 1700,
+    "odc": 500,
+    "phaseout_start": {
+      "mfj": 400000,
+      "other": 200000
+    },
+    "earned_threshold": 2500,
+    "refund_rate": 0.15
+  },
+  "eitc": {
+    "0": {
+      "phasein_rate": 0.0765,
+      "earned_amount": 8490,
+      "max": 649,
+      "phaseout_rate": 0.0765,
+      "phaseout_start": 10620,
+      "phaseout_start_mfj": 17730
+    },
+    "1": {
+      "phasein_rate": 0.34,
+      "earned_amount": 12730,
+      "max": 4328,
+      "phaseout_rate": 0.1598,
+      "phaseout_start": 23350,
+      "phaseout_start_mfj": 30470
+    },
+    "2": {
+      "phasein_rate": 0.4,
+      "earned_amount": 17880,
+      "max": 7152,
+      "phaseout_rate": 0.2106,
+      "phaseout_start": 23350,
+      "phaseout_start_mfj": 30470
+    },
+    "3": {
+      "phasein_rate": 0.45,
+      "earned_amount": 17880,
+      "max": 8046,
+      "phaseout_rate": 0.2106,
+      "phaseout_start": 23350,
+      "phaseout_start_mfj": 30470
+    },
+    "investment_limit": 11950
+  },
+  "salt": {
+    "cap": 40000,
+    "cap_mfs": 20000,
+    "phaseout_start": 500000,
+    "phaseout_start_mfs": 250000,
+    "phaseout_rate": 0.3,
+    "floor": 10000,
+    "floor_mfs": 5000
+  },
+  "tips": {
+    "max": 25000,
+    "phaseout_start": {
+      "mfj": 300000,
+      "other": 150000
+    },
+    "reduce_per_1000": 100
+  },
+  "overtime": {
+    "max": {
+      "mfj": 25000,
+      "other": 12500
+    },
+    "phaseout_start": {
+      "mfj": 300000,
+      "other": 150000
+    },
+    "reduce_per_1000": 100
+  },
+  "car_loan": {
+    "max": 10000,
+    "phaseout_start": {
+      "mfj": 200000,
+      "other": 100000
+    },
+    "reduce_per_1000": 200
+  },
+  "senior": {
+    "amount": 6000,
+    "phaseout_start": {
+      "mfj": 150000,
+      "other": 75000
+    },
+    "rate": 0.06
+  },
+  "charitable_nonitemizer": {
+    "single": 0,
+    "mfj": 0
+  },
+  "charitable_floor_pct": 0.0,
+  "itemized_37_limit": false,
+  "medical_floor": 0.075,
+  "student_loan": {
+    "max": 2500,
+    "phaseout": {
+      "other": [
+        85000,
+        100000
+      ],
+      "mfj": [
+        170000,
+        200000
+      ]
+    }
+  },
+  "educator_max": 300,
+  "se": {
+    "ss_wage_base": 176100,
+    "ss_rate": 0.124,
+    "medicare_rate": 0.029,
+    "net_factor": 0.9235
+  },
+  "addl_medicare": {
+    "rate": 0.009,
+    "threshold": {
+      "mfj": 250000,
+      "mfs": 125000,
+      "other": 200000
+    }
+  },
+  "niit": {
+    "rate": 0.038,
+    "threshold": {
+      "mfj": 250000,
+      "mfs": 125000,
+      "other": 200000
+    }
+  },
+  "amt": {
+    "exemption": {
+      "single": 88100,
+      "hoh": 88100,
+      "mfj": 137000,
+      "qss": 137000,
+      "mfs": 68500
+    },
+    "phaseout_start": {
+      "single": 626350,
+      "hoh": 626350,
+      "mfj": 1252700,
+      "qss": 1252700,
+      "mfs": 626350
+    },
+    "phaseout_rate": 0.25,
+    "rate28_threshold": {
+      "mfs": 119550,
+      "other": 239100
+    }
+  },
+  "qbi": {
+    "rate": 0.2,
+    "threshold": {
+      "mfj": 394600,
+      "other": 197300
+    },
+    "phase_range": {
+      "mfj": 100000,
+      "other": 50000
+    },
+    "min_deduction": 0,
+    "min_qbi": 0
+  },
+  "aotc": {
+    "max": 2500,
+    "refundable_pct": 0.4,
+    "phaseout": {
+      "mfj": [
+        160000,
+        180000
+      ],
+      "other": [
+        80000,
+        90000
+      ]
+    }
+  },
+  "llc": {
+    "rate": 0.2,
+    "max_expenses": 10000,
+    "phaseout": {
+      "mfj": [
+        160000,
+        180000
+      ],
+      "other": [
+        80000,
+        90000
+      ]
+    }
+  },
+  "cdcc": {
+    "expense_limit_one": 3000,
+    "expense_limit_two": 6000,
+    "max_rate": 0.35,
+    "min_rate": 0.2,
+    "first_start": 15000,
+    "first_step": 2000,
+    "first_floor": 0.2,
+    "second_start": null
+  },
+  "savers": {
+    "contrib_max": 2000,
+    "tiers": {
+      "mfj": [
+        [
+          47500,
+          0.5
+        ],
+        [
+          51000,
+          0.2
+        ],
+        [
+          79000,
+          0.1
+        ]
+      ],
+      "hoh": [
+        [
+          35625,
+          0.5
+        ],
+        [
+          38250,
+          0.2
+        ],
+        [
+          59250,
+          0.1
+        ]
+      ],
+      "other": [
+        [
+          23750,
+          0.5
+        ],
+        [
+          25500,
+          0.2
+        ],
+        [
+          39500,
+          0.1
+        ]
+      ]
+    }
+  },
+  "ss_benefits": {
+    "base1": {
+      "mfj": 32000,
+      "mfs": 0,
+      "other": 25000
+    },
+    "base2": {
+      "mfj": 44000,
+      "mfs": 0,
+      "other": 34000
+    }
+  },
+  "capital_loss_limit": {
+    "mfs": 1500,
+    "other": 3000
+  },
+  "deadline": "2026-04-15"
+}

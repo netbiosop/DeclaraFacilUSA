@@ -1,0 +1,973 @@
+{
+ "year": 2026,
+ "notes": [
+  "Solo 10 estados tienen impuestos locales sobre la renta de personas: AL, DE, IN, IA, KY, MD, MI, MO, NY, OH, PA (y algunos en OR/CO).",
+  "En los demas estados el condado no cobra impuesto sobre la renta (si impuesto a la propiedad y ventas).",
+  "Use 'Impuesto local personalizado' para cualquier jurisdiccion no listada."
+ ],
+ "states": {
+  "MD": {
+   "county_tax": true,
+   "base": "state_taxable",
+   "label": "Impuesto local del condado (Maryland)",
+   "counties": {
+    "Allegany": {
+     "method": "flat",
+     "rate": 0.032
+    },
+    "Anne Arundel": {
+     "method": "graduated",
+     "brackets": {
+      "single": [
+       [
+        0,
+        0.027
+       ],
+       [
+        50000,
+        0.0294
+       ],
+       [
+        400000,
+        0.032
+       ]
+      ],
+      "mfj": [
+       [
+        0,
+        0.027
+       ],
+       [
+        75000,
+        0.0294
+       ],
+       [
+        480000,
+        0.032
+       ]
+      ]
+     },
+     "hoh_uses": "mfj",
+     "note": "Tasa progresiva de Anne Arundel."
+    },
+    "Baltimore County": {
+     "method": "flat",
+     "rate": 0.032
+    },
+    "Calvert": {
+     "method": "flat",
+     "rate": 0.032
+    },
+    "Caroline": {
+     "method": "flat",
+     "rate": 0.032
+    },
+    "Carroll": {
+     "method": "flat",
+     "rate": 0.0303
+    },
+    "Cecil": {
+     "method": "flat",
+     "rate": 0.0274
+    },
+    "Charles": {
+     "method": "flat",
+     "rate": 0.0303
+    },
+    "Dorchester": {
+     "method": "flat",
+     "rate": 0.033
+    },
+    "Frederick": {
+     "method": "band_flat",
+     "bands": {
+      "single": [
+       [
+        0,
+        0.0225
+       ],
+       [
+        25000,
+        0.0275
+       ],
+       [
+        50000,
+        0.0296
+       ],
+       [
+        150000,
+        0.032
+       ]
+      ],
+      "mfj": [
+       [
+        0,
+        0.0225
+       ],
+       [
+        25000,
+        0.0275
+       ],
+       [
+        100000,
+        0.0296
+       ],
+       [
+        250000,
+        0.032
+       ]
+      ]
+     },
+     "hoh_uses": "mfj",
+     "note": "Frederick: una sola tasa sobre todo el ingreso segun el rango del ingreso tributable."
+    },
+    "Garrett": {
+     "method": "flat",
+     "rate": 0.0265
+    },
+    "Harford": {
+     "method": "flat",
+     "rate": 0.0306
+    },
+    "Howard": {
+     "method": "flat",
+     "rate": 0.032
+    },
+    "Kent": {
+     "method": "flat",
+     "rate": 0.033
+    },
+    "Montgomery": {
+     "method": "flat",
+     "rate": 0.032
+    },
+    "Prince George's": {
+     "method": "flat",
+     "rate": 0.032
+    },
+    "Queen Anne's": {
+     "method": "flat",
+     "rate": 0.032
+    },
+    "St. Mary's": {
+     "method": "flat",
+     "rate": 0.032
+    },
+    "Somerset": {
+     "method": "flat",
+     "rate": 0.032
+    },
+    "Talbot": {
+     "method": "flat",
+     "rate": 0.024
+    },
+    "Washington": {
+     "method": "flat",
+     "rate": 0.0295
+    },
+    "Wicomico": {
+     "method": "flat",
+     "rate": 0.032
+    },
+    "Worcester": {
+     "method": "flat",
+     "rate": 0.0225
+    },
+    "Baltimore City": {
+     "method": "flat",
+     "rate": 0.032
+    }
+   }
+  },
+  "IN": {
+   "county_tax": true,
+   "base": "state_taxable",
+   "label": "Impuesto del condado (Indiana)",
+   "counties": {
+    "Adams": {
+     "method": "flat",
+     "rate": 0.016
+    },
+    "Allen": {
+     "method": "flat",
+     "rate": 0.0159
+    },
+    "Bartholomew": {
+     "method": "flat",
+     "rate": 0.0175
+    },
+    "Benton": {
+     "method": "flat",
+     "rate": 0.0179
+    },
+    "Blackford": {
+     "method": "flat",
+     "rate": 0.025
+    },
+    "Boone": {
+     "method": "flat",
+     "rate": 0.017
+    },
+    "Brown": {
+     "method": "flat",
+     "rate": 0.025234
+    },
+    "Carroll": {
+     "method": "flat",
+     "rate": 0.024733
+    },
+    "Cass": {
+     "method": "flat",
+     "rate": 0.0295
+    },
+    "Clark": {
+     "method": "flat",
+     "rate": 0.02
+    },
+    "Clay": {
+     "method": "flat",
+     "rate": 0.0235
+    },
+    "Clinton": {
+     "method": "flat",
+     "rate": 0.0265
+    },
+    "Crawford": {
+     "method": "flat",
+     "rate": 0.0165
+    },
+    "Daviess": {
+     "method": "flat",
+     "rate": 0.015
+    },
+    "Dearborn": {
+     "method": "flat",
+     "rate": 0.014
+    },
+    "Decatur": {
+     "method": "flat",
+     "rate": 0.0245
+    },
+    "DeKalb": {
+     "method": "flat",
+     "rate": 0.0213
+    },
+    "Delaware": {
+     "method": "flat",
+     "rate": 0.015
+    },
+    "Dubois": {
+     "method": "flat",
+     "rate": 0.012
+    },
+    "Elkhart": {
+     "method": "flat",
+     "rate": 0.02
+    },
+    "Fayette": {
+     "method": "flat",
+     "rate": 0.0282
+    },
+    "Floyd": {
+     "method": "flat",
+     "rate": 0.0189
+    },
+    "Fountain": {
+     "method": "flat",
+     "rate": 0.021
+    },
+    "Franklin": {
+     "method": "flat",
+     "rate": 0.017
+    },
+    "Fulton": {
+     "method": "flat",
+     "rate": 0.0288
+    },
+    "Gibson": {
+     "method": "flat",
+     "rate": 0.013
+    },
+    "Grant": {
+     "method": "flat",
+     "rate": 0.0275
+    },
+    "Greene": {
+     "method": "flat",
+     "rate": 0.0235
+    },
+    "Hamilton": {
+     "method": "flat",
+     "rate": 0.011
+    },
+    "Hancock": {
+     "method": "flat",
+     "rate": 0.0194
+    },
+    "Harrison": {
+     "method": "flat",
+     "rate": 0.01
+    },
+    "Hendricks": {
+     "method": "flat",
+     "rate": 0.017
+    },
+    "Henry": {
+     "method": "flat",
+     "rate": 0.0202
+    },
+    "Howard": {
+     "method": "flat",
+     "rate": 0.0235
+    },
+    "Huntington": {
+     "method": "flat",
+     "rate": 0.0195
+    },
+    "Jackson": {
+     "method": "flat",
+     "rate": 0.021
+    },
+    "Jasper": {
+     "method": "flat",
+     "rate": 0.02864
+    },
+    "Jay": {
+     "method": "flat",
+     "rate": 0.025
+    },
+    "Jefferson": {
+     "method": "flat",
+     "rate": 0.0103
+    },
+    "Jennings": {
+     "method": "flat",
+     "rate": 0.025
+    },
+    "Johnson": {
+     "method": "flat",
+     "rate": 0.014
+    },
+    "Knox": {
+     "method": "flat",
+     "rate": 0.017
+    },
+    "Kosciusko": {
+     "method": "flat",
+     "rate": 0.01
+    },
+    "LaGrange": {
+     "method": "flat",
+     "rate": 0.0165
+    },
+    "Lake": {
+     "method": "flat",
+     "rate": 0.015
+    },
+    "LaPorte": {
+     "method": "flat",
+     "rate": 0.0145
+    },
+    "Lawrence": {
+     "method": "flat",
+     "rate": 0.0175
+    },
+    "Madison": {
+     "method": "flat",
+     "rate": 0.0225
+    },
+    "Marion": {
+     "method": "flat",
+     "rate": 0.0202
+    },
+    "Marshall": {
+     "method": "flat",
+     "rate": 0.0125
+    },
+    "Martin": {
+     "method": "flat",
+     "rate": 0.025
+    },
+    "Miami": {
+     "method": "flat",
+     "rate": 0.0254
+    },
+    "Monroe": {
+     "method": "flat",
+     "rate": 0.0214
+    },
+    "Montgomery": {
+     "method": "flat",
+     "rate": 0.0265
+    },
+    "Morgan": {
+     "method": "flat",
+     "rate": 0.0272
+    },
+    "Newton": {
+     "method": "flat",
+     "rate": 0.01
+    },
+    "Noble": {
+     "method": "flat",
+     "rate": 0.0175
+    },
+    "Ohio": {
+     "method": "flat",
+     "rate": 0.02
+    },
+    "Orange": {
+     "method": "flat",
+     "rate": 0.0175
+    },
+    "Owen": {
+     "method": "flat",
+     "rate": 0.025
+    },
+    "Parke": {
+     "method": "flat",
+     "rate": 0.0265
+    },
+    "Perry": {
+     "method": "flat",
+     "rate": 0.014
+    },
+    "Pike": {
+     "method": "flat",
+     "rate": 0.012
+    },
+    "Porter": {
+     "method": "flat",
+     "rate": 0.005
+    },
+    "Posey": {
+     "method": "flat",
+     "rate": 0.0145
+    },
+    "Pulaski": {
+     "method": "flat",
+     "rate": 0.0285
+    },
+    "Putnam": {
+     "method": "flat",
+     "rate": 0.023
+    },
+    "Randolph": {
+     "method": "flat",
+     "rate": 0.03
+    },
+    "Ripley": {
+     "method": "flat",
+     "rate": 0.0238
+    },
+    "Rush": {
+     "method": "flat",
+     "rate": 0.0215
+    },
+    "St. Joseph": {
+     "method": "flat",
+     "rate": 0.0175
+    },
+    "Scott": {
+     "method": "flat",
+     "rate": 0.0216
+    },
+    "Shelby": {
+     "method": "flat",
+     "rate": 0.017
+    },
+    "Spencer": {
+     "method": "flat",
+     "rate": 0.008
+    },
+    "Starke": {
+     "method": "flat",
+     "rate": 0.0171
+    },
+    "Steuben": {
+     "method": "flat",
+     "rate": 0.0199
+    },
+    "Sullivan": {
+     "method": "flat",
+     "rate": 0.017
+    },
+    "Switzerland": {
+     "method": "flat",
+     "rate": 0.0145
+    },
+    "Tippecanoe": {
+     "method": "flat",
+     "rate": 0.0128
+    },
+    "Tipton": {
+     "method": "flat",
+     "rate": 0.026
+    },
+    "Union": {
+     "method": "flat",
+     "rate": 0.0275
+    },
+    "Vanderburgh": {
+     "method": "flat",
+     "rate": 0.0125
+    },
+    "Vermillion": {
+     "method": "flat",
+     "rate": 0.015
+    },
+    "Vigo": {
+     "method": "flat",
+     "rate": 0.02
+    },
+    "Wabash": {
+     "method": "flat",
+     "rate": 0.029
+    },
+    "Warren": {
+     "method": "flat",
+     "rate": 0.0212
+    },
+    "Warrick": {
+     "method": "flat",
+     "rate": 0.01
+    },
+    "Washington": {
+     "method": "flat",
+     "rate": 0.02
+    },
+    "Wayne": {
+     "method": "flat",
+     "rate": 0.0125
+    },
+    "Wells": {
+     "method": "flat",
+     "rate": 0.021
+    },
+    "White": {
+     "method": "flat",
+     "rate": 0.0232
+    },
+    "Whitley": {
+     "method": "flat",
+     "rate": 0.016829
+    }
+   },
+   "notes": [
+    "Se usa el condado de residencia al 1 de enero.",
+    "Boone cambia de 1.70% a 1.71% el 1 oct 2026 (aqui 1.70% para todo 2026)."
+   ]
+  },
+  "NY": {
+   "localities": {
+    "New York City (NYC)": {
+     "method": "graduated",
+     "base": "state_taxable",
+     "brackets": {
+      "single": [
+       [
+        0,
+        0.03078
+       ],
+       [
+        12000,
+        0.03762
+       ],
+       [
+        25000,
+        0.03819
+       ],
+       [
+        50000,
+        0.03876
+       ]
+      ],
+      "mfj": [
+       [
+        0,
+        0.03078
+       ],
+       [
+        21600,
+        0.03762
+       ],
+       [
+        45000,
+        0.03819
+       ],
+       [
+        90000,
+        0.03876
+       ]
+      ],
+      "hoh": [
+       [
+        0,
+        0.03078
+       ],
+       [
+        14400,
+        0.03762
+       ],
+       [
+        30000,
+        0.03819
+       ],
+       [
+        60000,
+        0.03876
+       ]
+      ]
+     },
+     "note": "Impuesto de residente de NYC (Bronx, Brooklyn, Manhattan, Queens, Staten Island)."
+    },
+    "Yonkers (residente)": {
+     "method": "pct_of_state_tax",
+     "rate": 0.1675,
+     "note": "Recargo de 16.75% sobre el impuesto estatal neto."
+    }
+   }
+  },
+  "PA": {
+   "localities": {
+    "Philadelphia (residente)": {
+     "method": "flat",
+     "base": "earned",
+     "rate": 0.037375,
+     "note": "Wage Tax de residente (3.75%/3.74%/3.735% segun fecha); promedio anual."
+    },
+    "Philadelphia (no residente que trabaja alli)": {
+     "method": "flat",
+     "base": "earned",
+     "rate": 0.034275,
+     "note": "Wage Tax de no residente; solo sobre salarios por trabajo realizado en la ciudad."
+    },
+    "Pittsburgh (residente)": {
+     "method": "flat",
+     "base": "earned",
+     "rate": 0.03,
+     "note": "EIT 1% ciudad + 2% distrito escolar."
+    },
+    "Otro municipio de PA (EIT tipico 1%)": {
+     "method": "flat",
+     "base": "earned",
+     "rate": 0.01,
+     "editable": true,
+     "note": "Consulte su tasa exacta en el buscador DCED de Pennsylvania (Act 32)."
+    }
+   }
+  },
+  "OH": {
+   "localities": {
+    "Columbus": {
+     "method": "flat",
+     "base": "earned",
+     "rate": 0.025,
+     "note": "Impuesto municipal sobre ingresos ganados."
+    },
+    "Cleveland": {
+     "method": "flat",
+     "base": "earned",
+     "rate": 0.025,
+     "note": "Impuesto municipal sobre ingresos ganados."
+    },
+    "Cincinnati": {
+     "method": "flat",
+     "base": "earned",
+     "rate": 0.018,
+     "note": "Impuesto municipal sobre ingresos ganados."
+    },
+    "Toledo": {
+     "method": "flat",
+     "base": "earned",
+     "rate": 0.025,
+     "note": "Impuesto municipal sobre ingresos ganados."
+    },
+    "Akron": {
+     "method": "flat",
+     "base": "earned",
+     "rate": 0.025,
+     "note": "Impuesto municipal sobre ingresos ganados."
+    },
+    "Dayton": {
+     "method": "flat",
+     "base": "earned",
+     "rate": 0.025,
+     "note": "Impuesto municipal sobre ingresos ganados."
+    },
+    "Youngstown": {
+     "method": "flat",
+     "base": "earned",
+     "rate": 0.0275,
+     "note": "Impuesto municipal sobre ingresos ganados."
+    },
+    "Canton": {
+     "method": "flat",
+     "base": "earned",
+     "rate": 0.025,
+     "note": "Impuesto municipal sobre ingresos ganados."
+    }
+   }
+  },
+  "MI": {
+   "localities": {
+    "Detroit": {
+     "method": "flat",
+     "base": "earned_less_exemptions",
+     "rate": 0.024,
+     "exemption": 600,
+     "note": "Impuesto de residente de la ciudad (exencion aprox. $600 por persona)."
+    },
+    "Grand Rapids": {
+     "method": "flat",
+     "base": "earned_less_exemptions",
+     "rate": 0.015,
+     "exemption": 600,
+     "note": "Impuesto de residente de la ciudad (exencion aprox. $600 por persona)."
+    },
+    "Saginaw": {
+     "method": "flat",
+     "base": "earned_less_exemptions",
+     "rate": 0.015,
+     "exemption": 600,
+     "note": "Impuesto de residente de la ciudad (exencion aprox. $600 por persona)."
+    },
+    "Highland Park": {
+     "method": "flat",
+     "base": "earned_less_exemptions",
+     "rate": 0.02,
+     "exemption": 600,
+     "note": "Impuesto de residente de la ciudad (exencion aprox. $600 por persona)."
+    },
+    "Lansing": {
+     "method": "flat",
+     "base": "earned_less_exemptions",
+     "rate": 0.01,
+     "exemption": 600,
+     "note": "Impuesto de residente de la ciudad (exencion aprox. $600 por persona)."
+    },
+    "Flint": {
+     "method": "flat",
+     "base": "earned_less_exemptions",
+     "rate": 0.01,
+     "exemption": 600,
+     "note": "Impuesto de residente de la ciudad (exencion aprox. $600 por persona)."
+    },
+    "Pontiac": {
+     "method": "flat",
+     "base": "earned_less_exemptions",
+     "rate": 0.01,
+     "exemption": 600,
+     "note": "Impuesto de residente de la ciudad (exencion aprox. $600 por persona)."
+    },
+    "Battle Creek": {
+     "method": "flat",
+     "base": "earned_less_exemptions",
+     "rate": 0.01,
+     "exemption": 600,
+     "note": "Impuesto de residente de la ciudad (exencion aprox. $600 por persona)."
+    },
+    "Jackson": {
+     "method": "flat",
+     "base": "earned_less_exemptions",
+     "rate": 0.01,
+     "exemption": 600,
+     "note": "Impuesto de residente de la ciudad (exencion aprox. $600 por persona)."
+    },
+    "Muskegon": {
+     "method": "flat",
+     "base": "earned_less_exemptions",
+     "rate": 0.01,
+     "exemption": 600,
+     "note": "Impuesto de residente de la ciudad (exencion aprox. $600 por persona)."
+    },
+    "Port Huron": {
+     "method": "flat",
+     "base": "earned_less_exemptions",
+     "rate": 0.01,
+     "exemption": 600,
+     "note": "Impuesto de residente de la ciudad (exencion aprox. $600 por persona)."
+    },
+    "East Lansing": {
+     "method": "flat",
+     "base": "earned_less_exemptions",
+     "rate": 0.01,
+     "exemption": 600,
+     "note": "Impuesto de residente de la ciudad (exencion aprox. $600 por persona)."
+    },
+    "Hamtramck": {
+     "method": "flat",
+     "base": "earned_less_exemptions",
+     "rate": 0.01,
+     "exemption": 600,
+     "note": "Impuesto de residente de la ciudad (exencion aprox. $600 por persona)."
+    }
+   }
+  },
+  "KY": {
+   "localities": {
+    "Louisville / Jefferson County": {
+     "method": "flat",
+     "base": "earned",
+     "rate": 0.022,
+     "note": "Impuesto ocupacional de residente."
+    },
+    "Lexington-Fayette": {
+     "method": "flat",
+     "base": "earned",
+     "rate": 0.0225,
+     "note": "Impuesto ocupacional urbano."
+    }
+   }
+  },
+  "MO": {
+   "localities": {
+    "Kansas City": {
+     "method": "flat",
+     "base": "earned",
+     "rate": 0.01,
+     "note": "Earnings tax 1%."
+    },
+    "St. Louis City": {
+     "method": "flat",
+     "base": "earned",
+     "rate": 0.01,
+     "note": "Earnings tax 1%."
+    }
+   }
+  },
+  "AL": {
+   "localities": {
+    "Birmingham": {
+     "method": "flat",
+     "base": "earned",
+     "rate": 0.01,
+     "note": "Impuesto ocupacional 1% (por trabajar en la ciudad)."
+    },
+    "Bessemer": {
+     "method": "flat",
+     "base": "earned",
+     "rate": 0.01,
+     "note": "Impuesto ocupacional 1%."
+    },
+    "Gadsden": {
+     "method": "flat",
+     "base": "earned",
+     "rate": 0.02,
+     "note": "Impuesto ocupacional 2%."
+    }
+   }
+  },
+  "DE": {
+   "localities": {
+    "Wilmington": {
+     "method": "flat",
+     "base": "earned",
+     "rate": 0.0125,
+     "note": "Earned income tax 1.25%."
+    }
+   }
+  },
+  "OR": {
+   "localities": {
+    "Portland Metro (SHS)": {
+     "method": "threshold",
+     "base": "state_taxable",
+     "tiers": {
+      "single": [
+       [
+        125000,
+        0.01
+       ]
+      ],
+      "mfj": [
+       [
+        200000,
+        0.01
+       ]
+      ]
+     },
+     "note": "1% sobre ingreso tributable > $125k ($200k MFJ)."
+    },
+    "Multnomah County (PFA)": {
+     "method": "threshold",
+     "base": "state_taxable",
+     "tiers": {
+      "single": [
+       [
+        125000,
+        0.015
+       ],
+       [
+        250000,
+        0.03
+       ]
+      ],
+      "mfj": [
+       [
+        200000,
+        0.015
+       ],
+       [
+        400000,
+        0.03
+       ]
+      ]
+     },
+     "note": "1.5% sobre > $125k/$200k y 3% sobre > $250k/$400k."
+    },
+    "Portland Metro + Multnomah": {
+     "method": "threshold",
+     "base": "state_taxable",
+     "tiers": {
+      "single": [
+       [
+        125000,
+        0.025
+       ],
+       [
+        250000,
+        0.04
+       ]
+      ],
+      "mfj": [
+       [
+        200000,
+        0.025
+       ],
+       [
+        400000,
+        0.04
+       ]
+      ]
+     },
+     "note": "Ambos impuestos (residente de Portland en Multnomah)."
+    }
+   }
+  },
+  "CO": {
+   "localities": {
+    "Denver (impuesto ocupacional)": {
+     "method": "monthly",
+     "amount": 5.75,
+     "note": "$5.75 por mes trabajado en Denver (si gana > $500/mes)."
+    },
+    "Aurora (impuesto ocupacional)": {
+     "method": "monthly",
+     "amount": 2.0,
+     "note": "$2 por mes."
+    }
+   }
+  },
+  "IA": {
+   "localities": {
+    "Distrito escolar (recargo)": {
+     "method": "pct_of_state_tax",
+     "rate": 0.05,
+     "editable": true,
+     "note": "Recargo del distrito escolar (varia 0%-20%). Edite su tasa."
+    }
+   }
+  }
+ }
+}

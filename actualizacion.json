@@ -1,0 +1,177 @@
+{
+ "app": "DeclaraFacilUSA",
+ "version": "1.4.0",
+ "base": "1.4.0",
+ "published": "2026-10-26",
+ "notes": "## Novedades / What's new\n\n- **Actualizaciones por archivos**: las mejoras llegan descargando solo los archivos que cambiaron, sin reinstalar. Si una versión nueva no arranca, la app vuelve sola a la anterior.\n- **File-level updates**: improvements arrive by downloading only the changed files, without reinstalling. If a new version fails to start, the app goes back to the previous one.\n- Instalador con ícono propio, accesos directos y desinstalación desde Windows.\n",
+ "files": {
+  "taxapp/__init__.py": {
+   "sha256": "17709cb819c06a04e9e7011c822b4ba689ef69763647ea822a7bcb400b8aa9c3",
+   "size": 405
+  },
+  "taxapp/accounts.py": {
+   "sha256": "84d91983188d0488eaf3618f962a58c8128792d54a0f4d1a4af4fe4a5ca696ab",
+   "size": 19207
+  },
+  "taxapp/assistant.py": {
+   "sha256": "061e721f5b891184214e41aed7079cd9edd9130def3d2bb0f4fe0d3aeae8f845",
+   "size": 22151
+  },
+  "taxapp/counties.py": {
+   "sha256": "ed4b520ba8c67ecf218d3163159a7840ccf9dba93daf4df35e610a5e8de97005",
+   "size": 3619
+  },
+  "taxapp/data_loader.py": {
+   "sha256": "bce290faa5039911ec6b722dbcb8d2688fe8ea3751541f2a0e3163d241d8e10b",
+   "size": 2471
+  },
+  "taxapp/engine.py": {
+   "sha256": "7be0594ab22f69d817496ad0eb20cacd0d6c7a2f4448102e5990e60d0b88f581",
+   "size": 1275
+  },
+  "taxapp/federal.py": {
+   "sha256": "873a1c2a877fc142f85cf05570b049a4aaed391bcbcc176c0b72c7484801f0c3",
+   "size": 25764
+  },
+  "taxapp/gui/__init__.py": {
+   "sha256": "8791b6432ea0a76eaf4a1698d3d2f4876cd13b57c8844eeb828b8632cede8805",
+   "size": 56
+  },
+  "taxapp/gui/app.py": {
+   "sha256": "2cc45c457b53f9f87829ad07ae36886b470731194f047b50dc8d6fa9ca2caf19",
+   "size": 28304
+  },
+  "taxapp/gui/assistant.py": {
+   "sha256": "811f8b118d58d0ff90212d5a8cd4fbf593972ea344e642f9432722b47327da80",
+   "size": 24177
+  },
+  "taxapp/gui/home.py": {
+   "sha256": "714de0765199cd71d8f8e9beaaca551fc1548626560be130a2d3a18987c1d303",
+   "size": 24207
+  },
+  "taxapp/gui/login.py": {
+   "sha256": "32a055fee44c347716bc0bfa2c93d36b94a73fe1927a6e4f1b3c9db8ebaa08ce",
+   "size": 10871
+  },
+  "taxapp/gui/screens.py": {
+   "sha256": "f71b821607b7a35bbceb03625e18adbbc9e26904a73e6fcb3e57395251a422b4",
+   "size": 58391
+  },
+  "taxapp/gui/settings.py": {
+   "sha256": "285bda38ac38d7233a7fa7088f8122d04c6e732a3475de4c068c11d51519877b",
+   "size": 41928
+  },
+  "taxapp/gui/theme.py": {
+   "sha256": "ebae4859ee58613ffe34e0610d4d8792f263d1e1775395782ca84b3d969887af",
+   "size": 16755
+  },
+  "taxapp/gui/tools.py": {
+   "sha256": "774cf66fcc94e569698fcff982f2103419ed876d43ebdaa3d5141ab94a79735e",
+   "size": 13172
+  },
+  "taxapp/gui/ui.py": {
+   "sha256": "61628968530c7aae4cda407af0a05357b19c1286529325b10a94f1cbccbe1449",
+   "size": 12604
+  },
+  "taxapp/gui/updates.py": {
+   "sha256": "cc1ba75d7a74c22bd673869255e6788767d29ca4fc92c3dba03645cda7281c9a",
+   "size": 6738
+  },
+  "taxapp/gui/widgets.py": {
+   "sha256": "f4494c01e86fcc6d9d18117797acc6cac5d76187f92eebd1cd5b5d5d18d8a053",
+   "size": 14051
+  },
+  "taxapp/gui/workspace.py": {
+   "sha256": "566e660397d726d3c4f74df7ad90107834e02b0ed76408e1d17ad77db6bec7be",
+   "size": 14809
+  },
+  "taxapp/i18n.py": {
+   "sha256": "2a7dbfe7fcd8521d2bf22a94ff48bb7d34f5b6ebfbb97c67ccbb50994aba9fd2",
+   "size": 3084
+  },
+  "taxapp/lang_en.py": {
+   "sha256": "dbf3a354aeb7147f77b95a2298a12f627f41de762a879e0cd6e259871987e9f5",
+   "size": 93212
+  },
+  "taxapp/lang_en_data.py": {
+   "sha256": "da094de3048f7a7c84959516c1b4d2254ddec49df68dfcd6f0592e42d26cc2b0",
+   "size": 16228
+  },
+  "taxapp/local.py": {
+   "sha256": "886c2be0e45c6abee346ac9928b4f64f8229b69f585b28d57f55e215e5a7c074",
+   "size": 7364
+  },
+  "taxapp/models.py": {
+   "sha256": "27444d9616d4991a580ed6e22ab8a4024233ed898fa0862777f50e49f43dc2b3",
+   "size": 13431
+  },
+  "taxapp/reports.py": {
+   "sha256": "36cd756017426424daa3a5ec9e461143c27e55d1a5dc023ec733f000da8767d6",
+   "size": 15084
+  },
+  "taxapp/review.py": {
+   "sha256": "2bb6ed2430b74c0a9160b264c28164fb552d7b45586283a9c8c92651aa2c79e9",
+   "size": 8819
+  },
+  "taxapp/state.py": {
+   "sha256": "ac509941db689c41793d171db147310b4cb339ef09c878212596d6bc05ff50ed",
+   "size": 16425
+  },
+  "taxapp/storage.py": {
+   "sha256": "16e3779cdf7353ac615c929537d09db503cea9673adaa4f8c154156d3ecf567b",
+   "size": 2207
+  },
+  "taxapp/updater.py": {
+   "sha256": "f3b835eab021fbe01a83c47f2b657aa24e57f4cb798b614ba944f004b8669224",
+   "size": 19048
+  },
+  "data/actualizaciones.json": {
+   "sha256": "4d3a8efab884bbb8240f892c4a4afcf48fce6e049f56a85542d45cefbe7f548b",
+   "size": 64
+  },
+  "data/counties_builtin.json": {
+   "sha256": "a5515bc0f2e23abfad45787d957e8ad5215da5418d399de30bdcdf7bc25b0985",
+   "size": 1788
+  },
+  "data/federal_2025.json": {
+   "sha256": "bcfd9878ea1af08064f69cacef52f9643f5bb217005bad59d340eebba3248d71",
+   "size": 6698
+  },
+  "data/federal_2026.json": {
+   "sha256": "92d17eabacc158810842fe32bce3ebc4efafbd8d3b8f68972127110800f25f5e",
+   "size": 6867
+  },
+  "data/local_2025.json": {
+   "sha256": "2cbcb14349fa819c05dd9ebc520b286c24a17b9d61364e5390022fdee9701f39",
+   "size": 18463
+  },
+  "data/local_2026.json": {
+   "sha256": "b6ec37749d5e5b58056bc8664b884fc99e5a4e614cab8e5494c64300b95a5252",
+   "size": 18547
+  },
+  "data/states_2025.json": {
+   "sha256": "131140fb8896e2a173a4f9b47c618935222ceb8cd01cfabd6ac2a27d54e124ef",
+   "size": 42300
+  },
+  "data/states_2026.json": {
+   "sha256": "35996cc68a383b0481f2df9315511e9f7e9dbb11b5d3d38af89db6d1efaa6c60",
+   "size": 41781
+  },
+  "data/states_info.json": {
+   "sha256": "f3e01b456cee1871d515c1753f5f91b5462d4496487190c3767ba9921cbd5643",
+   "size": 16224
+  },
+  "docs/INVESTIGACION.md": {
+   "sha256": "0c09f7616bd02e653beac0c6797c77176c5940b356d856c945794d2148981b2b",
+   "size": 9802
+  },
+  "docs/RESEARCH_EN.md": {
+   "sha256": "1ce5661a60931b737c166229005e072b22b70e97ec4bac59f257e12d94a742ab",
+   "size": 9055
+  },
+  "assets/DeclaraFacilUSA.ico": {
+   "sha256": "a49b3a513642e2f81fa49064a0c3c02014500b6122efff638bcec1e36abc2f4f",
+   "size": 21681
+  }
+ }
+}
