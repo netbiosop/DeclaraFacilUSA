@@ -53,6 +53,17 @@ class PasswordTests(AccountsBase):
         self.assertIsNotNone(A.validate_username("a"))
 
 
+class DamagedFileTests(AccountsBase):
+    def test_damaged_users_file_is_copied_once(self):
+        self.admin()
+        A._file().write_text("{ roto", encoding="utf-8")
+        self.assertEqual(A.load()["users"], [])
+        A.load()
+        copies = list(A._file().parent.glob("usuarios.danado-*.json"))
+        self.assertEqual(len(copies), 1)
+        self.assertEqual(copies[0].read_text(encoding="utf-8"), "{ roto")
+
+
 class UserTests(AccountsBase):
     def test_first_admin_and_login(self):
         self.assertFalse(A.has_users())

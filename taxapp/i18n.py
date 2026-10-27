@@ -53,16 +53,9 @@ def system_language() -> str:
 def load_saved_language() -> str:
     """Idioma guardado; la primera vez se usa el idioma del sistema."""
     global _lang
-    try:
-        cfg = json.loads(_config_file().read_text(encoding="utf-8"))
-        if cfg.get("language") in LANGS:
-            _lang = cfg["language"]
-            return _lang
-    except FileNotFoundError:
-        pass  # primera vez: se detecta el idioma del sistema
-    except (OSError, ValueError) as e:
-        logger.warning("Configuración de idioma ilegible: %s", e)
-    _lang = system_language()
+    from .data_loader import read_json
+    saved = read_json(_config_file(), {}).get("language")
+    _lang = saved if saved in LANGS else system_language()   # la primera vez, el idioma del sistema
     return _lang
 
 
@@ -72,15 +65,11 @@ def set_language(lang: str, save: bool = True):
         return
     _lang = lang
     if save:
+        from .data_loader import read_json
+        p = _config_file()
+        cfg = read_json(p, {})
+        cfg["language"] = lang
         try:
-            p = _config_file()
-            cfg = {}
-            if p.exists():
-                try:
-                    cfg = json.loads(p.read_text(encoding="utf-8"))
-                except ValueError:
-                    cfg = {}
-            cfg["language"] = lang
             p.write_text(json.dumps(cfg, indent=1), encoding="utf-8")
         except OSError as e:
             logger.warning("No se pudo guardar el idioma elegido: %s", e)

@@ -72,11 +72,7 @@ def _user_file() -> Path:
 def load_config() -> UpdateConfig:
     cfg = UpdateConfig()
     for p in (data_loader.data_dir() / "actualizaciones.json", _user_file()):
-        try:
-            d = json.loads(p.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            continue
-        for k, v in d.items():
+        for k, v in data_loader.read_json(p, {}).items():
             if k in UpdateConfig.__dataclass_fields__:
                 setattr(cfg, k, v)
     return cfg
@@ -313,10 +309,7 @@ def _state_path() -> Path:
 
 
 def load_state() -> dict:
-    try:
-        return json.loads(_state_path().read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return {}
+    return data_loader.read_json(_state_path(), {})
 
 
 def save_state(st: dict):

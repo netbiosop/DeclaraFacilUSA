@@ -91,10 +91,27 @@ def _empty() -> dict:
     return {"version": 1, "users": [], "matrix": copy.deepcopy(DEFAULT_MATRIX), "settings": dict(DEFAULT_SETTINGS)}
 
 
-def load() -> dict:
+def _keep_damaged(p: Path, err: Exception):
+    """Copia un usuarios.json ilegible antes de que el asistente de inicio lo reemplace por uno nuevo."""
+    backup = p.with_name(f"usuarios.danado-{datetime.now():%Y%m%d-%H%M%S}.json")
     try:
-        d = json.loads(_file().read_text(encoding="utf-8"))
-    except (OSError, ValueError):
+        content = p.read_bytes()
+        if any(prev.read_bytes() == content for prev in p.parent.glob("usuarios.danado-*.json")):
+            return  # esta versión dañada ya tiene su copia
+        shutil.copy2(p, backup)
+        logger.error("usuarios.json ilegible (%s); se guardó una copia en %s", err, backup)
+    except OSError as e:
+        logger.error("usuarios.json ilegible (%s) y no se pudo copiar: %s", err, e)
+
+
+def load() -> dict:
+    p = _file()
+    try:
+        d = json.loads(p.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return _empty()
+    except (OSError, ValueError) as e:
+        _keep_damaged(p, e)
         return _empty()
     d.setdefault("users", [])
     m = d.setdefault("matrix", {})

@@ -3,7 +3,6 @@ herramientas y cambio de idioma ES/EN. Cada usuario tiene rol, permisos, carpeta
 from __future__ import annotations
 
 import logging
-import os
 import sys
 import threading
 import time
@@ -18,6 +17,7 @@ from ..i18n import _, tr
 from ..models import TaxReturn
 from ..review import review
 from . import theme
+from .ui import open_path
 from .widgets import Form
 from .workspace import Workspace, SECTIONS
 from . import layout
@@ -30,6 +30,8 @@ __all__ = ["App", "SECTIONS", "main"]
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
+        # Sin consola (programa instalado) Tk no muestra los errores de los botones: que queden en errores.log
+        self.report_callback_exception = lambda *exc: logger.error("Error no controlado en la interfaz", exc_info=exc)
         i18n.load_saved_language()
         self.title(APP_NAME)
         ico = data_loader.app_dir() / "assets" / "DeclaraFacilUSA.ico"
@@ -337,6 +339,7 @@ class App(tk.Tk):
         try:
             self.ret = storage.load(path)
         except Exception as e:  # noqa: BLE001
+            logger.exception("No se pudo abrir %s", path)
             messagebox.showerror(APP_NAME, tr("No se pudo abrir el archivo:\n{e}", e=e))
             return
         if self.ret.tax_year not in data_loader.SUPPORTED_YEARS:
@@ -407,6 +410,7 @@ class App(tk.Tk):
         try:
             self.result = compute_all(self.ret)
         except Exception as e:  # noqa: BLE001 - mostrar sin cerrar la app
+            logger.exception("Error de cálculo")
             if self.workspace:
                 self.workspace.status.configure(text=tr("Error de cálculo: {e}", e=e))
             return
@@ -485,6 +489,7 @@ class App(tk.Tk):
             else:
                 Path(p).write_text(reports.to_html(self.ret, self.result, fnd), encoding="utf-8")
         except Exception as e:  # noqa: BLE001
+            logger.exception("No se pudo exportar %s", p)
             messagebox.showerror(APP_NAME, tr("No se pudo exportar:\n{e}", e=e))
             return
         accounts.log("return_exported", self.user["username"], Path(p).name)
@@ -499,14 +504,8 @@ class App(tk.Tk):
 
     # ================================================================ utilidades
     def _open_path(self, p):
-        try:
-            if sys.platform.startswith("win"):
-                os.startfile(p)  # type: ignore[attr-defined]
-            else:
-                webbrowser.open(Path(p).resolve().as_uri())
-        except OSError as e:
-            logger.warning("No se pudo abrir %s: %s", p, e)
-            messagebox.showerror(APP_NAME, tr("No se pudo abrir el archivo:\n{e}", e=e), parent=self)
+        if not open_path(p):
+            messagebox.showerror(APP_NAME, tr("No se pudo abrir el archivo:\n{e}", e=p), parent=self)
 
     def _open_folder(self, p):
         self._open_path(str(p))
@@ -524,6 +523,7 @@ class App(tk.Tk):
                 n = counties.download_from_census()
                 msg = (True, tr("Lista de condados actualizada: {n} estados y territorios.", n=n))
             except Exception as e:  # noqa: BLE001
+                logger.warning("No se pudo descargar la lista de condados: %s", e)
                 msg = (False, tr("{e}\n\nPuede escribir el condado manualmente o importar el archivo "
                                  "national_county2020.txt desde Herramientas.", e=e))
             self.after(0, lambda: self._download_done(*msg))
@@ -545,6 +545,7 @@ class App(tk.Tk):
                 n = counties.import_file(p)
                 messagebox.showinfo(APP_NAME, tr("Importados condados de {n} estados.", n=n))
             except Exception as e:  # noqa: BLE001
+                logger.exception("No se pudo importar %s", p)
                 messagebox.showerror(APP_NAME, str(e))
 
     def about(self):
@@ -596,6 +597,7 @@ class App(tk.Tk):
                 else:
                     msg = (tr("Ya tiene la versión más reciente ({v}).", v=__version__), False)
             except Exception as e:  # noqa: BLE001
+                logger.warning("Búsqueda de actualizaciones: %s", e)
                 msg = (str(e), False)
             if on_done:
                 self.after(0, lambda: on_done(*msg))

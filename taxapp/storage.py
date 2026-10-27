@@ -65,11 +65,7 @@ def _recent_file() -> Path:
 
 
 def recent() -> List[str]:
-    try:
-        items = json.loads(_recent_file().read_text(encoding="utf-8"))
-        return [x for x in items if Path(x).exists()][:8]
-    except (OSError, ValueError):
-        return []
+    return [x for x in data_loader.read_json(_recent_file(), []) if Path(x).exists()][:8]
 
 
 def add_recent(p: Path):

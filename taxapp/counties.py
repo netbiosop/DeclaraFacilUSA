@@ -36,15 +36,10 @@ def _all() -> Dict[str, List[str]]:
             out.update(json.load(f)["states"])
     except (OSError, ValueError, KeyError) as e:
         logger.warning("No se pudo leer counties_builtin.json: %s", e)
-    try:
-        cached = json.loads(_cache_file().read_text(encoding="utf-8"))
-        for k, v in cached.items():
-            if k not in out or len(v) > len(out[k]):
-                out[k] = v
-    except FileNotFoundError:
-        pass  # todavía no se descargó la lista completa del Census
-    except (OSError, ValueError) as e:
-        logger.warning("Lista de condados descargada ilegible, se usa la incluida: %s", e)
+    # lista completa del Census, si ya se descargó
+    for k, v in data_loader.read_json(_cache_file(), {}).items():
+        if k not in out or len(v) > len(out[k]):
+            out[k] = v
     return out
 
 

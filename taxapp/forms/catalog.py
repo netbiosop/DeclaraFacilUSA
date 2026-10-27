@@ -5,7 +5,6 @@ Los PDF en blanco del IRS y el mapa de campos están en data/formularios/<año>/
 """
 from __future__ import annotations
 
-import json
 from functools import lru_cache
 from pathlib import Path
 from typing import Dict, Optional
@@ -45,11 +44,7 @@ def forms_dir(year: int) -> Path:
 
 @lru_cache(maxsize=None)
 def _load(year: int) -> Optional[dict]:
-    p = data_loader.data_dir() / "formularios" / f"{year}.json"
-    try:
-        return json.loads(p.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return None
+    return data_loader.read_json(data_loader.data_dir() / "formularios" / f"{year}.json")
 
 
 def available(year: int) -> bool:

@@ -6,12 +6,26 @@ Las listas de condados descargadas del Censo se guardan en la carpeta de usuario
 from __future__ import annotations
 
 import json
+import logging
 import os
 import sys
 from functools import lru_cache
 from pathlib import Path
 
 SUPPORTED_YEARS = (2025, 2026)
+
+logger = logging.getLogger(__name__)
+
+
+def read_json(path, default=None):
+    """Lee un JSON. Si no existe devuelve `default` sin avisar; si está dañado lo anota y devuelve `default`."""
+    try:
+        return json.loads(Path(path).read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return default
+    except (OSError, ValueError) as e:
+        logger.warning("No se pudo leer %s: %s", path, e)
+        return default
 
 
 def app_dir() -> Path:

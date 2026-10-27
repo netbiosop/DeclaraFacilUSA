@@ -104,14 +104,11 @@ def _config_path():
 
 
 def load_config() -> AIConfig:
-    try:
-        d = json.loads(_config_path().read_text(encoding="utf-8"))
-        cfg = AIConfig(**{k: v for k, v in d.items() if k in AIConfig.__dataclass_fields__})
-        if cfg.provider not in PROVIDERS:
-            cfg.provider = "anthropic"
-        return cfg
-    except (OSError, ValueError, TypeError):
-        return AIConfig()
+    d = data_loader.read_json(_config_path(), {})
+    cfg = AIConfig(**{k: v for k, v in d.items() if k in AIConfig.__dataclass_fields__})
+    if cfg.provider not in PROVIDERS:
+        cfg.provider = "anthropic"
+    return cfg
 
 
 def save_config(cfg: AIConfig):

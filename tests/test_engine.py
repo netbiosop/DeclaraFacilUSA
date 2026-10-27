@@ -98,7 +98,7 @@ class FederalTests(unittest.TestCase):
 
 
 class StatutoryAmountsTests(unittest.TestCase):
-    """Montos fijados por ley en federal.py (no vienen de data/)."""
+    """Montos de la ley: umbral del Anexo SE, escalones del AOTC y reducción del CTC."""
 
     def test_se_tax_starts_at_400_net(self):
         below = compute_all(make(2025, business_gross=430))["federal"]   # 430 * 0.9235 = 397.11
