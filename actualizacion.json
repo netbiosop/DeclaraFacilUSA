@@ -1,12 +1,12 @@
 {
  "app": "DeclaraFacilUSA",
  "version": "1.5.1",
- "base": "1.5.0",
+ "base": "1.5.1",
  "published": "2026-10-27",
  "notes": "## Novedades / What's new\n\n- **Formularios en español**: con el idioma español se usan las versiones oficiales del IRS en español (1040(SP), 1040-SR(SP) y Anexos 1, 1-A, 2, 3, 8812, C, EIC y SE). Los formularios que el IRS solo publica en inglés siguen en inglés y se envían juntos. Se elige en *Formularios del IRS → Opciones → Idioma de los formularios*.\n- **Pantallas que se acomodan solas**: los textos se ajustan al ancho de la ventana y todo se escala con la escala de Windows (125 %, 150 %) y el tamaño de letra. Las ventanas nunca abren más grandes que la pantalla.\n\n- **Spanish forms**: in Spanish, the official IRS Spanish versions are used where they exist; the rest stay in English.\n- **Self-fitting screens**: text wraps to the window width and everything scales with Windows display scaling and the font size.\n",
  "files": {
   "taxapp/__init__.py": {
-   "sha256": "85ec839c48aab55cd3d7ccbaefe8f1b3269162447515c53dc4b96e4f23677e67",
+   "sha256": "ec373af848b1b6ee701853df9e99e713d2512080d537e1c85fabf6279fb13bf2",
    "size": 405
   },
   "taxapp/accounts.py": {
