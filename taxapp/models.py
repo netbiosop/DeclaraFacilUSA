@@ -470,6 +470,7 @@ class FilingInfo:
     foreign_trust: bool = False
     # Preparador pagado (datos en Configuración); se imprime si está activado
     use_preparer: bool = True
+    forms_language: str = ""              # "" = idioma de la aplicación | en | es (versiones oficiales en español)
     answered: List[str] = field(default_factory=list)   # preguntas guiadas ya respondidas (claves)
 
     def __post_init__(self):

@@ -15,6 +15,7 @@ from ..i18n import _, tr
 from .theme import icon, icon_font
 from .ui import C, label
 from .widgets import COLORS, font
+from . import layout
 
 
 class UpdateDialog(tk.Toplevel):
@@ -25,8 +26,7 @@ class UpdateDialog(tk.Toplevel):
         self.title(_("Actualización disponible"))
         self.configure(bg=c["card"])
         self.transient(app)
-        self.geometry("620x560")
-        self.minsize(520, 440)
+        layout.fit_window(self, 620, 560, 520, 440)
         body = tk.Frame(self, bg=c["card"], padx=24, pady=20)
         body.pack(fill="both", expand=True)
         top = tk.Frame(body, bg=c["card"])

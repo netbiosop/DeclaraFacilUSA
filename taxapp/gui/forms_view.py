@@ -17,6 +17,7 @@ from .lists import ListEditor
 from .screens import Screen
 from .ui import C, label
 from .widgets import COLORS, font, make_tree, money_str, parse_money, ScrollFrame
+from . import layout
 
 
 def preparer_info() -> dict:
@@ -63,8 +64,8 @@ class FormsScreen(Screen):
         right.pack(side="right", fill="y")
         # --- formularios necesarios
         ttk.Label(left, text=_("Formularios que necesita su declaración"), style="Section.TLabel").pack(anchor="w")
-        self.tree = make_tree(left, ("f", "t", "n"), (_("Formulario"), _("Descripción"), _("Copias")),
-                              widths=(120, 420, 60), height=10, anchors=("w", "w", "center"))
+        self.tree = make_tree(left, ("f", "t", "l", "n"), (_("Formulario"), _("Descripción"), _("Idioma"), _("Copias")),
+                              widths=(120, 380, 80, 60), height=10, anchors=("w", "w", "center", "center"))
         self.tree.frame.pack(fill="both", expand=True, pady=6)
         ttk.Label(left, text=_("Revise antes de firmar"), style="Section.TLabel").pack(anchor="w", pady=(8, 0))
         self.warn_txt = tk.Text(left, height=6, wrap="word", relief="flat", background=COLORS["accent_light"],
@@ -85,6 +86,15 @@ class FormsScreen(Screen):
         opt = ttk.Frame(right, style="Card.TFrame")
         opt.pack(fill="x", pady=(14, 0))
         ttk.Label(opt, text=_("Opciones"), style="Section.TLabel").pack(anchor="w")
+        label(opt, _("Idioma de los formularios"), 10, "bold", bg=C("card")).pack(anchor="w", pady=(2, 0))
+        self.lang_var = tk.StringVar(value=forms.forms_language(self.ret))
+        self.lang_es = ttk.Radiobutton(opt, text=_("Español (versiones oficiales del IRS donde existen)"),
+                                       value="es", variable=self.lang_var, command=self._lang_changed)
+        self.lang_es.pack(anchor="w", pady=1)
+        ttk.Radiobutton(opt, text=_("Inglés"), value="en", variable=self.lang_var,
+                        command=self._lang_changed).pack(anchor="w", pady=1)
+        self.lang_note = label(opt, "", 9, fg=C("muted"), bg=C("card"), wraplength=300, justify="left")
+        self.lang_note.pack(anchor="w", pady=(0, 6))
         self.sr_cb = ttk.Checkbutton(opt, text=_("Usar el Formulario 1040-SR (letra grande, 65 años o más)"),
                                      variable=self.use_sr, command=self.refresh)
         self.sr_cb.pack(anchor="w", pady=2)
@@ -116,6 +126,11 @@ class FormsScreen(Screen):
     def on_result(self, res):
         self.refresh()
 
+    def _lang_changed(self):
+        self.ret.filing.forms_language = self.lang_var.get()
+        self.changed()
+        self.refresh()
+
     def _prep_toggle(self):
         self.ret.filing.use_preparer = bool(self.prep_var.get())
         self.changed()
@@ -125,7 +140,7 @@ class FormsScreen(Screen):
         if not res:
             self.app.recalc_now()
             res = self.app.result
-        return forms.plan(self.ret, res, preparer_info(), use_sr=self.use_sr.get())
+        return forms.plan(self.ret, res, preparer_info(), use_sr=self.use_sr.get(), lang=self.lang_var.get())
 
     def refresh(self):
         y = self.ret.tax_year
@@ -165,11 +180,25 @@ class FormsScreen(Screen):
         counts = {}
         for inst in plan.instances:
             counts[inst.form] = counts.get(inst.form, 0) + 1
+        es = self.lang_var.get() == "es"
+        n_es = 0
         for fid in plan.forms():
-            self.tree.insert("", "end", values=(catalog.SHORT.get(fid, fid), catalog.title(y, fid) if ok_year else "",
-                                                counts[fid]))
+            in_es = es and ok_year and catalog.has_spanish(y, fid)
+            n_es += in_es
+            self.tree.insert("", "end", values=(catalog.short(fid) + (" (SP)" if in_es else ""),
+                                                catalog.title(y, fid) if ok_year else "",
+                                                _("Español") if in_es else _("Inglés"), counts[fid]))
         if plan.statements:
-            self.tree.insert("", "end", values=("—", tr("Hojas adicionales: {n}", n=len(plan.statements)), ""))
+            self.tree.insert("", "end", values=("—", tr("Hojas adicionales: {n}", n=len(plan.statements)), "", ""))
+        if not es:
+            self.lang_note.configure(text="")
+        elif ok_year and not catalog.spanish_available(y):
+            self.lang_note.configure(text=_("Las versiones en español aún no están incluidas en esta instalación; "
+                                            "por ahora se generan en inglés."))
+        else:
+            self.lang_note.configure(text=tr("{n} de {t} formularios en español. El IRS solo publica en español el "
+                                             "1040, 1040-SR y los Anexos 1, 1-A, 2, 3, 8812, C, EIC y SE; los demás "
+                                             "van en inglés y se aceptan juntos.", n=n_es, t=len(plan.forms())))
         allq = qmod.questions(self.ret, res)
         miss = [q for q in allq if q.is_missing(self.ret)]
         req = [q for q in miss if q.required]
@@ -230,7 +259,8 @@ class FormsScreen(Screen):
         self.last_lbl.configure(text=_("Generando formularios…"))
         ret, res = self.ret, self.app.result
         prep = preparer_info()
-        opts = dict(draft=draft, editable=self.editable.get(), preparer=prep, use_sr=self.use_sr.get())
+        opts = dict(draft=draft, editable=self.editable.get(), preparer=prep, use_sr=self.use_sr.get(),
+                    lang=self.lang_var.get())
 
         def work():
             try:
@@ -286,8 +316,7 @@ class GuidedQuestions(tk.Toplevel):
         self.title(_("Preguntas para los formularios"))
         self.configure(bg=C("card"))
         self.transient(app)
-        self.geometry("760x560")
-        self.minsize(620, 460)
+        layout.fit_window(self, 760, 560, 620, 460)
         res = app.result
         allq = qmod.questions(app.ret, res)
         self.pending = {q.key for q in allq if q.is_missing(app.ret)} if only_missing else {q.key for q in allq}
@@ -492,8 +521,7 @@ class PackageDialog(tk.Toplevel):
         self.title(_("Borrador generado") if out.draft else _("Formularios listos para firmar"))
         self.configure(bg=C("card"))
         self.transient(app)
-        self.geometry("820x640")
-        self.minsize(680, 520)
+        layout.fit_window(self, 820, 640, 680, 520)
         sf = ScrollFrame(self)
         sf.pack(fill="both", expand=True)
         b = tk.Frame(sf.inner, bg=C("card"), padx=24, pady=18)

@@ -15,6 +15,7 @@ from . import theme
 from .theme import THEMES, ACCENTS, SIZES, icon, icon_font, mix
 from .ui import C, label, card, IconButton, user_chip, flat_button
 from .widgets import COLORS, font, ScrollFrame, make_tree, Tooltip
+from . import layout
 
 SECTIONS = [  # clave, titulo, icono, permiso necesario (None = todos)
     ("appearance", N_("Apariencia"), "palette", None),
@@ -45,7 +46,7 @@ class SettingsView(tk.Frame):
 
         body = tk.Frame(self, bg=c["bg"])
         body.pack(fill="both", expand=True)
-        nav = tk.Frame(body, bg=c["sidebar"], width=280, padx=14, pady=16)
+        nav = tk.Frame(body, bg=c["sidebar"], width=layout.px(280), padx=14, pady=16)
         nav.pack(side="left", fill="y")
         nav.pack_propagate(False)
         tk.Frame(body, bg=c["border"], width=1).pack(side="left", fill="y")

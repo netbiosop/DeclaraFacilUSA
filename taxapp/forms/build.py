@@ -70,7 +70,9 @@ class Plan:
 
 
 class Builder:
-    def __init__(self, ret: TaxReturn, res: dict, preparer: Optional[dict] = None, use_sr: Optional[bool] = None):
+    def __init__(self, ret: TaxReturn, res: dict, preparer: Optional[dict] = None, use_sr: Optional[bool] = None,
+                 lang: str = "en"):
+        self.lang = lang          # idioma de los formularios: "es" usa las versiones oficiales en español
         self.ret = ret
         self.res = res
         self.fed = res["federal"]
@@ -115,6 +117,20 @@ class Builder:
     def warn(self, msg):
         if msg not in self.plan.warnings:
             self.plan.warnings.append(msg)
+
+    def form_lang(self, fid: str) -> str:
+        """Idioma real de un formulario: español solo si el IRS publica esa versión y está incluida."""
+        from . import catalog
+        return "es" if self.lang == "es" and catalog.has_spanish(self.year, fid) else "en"
+
+    def rel(self, relationship: str, fid: str) -> str:
+        """Parentesco en el idioma del formulario (inglés en los formularios en inglés)."""
+        if self.form_lang(fid) == "es" and relationship:
+            return relationship
+        return _rel_en(relationship)
+
+    def t(self, en: str, es: str) -> str:
+        return es if self.lang == "es" else en
 
     def statement(self, title, lines):
         self.plan.statements.append({"title": title, "lines": lines})
@@ -191,7 +207,7 @@ class Builder:
         for i, d in enumerate(deps[:4]):
             ctc = d.qualifies_ctc(self.year) and n_ctc_allowed
             v.update({f"dep{i}_first": upper(d.first_name), f"dep{i}_last": upper(d.last_name),
-                      f"dep{i}_ssn": digits(d.ssn), f"dep{i}_rel": upper(_rel_en(d.relationship)),
+                      f"dep{i}_ssn": digits(d.ssn), f"dep{i}_rel": upper(self.rel(d.relationship, self.main)),
                       f"dep{i}_lived": d.months_lived > 6, f"dep{i}_us": d.months_lived > 6 and d.lived_in_us,
                       f"dep{i}_student": d.full_time_student, f"dep{i}_disabled": d.disabled,
                       f"dep{i}_ctc": ctc, f"dep{i}_odc": not ctc})
@@ -200,9 +216,9 @@ class Builder:
             lines = []
             for d in deps[4:]:
                 ctc = d.qualifies_ctc(self.year) and n_ctc_allowed
-                lines.append(f"{upper(d.full_name())}  SSN {_fmt_ssn(d.ssn)}  {upper(_rel_en(d.relationship))}  "
+                lines.append(f"{upper(d.full_name())}  SSN {_fmt_ssn(d.ssn)}  {upper(self.rel(d.relationship, self.main))}  "
                              f"{'CTC' if ctc else 'ODC'}")
-            self.statement("Form 1040 - Dependents (continued)", lines)
+            self.statement(self.t("Form 1040 - Dependents (continued)", "Formulario 1040 - Dependientes (continuacion)"), lines)
         # Ingresos
         v.update({"L1a": m(L["1a"]), "L1z": m(L["1z"]), "L2a": m(L["2a"]), "L2b": m(L["2b"]), "L3a": m(L["3a"]),
                   "L3b": m(L["3b"]), "L4a": m(L["4a"]), "L4b": m(L["4b"]), "L5a": m(L["5a"]), "L5b": m(L["5b"]),
@@ -390,7 +406,8 @@ class Builder:
             if len(rows) > n_max:
                 extra = rows[n_max - 1:]
                 rows = rows[:n_max - 1] + [("SEE ATTACHED STATEMENT", sum(a for _n, a in extra))]
-                self.statement(f"Schedule B - {'Interest' if key == 'int' else 'Dividends'} (continued)",
+                self.statement(self.t(f"Schedule B - {'Interest' if key == 'int' else 'Dividends'} (continued)",
+                                      f"Anexo B - {'Intereses' if key == 'int' else 'Dividendos'} (continuacion)"),
                                [f"{n:<50} {m(a, True):>12}" for n, a in extra])
             for i, (n, a) in enumerate(rows):
                 v[f"{key}{i}_name"] = n
@@ -465,7 +482,8 @@ class Builder:
         if len(rows) > 9:
             extra = rows[8:]
             rows = rows[:8] + [("SEE ATTACHED STATEMENT", sum(a for _n, a in extra))]
-            self.statement("Schedule C - Part V Other expenses (continued)",
+            self.statement(self.t("Schedule C - Part V Other expenses (continued)",
+                                      "Anexo C - Parte V Otros gastos (continuacion)"),
                            [f"{n:<50} {m(a, True):>12}" for n, a in extra])
         for i, (n, a) in enumerate(rows):
             v[f"oth{i}_desc"] = n
@@ -580,7 +598,8 @@ class Builder:
                       f"prov{i}_hh_yes": p.household_employee, f"prov{i}_hh_no": not p.household_employee,
                       f"prov{i}_amt": m(p.amount, True)})
         if len(provs) > 3:
-            self.statement("Form 2441 - Part I Care providers (continued)",
+            self.statement(self.t("Form 2441 - Part I Care providers (continued)",
+                                      "Formulario 2441 - Parte I Proveedores de cuidado (continuacion)"),
                            [f"{upper(p.name)}  {upper(p.address)}  TIN {p.tin}  {m(p.amount, True)}" for p in provs[3:]])
         qual = [dep for dep in r.dependents if dep.qualifies_care(self.year)]
         n = len(qual) or cr.care_persons
@@ -649,7 +668,7 @@ class Builder:
             yr = (dep.dob or "")[:4]
             a = dep.age(self.year)
             v.update({f"c{i}_name": upper(dep.full_name()), f"c{i}_ssn": digits(dep.ssn),
-                      f"c{i}_rel": upper(_rel_en(dep.relationship)), f"c{i}_months": str(min(12, dep.months_lived))})
+                      f"c{i}_rel": upper(self.rel(dep.relationship, "sei")), f"c{i}_months": str(min(12, dep.months_lived))})
             for k, ch in enumerate(yr):
                 v[f"c{i}_y{k}"] = ch
             if a is not None and a >= 19:
@@ -918,8 +937,9 @@ def _num(s) -> float:
     return -x if neg else x
 
 
-def build(ret: TaxReturn, res: dict, preparer: Optional[dict] = None, use_sr: Optional[bool] = None) -> Plan:
-    return Builder(ret, res, preparer, use_sr).build()
+def build(ret: TaxReturn, res: dict, preparer: Optional[dict] = None, use_sr: Optional[bool] = None,
+          lang: str = "en") -> Plan:
+    return Builder(ret, res, preparer, use_sr, lang).build()
 
 
 def _fmt_ein(s: str) -> str:

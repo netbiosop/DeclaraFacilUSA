@@ -1486,4 +1486,13 @@ EN = {
     '¿Vivió separado(a) de su cónyuge los últimos 6 meses del año?': 'Did you live apart from your spouse for the last 6 months of the year?',
     '• Hojas adicionales: {n}': '• Additional statements: {n}',
     '‹ Anterior': '‹ Previous',
+    'El IRS acepta las versiones en español (por ejemplo, el Formulario 1040(SP)) igual que las versiones en inglés. Los formularios que el IRS no publica en español se presentan en inglés; puede combinarlos en la misma declaración.': 'The IRS accepts the Spanish versions (for example, Form 1040(SP)) just like the English versions. Forms the IRS does not publish in Spanish are filed in English; you can combine them in the same return.',
+    'Español': 'Spanish',
+    'Español (versiones oficiales del IRS donde existen)': 'Spanish (official IRS versions where they exist)',
+    'Idioma de los formularios': 'Forms language',
+    'Inglés': 'English',
+    'Las versiones en español aún no están incluidas en esta instalación; por ahora se generan en inglés.': 'The Spanish versions are not included in this installation yet; for now the forms are generated in English.',
+    '[solo existe en inglés]': '[only exists in English]',
+    '[versión oficial en español]': '[official Spanish version]',
+    '{n} de {t} formularios en español. El IRS solo publica en español el 1040, 1040-SR y los Anexos 1, 1-A, 2, 3, 8812, C, EIC y SE; los demás van en inglés y se aceptan juntos.': '{n} of {t} forms in Spanish. The IRS only publishes the 1040, 1040-SR and Schedules 1, 1-A, 2, 3, 8812, C, EIC and SE in Spanish; the others go in English and are accepted together.',
 }

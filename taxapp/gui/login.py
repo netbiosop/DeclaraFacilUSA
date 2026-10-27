@@ -9,6 +9,7 @@ from ..i18n import _, tr
 from .theme import icon, icon_font, mix
 from .ui import C, label, lang_toggle
 from .widgets import COLORS, font
+from . import layout
 
 
 class LoginView(tk.Frame):
@@ -19,7 +20,7 @@ class LoginView(tk.Frame):
         self.app = app
         self.mode = mode
         c = COLORS
-        left = tk.Frame(self, bg=c["accent"], width=500, padx=48, pady=48)
+        left = tk.Frame(self, bg=c["accent"], width=layout.px(500), padx=48, pady=48)
         left.pack(side="left", fill="y")
         left.pack_propagate(False)
         on, soft = c["on_accent"], mix(c["on_accent"], c["accent"], 0.22)
@@ -50,7 +51,7 @@ class LoginView(tk.Frame):
         label(foot, tr("Tras {n} intentos fallidos la cuenta se bloquea {m} minutos", n=s["max_attempts"],
                        m=s["lock_minutes"]), 9, fg=c["muted"]).pack(side="right")
 
-        form = tk.Frame(right, bg=c["card"], width=420)
+        form = tk.Frame(right, bg=c["card"], width=layout.px(420))
         form.place(relx=0.5, rely=0.5, anchor="center")
         self.vars = {}
         self.entries = {}

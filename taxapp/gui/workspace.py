@@ -13,6 +13,7 @@ from .screens import SCREENS
 from .theme import icon, icon_font
 from .ui import C, Pill, Progress, IconButton, flat_button, user_chip, label
 from .widgets import COLORS, font, Tooltip
+from . import layout
 
 SECTIONS = [("personal", N_("Información personal")), ("address", N_("Dirección, estado y condado")),
             ("dependents", N_("Dependientes")), ("income", N_("Ingresos")), ("deductions", N_("Deducciones")),
@@ -161,7 +162,7 @@ class Workspace(tk.Frame):
         # ---- cuerpo
         main = tk.Frame(self, bg=c["bg"])
         main.pack(fill="both", expand=True)
-        side = tk.Frame(main, bg=c["sidebar"], width=268, padx=14, pady=16)
+        side = tk.Frame(main, bg=c["sidebar"], width=layout.px(268), padx=14, pady=16)
         side.pack(side="left", fill="y")
         side.pack_propagate(False)
         tk.Frame(main, bg=c["border"], width=1).pack(side="left", fill="y")
@@ -191,7 +192,7 @@ class Workspace(tk.Frame):
             self.nav[key] = (row, dot, txt, i)
 
         if self.docked or self.meter_mode == "panel":
-            right = tk.Frame(main, bg=c["bg"], width=370 if self.docked else 300)
+            right = tk.Frame(main, bg=c["bg"], width=layout.px(370 if self.docked else 300))
             right.pack(side="right", fill="y")
             right.pack_propagate(False)
             if self.meter_mode == "panel":

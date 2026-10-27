@@ -27,6 +27,12 @@ FILE_NAMES = {"1040": "1040", "1040sr": "1040-SR", "s1": "Anexo_1", "s1a": "Anex
               "8863": "8863", "8889": "8889", "8880": "8880", "8995": "8995", "8959": "8959", "8960": "8960",
               "1040v": "1040-V"}
 FILE_NAMES_EN = {k: v.replace("Anexo_", "Schedule_") for k, v in FILE_NAMES.items()}
+SHORT_ES = {k: v.replace("Schedule ", "Anexo ").replace("Form ", "Formulario ") for k, v in SHORT.items()}
+
+
+def short(fid: str) -> str:
+    """Nombre corto del formulario en el idioma de la aplicación (Schedule C / Anexo C)."""
+    return (SHORT if is_en() else SHORT_ES).get(fid, fid)
 
 
 def file_name(fid: str) -> str:
@@ -67,8 +73,28 @@ def title(year: int, fid: str) -> str:
     return f["title"][1] if is_en() else f["title"][0]
 
 
-def pdf_path(year: int, fid: str) -> Path:
-    return forms_dir(year) / forms(year)[fid]["file"]
+def has_spanish(year: int, fid: str) -> bool:
+    """True si el IRS publica una versión oficial en español de este formulario y está incluida."""
+    f = forms(year).get(fid) or {}
+    return "es" in f and (forms_dir(year) / f["es"]["file"]).exists()
+
+
+def spanish_available(year: int) -> bool:
+    return any(has_spanish(year, fid) for fid in forms(year))
+
+
+def variant(year: int, fid: str, lang: str = "en") -> dict:
+    """Edición del formulario a usar: {'file', 'fields', 'pages', 'lang'}. Si no hay versión en el idioma pedido,
+    se usa la oficial en inglés."""
+    f = forms(year)[fid]
+    if lang == "es" and has_spanish(year, fid):
+        v = f["es"]
+        return {"file": v["file"], "fields": v["fields"], "pages": v.get("pages"), "lang": "es"}
+    return {"file": f["file"], "fields": f["fields"], "pages": f.get("pages"), "lang": "en"}
+
+
+def pdf_path(year: int, fid: str, lang: str = "en") -> Path:
+    return forms_dir(year) / variant(year, fid, lang)["file"]
 
 
 def clear_cache():

@@ -19,7 +19,7 @@ from typing import List, Optional
 
 from .. import APP_NAME
 from ..engine import fmt_money
-from ..i18n import _, tr
+from ..i18n import _, is_en, tr
 from ..models import FILING_STATUSES, TaxReturn
 from . import catalog, mailing, pdf
 from .build import Plan, build as _build
@@ -36,8 +36,17 @@ def available(year: int) -> bool:
     return catalog.available(year)
 
 
-def plan(ret: TaxReturn, res: dict, preparer: Optional[dict] = None, use_sr: Optional[bool] = None) -> Plan:
-    return _build(ret, res, preparer, use_sr)
+def forms_language(ret: TaxReturn) -> str:
+    """Idioma de los formularios: el elegido en la declaración o, si no se eligió, el idioma de la aplicación."""
+    lang = (ret.filing.forms_language or "").strip()
+    if lang in ("en", "es"):
+        return lang
+    return "en" if is_en() else "es"
+
+
+def plan(ret: TaxReturn, res: dict, preparer: Optional[dict] = None, use_sr: Optional[bool] = None,
+         lang: Optional[str] = None) -> Plan:
+    return _build(ret, res, preparer, use_sr, lang or forms_language(ret))
 
 
 @dataclass
@@ -52,6 +61,8 @@ class Generated:
     warnings: List[str] = field(default_factory=list)
     draft: bool = False
     mailing: dict = field(default_factory=dict)
+    lang: str = "en"
+    spanish: List[str] = field(default_factory=list)   # formularios generados en su versión oficial en español
 
 
 def _safe(s: str) -> str:
@@ -66,16 +77,17 @@ def default_folder(ret: TaxReturn, base: Path, draft: bool) -> Path:
 
 
 def generate(ret: TaxReturn, res: dict, folder: Path, *, draft: bool, editable: bool = False,
-             preparer: Optional[dict] = None, use_sr: Optional[bool] = None) -> Generated:
+             preparer: Optional[dict] = None, use_sr: Optional[bool] = None,
+             lang: Optional[str] = None) -> Generated:
     pdf.require()
     year = ret.tax_year
     if not catalog.available(year):
         raise FileNotFoundError(tr("No hay formularios oficiales del IRS para {y} en esta versión.", y=year))
-    p = _build(ret, res, preparer, use_sr)
+    lang = lang or forms_language(ret)
+    p = _build(ret, res, preparer, use_sr, lang)
     folder = Path(folder)
     folder.mkdir(parents=True, exist_ok=True)
-    fmap = catalog.forms(year)
-    out = Generated(folder=folder, draft=draft, warnings=list(p.warnings), forms=p.forms())
+    out = Generated(folder=folder, draft=draft, warnings=list(p.warnings), forms=p.forms(), lang=lang)
     stamp = date.today().isoformat()
     big = _("BORRADOR - NO PRESENTAR")
     small = tr("Borrador generado el {d} con {app}. Revise todos los datos antes de firmar.", d=stamp, app=APP_NAME)
@@ -90,9 +102,15 @@ def generate(ret: TaxReturn, res: dict, folder: Path, *, draft: bool, editable: 
     parts: List[bytes] = []
     per_form: dict = {}
     for inst in insts:
-        args = (catalog.pdf_path(year, inst.form), fmap[inst.form]["fields"], inst.values)
-        flat = pdf.fill(*args, flatten=True, pages=inst.pages)
-        live = pdf.fill(*args, flatten=False, pages=inst.pages) if editable else None
+        var = catalog.variant(year, inst.form, lang)
+        if var["lang"] == "es":
+            out.spanish.append(inst.form) if inst.form not in out.spanish else None
+        pages = inst.pages
+        if inst.form == "1040sr" and var.get("pages"):
+            pages = list(range(var["pages"] - 1))   # la última página es la tabla de deducción estándar
+        args = (catalog.forms_dir(year) / var["file"], var["fields"], inst.values)
+        flat = pdf.fill(*args, flatten=True, pages=pages)
+        live = pdf.fill(*args, flatten=False, pages=pages) if editable else None
         per_form.setdefault(inst.form, []).append((flat, live))
     seq = 1
     for fid in sorted(per_form, key=lambda f: order.get(f, 99)):
@@ -123,7 +141,8 @@ def generate(ret: TaxReturn, res: dict, folder: Path, *, draft: bool, editable: 
     owed = res["federal"]["lines"].get("37", 0.0)
     v_inst = [i for i in p.instances if i.form == "1040v"]
     if v_inst:
-        data = finish(pdf.fill(catalog.pdf_path(year, "1040v"), fmap["1040v"]["fields"], v_inst[0].values,
+        var = catalog.variant(year, "1040v", lang)
+        data = finish(pdf.fill(catalog.forms_dir(year) / var["file"], var["fields"], v_inst[0].values,
                                flatten=not editable))
         out.voucher = folder / f"{prefix}{catalog.file_name('1040v')}_{year}.pdf"
         out.voucher.write_bytes(data)
@@ -151,7 +170,7 @@ def instructions_pdf(ret: TaxReturn, res: dict, p: Plan, out: Generated, draft: 
     L = fed["lines"]
     year = ret.tax_year
     info = out.mailing
-    main = catalog.SHORT.get(p.main_form, "1040")
+    main = catalog.short(p.main_form)
     blocks = [("h1", tr("Declaración federal {y} — instrucciones de envío", y=year))]
     if draft:
         blocks.append(("box", _("ESTE ES UN BORRADOR. No lo firme ni lo envíe: revíselo y genere los formularios "
@@ -179,7 +198,7 @@ def instructions_pdf(ret: TaxReturn, res: dict, p: Plan, out: Generated, draft: 
     steps.append(_("Adjunte la Copia B de cada W-2 (y de los W-2G y 1099-R con impuesto retenido) en el frente de la "
                    "página 1 del 1040."))
     steps.append(tr("Ordene las hojas así: {lst}. Así está armado el archivo COMPLETO.",
-                    lst=", ".join(catalog.SHORT.get(f, f) for f in p.forms() if f != "1040v")))
+                    lst=", ".join(catalog.short(f) for f in p.forms() if f != "1040v")))
     if L.get("37", 0) >= 1:
         steps.append(tr("Pague {a}: en línea en www.irs.gov/payments (recomendado), o con cheque/giro a nombre de "
                         "\"United States Treasury\" escribiendo en él su teléfono, su SSN y \"{y} Form {f}\". Coloque "
@@ -200,7 +219,14 @@ def instructions_pdf(ret: TaxReturn, res: dict, p: Plan, out: Generated, draft: 
     for f in p.forms():
         n = sum(1 for inst in p.instances if inst.form == f)
         extra = tr(" ({n} copias)", n=n) if n > 1 else ""
+        if out.lang == "es":
+            extra += "  " + (_("[versión oficial en español]") if f in out.spanish or
+                             (f == "1040v" and catalog.has_spanish(year, f)) else _("[solo existe en inglés]"))
         blocks.append(("p", f"• {catalog.title(year, f)}{extra}"))
+    if out.lang == "es":
+        blocks.append(("p", _("El IRS acepta las versiones en español (por ejemplo, el Formulario 1040(SP)) igual que "
+                              "las versiones en inglés. Los formularios que el IRS no publica en español se presentan "
+                              "en inglés; puede combinarlos en la misma declaración.")))
     if p.statements:
         blocks.append(("p", tr("• Hojas adicionales: {n}", n=len(p.statements))))
     if p.warnings:

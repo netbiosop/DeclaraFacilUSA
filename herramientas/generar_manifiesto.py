@@ -32,21 +32,46 @@ def build(root: Path = ROOT) -> dict:
             "notes": notes, "files": files}
 
 
+def published_version(root: Path):
+    """Version publicada en GitHub (actualizacion.json de la rama main), o None si no se puede consultar."""
+    import urllib.request
+    try:
+        repo = json.loads((root / "data" / "actualizaciones.json").read_text(encoding="utf-8")).get("repo", "")
+    except (OSError, ValueError):
+        repo = ""
+    if not repo:
+        return None
+    req = urllib.request.Request(f"https://api.github.com/repos/{repo}/contents/actualizacion.json?ref=main",
+                                 headers={"Accept": "application/vnd.github.raw", "User-Agent": "DeclaraFacilUSA"})
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            return json.loads(r.read().decode("utf-8")).get("version")
+    except Exception:  # noqa: BLE001 - sin conexion: no se bloquea la publicacion
+        return None
+
+
 def main():
-    root = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else ROOT
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    root = Path(args[0]).resolve() if args else ROOT
     out = root / "actualizacion.json"
-    prev = None
-    if out.exists():
-        try:
-            prev = json.loads(out.read_text(encoding="utf-8")).get("version")
-        except ValueError:
-            prev = None
     man = build(root)
-    if "--check-new" in sys.argv and prev == man["version"]:
-        print(f"ERROR: la version {prev} ya fue publicada. Suba el numero en taxapp\\__init__.py.")
-        sys.exit(2)
+    if "--check-new" in sys.argv:
+        pub = published_version(root)
+        if pub == man["version"]:
+            print(f"ERROR: la version {pub} ya esta publicada en GitHub. Suba el numero en taxapp\\__init__.py "
+                  f"(por ejemplo {_next(pub)}) y anote las novedades en instalador\\NOTAS_VERSION.md.")
+            sys.exit(2)
     out.write_text(json.dumps(man, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"Manifiesto: version {man['version']} (base {man['base']}), {len(man['files'])} archivos")
+
+
+def _next(v: str) -> str:
+    parts = (v or "0").split(".")
+    try:
+        parts[-1] = str(int(parts[-1]) + 1)
+    except ValueError:
+        return v
+    return ".".join(parts)
 
 
 if __name__ == "__main__":

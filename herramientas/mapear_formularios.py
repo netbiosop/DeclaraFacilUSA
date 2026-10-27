@@ -48,6 +48,13 @@ FORMS = {
 }
 
 
+# Versiones oficiales en español publicadas por el IRS (van en data/formularios/<año>/es/). Los demás formularios
+# solo existen en inglés.
+SPANISH = {"1040": "f1040sp.pdf", "1040sr": "f1040srs.pdf", "s1": "f1040s1s.pdf", "s1a": "f1040asp.pdf",
+           "s2": "f1040s2s.pdf", "s3": "f1040s3s.pdf", "s8812": "f1040s8s.pdf", "sc": "f1040scs.pdf",
+           "sei": "f1040sep.pdf", "sse": "f1040ssp.pdf"}
+
+
 def _seq(prefix, first, n, step=1, width=2):
     return [f"{prefix}{str(first + i * step).zfill(width)}" for i in range(n)]
 
@@ -465,9 +472,59 @@ def build(year):
             sr_map[key] = other
     fname, root, seq, te, tn = FORMS["1040sr"]
     result["forms"]["1040sr"] = {"file": fname, "seq": seq, "title": [te, tn], "pages": 4, "fields": sr_map}
+    # Versiones en español: se alinean campo por campo con la versión en inglés (mismo tipo, estados y largo).
+    for fid, es_file in SPANISH.items():
+        es_pdf = src / "es" / es_file
+        if fid not in result["forms"] or not es_pdf.exists():
+            continue
+        en = result["forms"][fid]
+        es_map, es_errs, n_pages = align_variant(src / en["file"], es_pdf, en["fields"])
+        if es_errs:
+            errors += [f"{fid} (es): {e}" for e in es_errs]
+            continue
+        en["es"] = {"file": "es/" + es_file, "pages": n_pages, "fields": es_map}
     # orden de presentación
     result["forms"] = {k: result["forms"][k] for k in FORMS if k in result["forms"]}
     return result, errors
+
+
+def _signature(info):
+    ft, states, ml, page = info
+    return (ft, len(states) if ft == "/Btn" else 0, ml)
+
+
+def align_variant(en_pdf, var_pdf, mapping):
+    """Mapea las claves de un formulario a otra edición del mismo formulario (p. ej. la versión en español),
+    alineando la secuencia de campos por tipo, estados de casilla, largo máximo y página."""
+    import difflib
+    import pypdf
+    en = pdf_fields(en_pdf)
+    va = pdf_fields(var_pdf)
+    en_names, va_names = list(en), list(va)
+    a = [_signature(en[n]) for n in en_names]
+    b = [_signature(va[n]) for n in va_names]
+    pos = {}
+    sm = difflib.SequenceMatcher(None, a, b, autojunk=False)
+    for tag, i1, i2, j1, j2 in sm.get_opcodes():
+        if tag == "equal" or (tag == "replace" and i2 - i1 == j2 - j1):
+            for k in range(i2 - i1):
+                if a[i1 + k][0] == b[j1 + k][0]:
+                    pos[en_names[i1 + k]] = va_names[j1 + k]
+    out, errs = {}, []
+    for key, val in mapping.items():
+        full = val[0] if isinstance(val, list) else val
+        other = pos.get(full)
+        if not other:
+            errs.append(f"{key}: sin campo equivalente para {full}")
+            continue
+        if isinstance(val, list) and val[1] and val[1] not in va[other][1]:
+            if len(va[other][1]) == 1:   # misma casilla con otro nombre de estado (p. ej. /Yes -> /Si)
+                out[key] = [other, va[other][1][0]] + val[2:]
+                continue
+            errs.append(f"{key}: el estado {val[1]} no existe en {other} ({va[other][1]})")
+            continue
+        out[key] = [other] + val[1:] if isinstance(val, list) else other
+    return out, errs, len(pypdf.PdfReader(str(var_pdf)).pages)
 
 
 def dump(year):

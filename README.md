@@ -24,6 +24,9 @@ En la sección **Formularios del IRS** (después de *Resumen*):
    un PDF por formulario, el archivo **COMPLETO** en el orden de adjuntos del IRS, el comprobante **1040-V** si hay
    saldo a pagar y la hoja **LEAME_Instrucciones_de_envio.pdf** con la dirección del IRS para su estado y qué firmar.
 
+Idioma: con *Español* se usan las versiones oficiales del IRS en español (1040(SP), 1040-SR(SP), Anexos 1, 1-A, 2,
+3, 8812, C, EIC y SE, en `data/formularios/<año>/es/`); los demás formularios solo existen en inglés.
+
 Formularios: 1040 / 1040-SR; Anexos 1, 1-A, 2, 3, A, B, C, D, SE, 8812, EIC; Formularios 8949, 8863, 2441, 8880,
 8995, 8889, 6251, 8959, 8960; 1040-V. Los PDF en blanco del IRS van incluidos en `data/formularios/<año>/` y el mapa
 de campos en `data/formularios/<año>.json` (se genera y valida con `herramientas/mapear_formularios.py`). Los

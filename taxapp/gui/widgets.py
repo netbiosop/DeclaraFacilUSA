@@ -159,7 +159,10 @@ class Form:
         return q
 
     def _label(self, text, help_text=None):
-        lbl = ttk.Label(self.parent, text=text, style="Card.TLabel", width=self.label_width, anchor="w", wraplength=300)
+        from . import layout
+        # Ancho mínimo (no fijo) para que el texto nunca quede cortado; la línea se parte a ~38 caracteres.
+        lbl = ttk.Label(self.parent, text=text, style="Card.TLabel", width=-self.label_width, anchor="w",
+                        wraplength=layout.px(max(300, self.label_width * 9)))
         lbl.grid(row=self.row, column=0, sticky="w", padx=(4, 8), pady=3)
         if help_text:
             Tooltip(lbl, help_text)
@@ -306,7 +309,9 @@ def make_tree(parent, columns, headings, widths=None, height=8, anchors=None) ->
     tree = ttk.Treeview(frame, columns=columns, show="headings", height=height)
     for i, (c, h) in enumerate(zip(columns, headings)):
         tree.heading(c, text=h)
-        tree.column(c, width=(widths[i] if widths else 120), anchor=(anchors[i] if anchors else "w"), stretch=True)
+        from . import layout
+        tree.column(c, width=layout.px(widths[i] if widths else 120), anchor=(anchors[i] if anchors else "w"),
+                    stretch=True, minwidth=layout.px(40))
     vsb = ttk.Scrollbar(frame, orient="vertical", command=tree.yview)
     tree.configure(yscrollcommand=vsb.set)
     tree.pack(side="left", fill="both", expand=True)
@@ -323,8 +328,8 @@ class Dialog(tk.Toplevel):
         self.title(title)
         self.configure(bg=COLORS["card"])
         self.transient(master)
-        self.geometry(f"{width}x{height}")
-        self.minsize(460, 360)
+        from . import layout
+        layout.fit_window(self, width, height, 460, 360)
         self.obj = obj
         self.on_ok = on_ok
         sf = ScrollFrame(self)

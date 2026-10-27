@@ -12,6 +12,7 @@ from ..local import localities_for_state, county_tax_info
 from ..models import TaxReturn, Person, W2, Dependent, FILING_STATUSES
 from .screens import STATE_KINDS, NONE_LOC, loc_from_model, loc_to_model
 from .widgets import COLORS, font, make_tree, Form
+from . import layout
 
 
 # ============================================================================ Explorador estado/condado
@@ -20,7 +21,7 @@ class ExplorerWindow(tk.Toplevel):
         super().__init__(app)
         self.app = app
         self.title(_("Explorador de impuestos por estado y condado"))
-        self.geometry("980x680")
+        layout.fit_window(self, 980, 680)
         self.configure(bg=COLORS["card"])
         top = ttk.Frame(self, style="Card.TFrame", padding=12)
         top.pack(fill="x")
@@ -110,7 +111,7 @@ class QuickCalcWindow(tk.Toplevel):
     def __init__(self, app):
         super().__init__(app)
         self.title(_("Calculadora rápida"))
-        self.geometry("880x620")
+        layout.fit_window(self, 880, 620)
         self.configure(bg=COLORS["card"])
         self.r = TaxReturn(tax_year=2026)
         self.r.taxpayer = Person(first_name="Estimado", dob="1990-01-01")
@@ -195,7 +196,7 @@ class GuideWindow(tk.Toplevel):
     def __init__(self, app):
         super().__init__(app)
         self.title(_("Guía de impuestos de EE.UU."))
-        self.geometry("900x720")
+        layout.fit_window(self, 900, 720)
         txt = tk.Text(self, wrap="word", font=font(10), padx=18, pady=14, relief="flat")
         vsb = ttk.Scrollbar(self, command=txt.yview)
         txt.configure(yscrollcommand=vsb.set)

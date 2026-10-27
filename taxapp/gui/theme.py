@@ -14,6 +14,7 @@ from tkinter import ttk
 from .. import data_loader
 from ..i18n import N_
 from . import widgets
+from . import layout
 
 THEMES = {
     "A": {"name": N_("A · Verde moderno"), "desc": N_("Claro, con tarjetas"), "dark": False, "accent": "#0F7B5C",
@@ -302,7 +303,7 @@ def style_ttk(root):
                  bordercolor=c["border"], lightcolor=c["surface"])
     st.map("TNotebook.Tab", background=[("selected", c["card"])], foreground=[("selected", c["primary"])],
            lightcolor=[("selected", c["card"])])
-    st.configure("Treeview", rowheight=round(28 * widgets.STYLE["scale"]), font=f(10), fieldbackground=c["card"],
+    st.configure("Treeview", rowheight=layout.px(28), font=f(10), fieldbackground=c["card"],
                  background=c["card"], foreground=c["text"], bordercolor=c["border"])
     st.map("Treeview", background=[("selected", c["tint"])], foreground=[("selected", c["tint_fg"])])
     st.configure("Treeview.Heading", font=f(10, "bold"), background=c["surface"], foreground=c["muted"],

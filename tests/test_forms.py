@@ -106,6 +106,9 @@ class MapTests(unittest.TestCase):
             self.assertIn(fid, fm)
             self.assertTrue(catalog.pdf_path(2025, fid).exists(), fid)
         self.assertFalse(catalog.available(2026))   # el IRS aún no publica los de 2026
+        es = {fid for fid in catalog.forms(2025) if catalog.has_spanish(2025, fid)}
+        self.assertEqual(es, {"1040", "1040sr", "s1", "s1a", "s2", "s3", "s8812", "sc", "sei", "sse"})
+        self.assertEqual(catalog.variant(2025, "sa", "es")["lang"], "en")   # el Anexo A solo existe en inglés
 
     @unittest.skipUnless(HAVE_PYPDF, "pypdf no instalado")
     def test_every_mapped_field_exists(self):
@@ -123,6 +126,7 @@ class MapTests(unittest.TestCase):
 class BuilderTests(unittest.TestCase):
     def plan(self, ret, **kw):
         res = compute_all(ret)
+        kw.setdefault("lang", "en")
         return res, forms.plan(ret, res, **kw)
 
     def vals(self, plan, fid, n=0):
@@ -267,6 +271,11 @@ class GenerateTests(unittest.TestCase):
             d = forms.generate(ret, res, pathlib.Path(tmp) / "d", draft=True)
             self.assertIn("BORRADOR", pypdf.PdfReader(str(d.package)).pages[0].extract_text().upper().replace(" ", "")
                           .replace("DRAFT", "BORRADOR"))
+            sp = forms.generate(ret, res, pathlib.Path(tmp) / "sp", draft=False, lang="es")
+            self.assertIn("sc", sp.spanish)
+            first = pypdf.PdfReader(str(sp.package)).pages[0].extract_text()
+            self.assertIn("Declaración de Impuestos", first)
+            self.assertIn("SMITH", first)
             e = forms.generate(ret, res, pathlib.Path(tmp) / "e", draft=False, editable=True)
             single = [p for p in e.files if "Anexo_C" in p.name or "Schedule_C" in p.name][0]
             self.assertTrue(pypdf.PdfReader(str(single)).get_fields())

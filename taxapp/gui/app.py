@@ -19,6 +19,7 @@ from ..review import review
 from . import theme
 from .widgets import Form
 from .workspace import Workspace, SECTIONS
+from . import layout
 
 __all__ = ["App", "SECTIONS", "main"]
 
@@ -38,8 +39,9 @@ class App(tk.Tk):
                 self.iconbitmap(default=str(ico))
             except tk.TclError:
                 pass
-        self.geometry("1320x840")
-        self.minsize(1120, 700)
+        layout.init(self)
+        layout.fit_window(self, 1320, 840, 960, 620)
+        layout.maximize_if_small(self, 1320, 840)
         theme.register_fonts()
         self.user = None
         self.prefs = dict(accounts.DEFAULT_PREFS)

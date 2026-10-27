@@ -14,6 +14,7 @@ from ..i18n import _, tr
 from . import widgets
 from .theme import icon, icon_font
 from .widgets import COLORS, font, Tooltip
+from . import layout
 
 MAX_HISTORY = 16   # mensajes que se reenvian como contexto de la conversacion
 
@@ -406,7 +407,7 @@ class AssistantPanel(tk.Frame):
     def show_payload(self):
         w = tk.Toplevel(self.winfo_toplevel())
         w.title(_("Datos que se envían a la IA"))
-        w.geometry("760x560")
+        layout.fit_window(w, 760, 560)
         t = tk.Text(w, wrap="word", font=("Consolas", 9), padx=10, pady=8)
         t.pack(fill="both", expand=True)
         t.insert("end", _("Esto es exactamente lo que se envía como instrucciones al proveedor, junto con sus preguntas:")
@@ -497,8 +498,7 @@ class AssistantWindow(tk.Toplevel):
     def __init__(self, app):
         super().__init__(app)
         self.title(_("Asistente de IA") + " — " + APP_NAME)
-        self.geometry("780x780")
-        self.minsize(560, 480)
+        layout.fit_window(self, 780, 780, 560, 480)
         self.configure(bg=COLORS["card"])
         self.panel = AssistantPanel(self, app)
         self.panel.pack(fill="both", expand=True)

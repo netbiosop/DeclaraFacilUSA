@@ -14,6 +14,7 @@ from .theme import icon, icon_font, mix
 from .ui import (C, Tile, Progress, IconButton, flat_button, user_chip, lang_toggle, label, card, fmt_date,
                  key_dates, next_filing_deadline, year_status)
 from .widgets import COLORS, font, Tooltip, make_tree
+from . import layout
 
 
 def _actions(app):
@@ -83,7 +84,7 @@ class HomeA(tk.Frame):
 
         body = tk.Frame(self, bg=c["bg"], padx=32, pady=26)
         body.pack(fill="both", expand=True)
-        aside = tk.Frame(body, bg=c["bg"], width=340)
+        aside = tk.Frame(body, bg=c["bg"], width=layout.px(340))
         aside.pack(side="right", fill="y", padx=(26, 0))
         aside.pack_propagate(False)
         main = tk.Frame(body, bg=c["bg"])
@@ -173,7 +174,7 @@ class HomeB(tk.Frame):
         self.app = app
         c = COLORS
         acts = _actions(app)
-        nav = tk.Frame(self, bg=c["sidebar"], width=250, padx=14, pady=20)
+        nav = tk.Frame(self, bg=c["sidebar"], width=layout.px(250), padx=14, pady=20)
         nav.pack(side="left", fill="y")
         nav.pack_propagate(False)
         tk.Frame(self, bg=c["border"], width=1).pack(side="left", fill="y")
@@ -237,7 +238,7 @@ class HomeB(tk.Frame):
 
         cont = card(row, padx=22, pady=20, bg=c["surface"])
         cont.pack(side="left", fill="y", padx=(18, 0))
-        cont.configure(width=300)
+        cont.configure(width=layout.px(300))
         label(cont, _("Continuar donde quedó"), 10, "bold", fg=c["muted"]).pack(anchor="w")
         name, pct, cmd = _continue_info(app)
         ring = tk.Canvas(cont, width=96, height=96, bg=c["surface"], highlightthickness=0)
@@ -397,7 +398,7 @@ class ReturnsWindow(tk.Toplevel):
         super().__init__(app)
         self.app = app
         self.title(_("Mis declaraciones"))
-        self.geometry("860x520")
+        layout.fit_window(self, 860, 520)
         self.configure(bg=C("card"))
         top = tk.Frame(self, bg=C("card"), padx=16, pady=12)
         top.pack(fill="x")

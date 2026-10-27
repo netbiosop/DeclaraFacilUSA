@@ -7,3 +7,5 @@ instalador_salida/
 *.tmp
 /formularios/
 descargar_formularios_irs.bat
+descargar_formularios_espanol.bat
+descargar_formularios_espanol.ps1
