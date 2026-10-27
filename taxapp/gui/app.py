@@ -674,11 +674,22 @@ class App(tk.Tk):
         self.ask_ai(ai.field_question(label.rstrip(" :"), help_text, sec))
 
 
+LOG_MAX_BYTES = 1_000_000
+
+
 def _setup_logging():
-    """Avisos y errores internos en Documentos\\DeclaraFacilUSA\\errores.log (1 MB, con una copia anterior)."""
-    import logging.handlers
-    handler = logging.handlers.RotatingFileHandler(data_loader.user_dir() / "errores.log", maxBytes=1_000_000,
-                                                   backupCount=1, encoding="utf-8")
+    """Avisos y errores internos en Documentos\\DeclaraFacilUSA\\errores.log.
+
+    Solo usa el módulo logging (no logging.handlers): el programa base 1.5.1 no lo incluye y las actualizaciones
+    de código corren sobre esa base. Al abrir, si el archivo pasa de 1 MB, se guarda como errores.log.1.
+    """
+    path = data_loader.user_dir() / "errores.log"
+    try:
+        if path.exists() and path.stat().st_size > LOG_MAX_BYTES:
+            path.replace(path.with_suffix(".log.1"))
+        handler = logging.FileHandler(path, encoding="utf-8")
+    except OSError:
+        handler = logging.NullHandler()   # sin acceso a Documentos la app igual abre; solo no hay registro
     logging.basicConfig(handlers=[handler], level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
 

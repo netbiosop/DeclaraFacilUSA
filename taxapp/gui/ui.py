@@ -27,7 +27,7 @@ def open_path(p, verb=None) -> bool:
                 os.startfile(str(p))  # type: ignore[attr-defined]
         else:
             webbrowser.open(Path(p).resolve().as_uri())
-    except OSError as e:
+    except (OSError, webbrowser.Error) as e:
         logger.warning("No se pudo abrir %s: %s", p, e)
         return False
     return True

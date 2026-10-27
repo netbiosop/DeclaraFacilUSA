@@ -106,7 +106,7 @@ def _config_path():
 def load_config() -> AIConfig:
     d = data_loader.read_json(_config_path(), {})
     cfg = AIConfig(**{k: v for k, v in d.items() if k in AIConfig.__dataclass_fields__})
-    if cfg.provider not in PROVIDERS:
+    if not isinstance(cfg.provider, str) or cfg.provider not in PROVIDERS:
         cfg.provider = "anthropic"
     return cfg
 
