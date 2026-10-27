@@ -19,6 +19,14 @@ from .models import TaxReturn
 
 INF = float("inf")
 
+# Montos fijados por ley (no se ajustan por inflación), por eso no están en data/federal_<año>.json
+SE_MIN_NET_EARNINGS = 400.0        # Anexo SE: sin impuesto de trabajo por cuenta propia por debajo de $400
+AOTC_FULL_EXPENSES = 2000.0        # Form 8863: el 100 % de los primeros $2,000 de gastos...
+AOTC_MAX_EXPENSES = 4000.0         # ...y el 25 % de los siguientes $2,000
+AOTC_EXCESS_RATE = 0.25
+CTC_REDUCTION_PER_1000 = 50.0      # Anexo 8812: $50 menos por cada $1,000 (o fracción) sobre el umbral
+EMPLOYEE_MEDICARE_RATE = 0.0145    # parte del empleado; lo retenido de más es el Medicare adicional (Form 8959)
+
 
 # ---------------------------------------------------------------------------- utilidades
 def sk(status: str) -> str:
@@ -139,7 +147,7 @@ def compute_federal(ret: TaxReturn) -> dict:
 
     # ---------------- Schedule SE
     se = fed["se"]
-    se_net = profit * se["net_factor"] if profit * se["net_factor"] >= 400 else 0.0
+    se_net = profit * se["net_factor"] if profit * se["net_factor"] >= SE_MIN_NET_EARNINGS else 0.0
     ss_room = max(0.0, se["ss_wage_base"] - ss_wages_by_owner["contribuyente"])
     se_ss = min(se_net, ss_room) * se["ss_rate"]
     se_med = se_net * se["medicare_rate"]
@@ -395,7 +403,7 @@ def compute_federal(ret: TaxReturn) -> dict:
         for stu in cr.students:
             if stu.credit.upper() == "AOTC":
                 e = stu.expenses
-                aotc_total += min(e, 2000) + 0.25 * max(0.0, min(e, 4000) - 2000)
+                aotc_total += min(e, AOTC_FULL_EXPENSES) + AOTC_EXCESS_RATE * max(0.0, min(e, AOTC_MAX_EXPENSES) - AOTC_FULL_EXPENSES)
         aotc_gross = aotc_total
         aotc_total *= factor
         lc = fed["llc"]
@@ -439,7 +447,7 @@ def compute_federal(ret: TaxReturn) -> dict:
         n_odc += n_ctc
         n_ctc = 0
     ctc_gross = n_ctc * ctc_data["per_child"] + n_odc * ctc_data["odc"]
-    ctc_red = 50.0 * math.ceil(max(0.0, magi - pick(ctc_data["phaseout_start"], st)) / 1000.0)
+    ctc_red = CTC_REDUCTION_PER_1000 * math.ceil(max(0.0, magi - pick(ctc_data["phaseout_start"], st)) / 1000.0)
     ctc_after = max(0.0, ctc_gross - ctc_red)
     ctc_limit = remaining
     ctc_nonref = min(remaining, ctc_after)
@@ -504,7 +512,7 @@ def compute_federal(ret: TaxReturn) -> dict:
                       + inc.unemployment_withheld + inc.business_withheld)
     withholding = w2_withheld + other_withheld
     excess_ss = _excess_ss(ret, se)
-    addl_med_withheld = max(0.0, medicare_withheld - 0.0145 * medicare_wages)
+    addl_med_withheld = max(0.0, medicare_withheld - EMPLOYEE_MEDICARE_RATE * medicare_wages)
     estimated = ret.payments.federal_estimated + ret.payments.federal_prior_overpayment
     refundable = eitc + actc + aotc_refundable + cr.other_refundable
     total_payments = (withholding + estimated + ret.payments.federal_extension + excess_ss + addl_med_withheld

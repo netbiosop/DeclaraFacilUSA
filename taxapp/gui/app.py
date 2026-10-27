@@ -2,6 +2,7 @@
 herramientas y cambio de idioma ES/EN. Cada usuario tiene rol, permisos, carpeta y preferencias de apariencia."""
 from __future__ import annotations
 
+import logging
 import os
 import sys
 import threading
@@ -9,11 +10,11 @@ import time
 import tkinter as tk
 import webbrowser
 from pathlib import Path
-from tkinter import ttk, messagebox, filedialog
+from tkinter import messagebox, filedialog
 
 from .. import APP_NAME, __version__, accounts, data_loader, storage, counties, reports, i18n
 from ..engine import compute_all
-from ..i18n import _, N_, tr
+from ..i18n import _, tr
 from ..models import TaxReturn
 from ..review import review
 from . import theme
@@ -21,11 +22,9 @@ from .widgets import Form
 from .workspace import Workspace, SECTIONS
 from . import layout
 
+logger = logging.getLogger(__name__)
+
 __all__ = ["App", "SECTIONS", "main"]
-
-
-def other_language() -> str:
-    return "en" if i18n.get_language() == "es" else "es"
 
 
 class App(tk.Tk):
@@ -227,9 +226,6 @@ class App(tk.Tk):
             accounts.save_prefs(self.user["username"], language=lang)
             self.prefs["language"] = lang
         self._rebuild(section=self.settings_section)
-
-    def toggle_language(self):
-        self.set_language(other_language())
 
     # ================================================================ menus
     def _build_menu(self):
@@ -508,8 +504,9 @@ class App(tk.Tk):
                 os.startfile(p)  # type: ignore[attr-defined]
             else:
                 webbrowser.open(Path(p).resolve().as_uri())
-        except Exception:  # noqa: BLE001
-            pass
+        except OSError as e:
+            logger.warning("No se pudo abrir %s: %s", p, e)
+            messagebox.showerror(APP_NAME, tr("No se pudo abrir el archivo:\n{e}", e=e), parent=self)
 
     def _open_folder(self, p):
         self._open_path(str(p))
@@ -579,7 +576,8 @@ class App(tk.Tk):
         def work():
             try:
                 found = updater.check_any(cfg)
-            except Exception:  # noqa: BLE001 - sin conexion: no molestar al usuario
+            except Exception as e:  # noqa: BLE001 - sin conexion: no molestar al usuario
+                logger.info("Búsqueda automática de actualizaciones sin resultado: %s", e)
                 return
             if found and found[1].version != cfg.skipped:
                 self.after(0, lambda: self._offer_update(*found))
@@ -674,6 +672,15 @@ class App(tk.Tk):
         self.ask_ai(ai.field_question(label.rstrip(" :"), help_text, sec))
 
 
+def _setup_logging():
+    """Avisos y errores internos en Documentos\\DeclaraFacilUSA\\errores.log (1 MB, con una copia anterior)."""
+    import logging.handlers
+    handler = logging.handlers.RotatingFileHandler(data_loader.user_dir() / "errores.log", maxBytes=1_000_000,
+                                                   backupCount=1, encoding="utf-8")
+    logging.basicConfig(handlers=[handler], level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+
+
 def main():
+    _setup_logging()
     app = App()
     app.mainloop()

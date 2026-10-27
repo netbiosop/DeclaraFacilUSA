@@ -95,7 +95,3 @@ def variant(year: int, fid: str, lang: str = "en") -> dict:
 
 def pdf_path(year: int, fid: str, lang: str = "en") -> Path:
     return forms_dir(year) / variant(year, fid, lang)["file"]
-
-
-def clear_cache():
-    _load.cache_clear()

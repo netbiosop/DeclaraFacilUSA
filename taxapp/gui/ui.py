@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import tkinter as tk
 from datetime import date, timedelta
-from tkinter import ttk
 
 from ..i18n import _, tr, N_
 from .theme import icon, icon_font, mix

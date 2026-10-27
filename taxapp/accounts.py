@@ -15,6 +15,7 @@ import copy
 import hashlib
 import hmac
 import json
+import logging
 import os
 import re
 import shutil
@@ -25,6 +26,8 @@ from typing import Dict, List, Optional, Tuple
 
 from . import data_loader
 from .i18n import N_, _, tr
+
+logger = logging.getLogger(__name__)
 
 ITERATIONS = 240_000
 ROLES = ["admin", "supervisor", "preparer", "viewer"]
@@ -467,8 +470,8 @@ def log(event: str, user: str, detail: str = ""):
     try:
         with open(_log_file(), "a", encoding="utf-8") as fh:
             fh.write(json.dumps({"time": _now(), "user": user, "event": event, "detail": detail}, ensure_ascii=False) + "\n")
-    except OSError:
-        pass
+    except OSError as e:
+        logger.warning("No se pudo anotar en el registro de actividad (%s): %s", event, e)
 
 
 EVENT_LABELS = {

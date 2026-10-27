@@ -1,6 +1,7 @@
 """Formularios oficiales del IRS: preguntas guiadas, borrador y formularios finales / Official IRS forms screen."""
 from __future__ import annotations
 
+import logging
 import os
 import sys
 import threading
@@ -19,6 +20,8 @@ from .ui import C, label
 from .widgets import COLORS, font, make_tree, money_str, parse_money, ScrollFrame
 from . import layout
 
+logger = logging.getLogger(__name__)
+
 
 def preparer_info() -> dict:
     p = accounts.settings().get("preparer") or {}
@@ -34,7 +37,8 @@ def open_path(p, verb=None):
                 os.startfile(str(p))  # type: ignore[attr-defined]
         else:
             webbrowser.open(Path(p).resolve().as_uri())
-    except Exception:  # noqa: BLE001
+    except OSError as e:
+        logger.warning("No se pudo abrir %s: %s", p, e)
         return False
     return True
 

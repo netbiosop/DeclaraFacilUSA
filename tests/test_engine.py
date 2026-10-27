@@ -97,6 +97,29 @@ class FederalTests(unittest.TestCase):
         self.assertAlmostEqual(f["deduction"], 60000)
 
 
+class StatutoryAmountsTests(unittest.TestCase):
+    """Montos fijados por ley en federal.py (no vienen de data/)."""
+
+    def test_se_tax_starts_at_400_net(self):
+        below = compute_all(make(2025, business_gross=430))["federal"]   # 430 * 0.9235 = 397.11
+        above = compute_all(make(2025, business_gross=440))["federal"]   # 440 * 0.9235 = 406.34
+        self.assertEqual(below["se_tax"], 0)
+        self.assertGreater(above["se_tax"], 0)
+
+    def test_aotc_100_then_25_percent(self):
+        from taxapp.models import Student
+        r = make(2025, wages=40000)
+        r.credits.students = [Student(name="Ana", credit="AOTC", expenses=3000)]
+        self.assertAlmostEqual(compute_all(r)["federal"]["detail"]["aotc_gross"], 2000 + 0.25 * 1000)
+        r.credits.students = [Student(name="Ana", credit="AOTC", expenses=9000)]
+        self.assertAlmostEqual(compute_all(r)["federal"]["detail"]["aotc_gross"], 2500)
+
+    def test_ctc_reduced_50_per_started_1000(self):
+        r = make(2025, wages=210500)
+        r.dependents = [Dependent(first_name="A", dob="2018-03-01", ssn="123-45-6787")]
+        self.assertAlmostEqual(compute_all(r)["federal"]["detail"]["ctc_red"], 11 * 50)
+
+
 class StateLocalTests(unittest.TestCase):
     def test_texas_no_tax(self):
         s = compute_all(make(2025, wages=60000, state="TX"))["state"]

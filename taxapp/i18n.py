@@ -9,9 +9,12 @@ English; any missing key falls back to the Spanish original. `tr()` translates a
 from __future__ import annotations
 
 import json
+import logging
 import os
 import sys
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 LANGS = {"es": "Español", "en": "English"}
 _lang = "es"
@@ -42,7 +45,8 @@ def system_language() -> str:
             return "es" if (lang_id & 0x3FF) == 0x0A else "en"
         loc = (locale.getlocale()[0] or os.environ.get("LANG", "")).lower()
         return "es" if loc.startswith("es") else "en"
-    except Exception:  # noqa: BLE001
+    except (AttributeError, OSError, ValueError) as e:
+        logger.warning("No se pudo detectar el idioma del sistema, se usa español: %s", e)
         return "es"
 
 
@@ -54,8 +58,10 @@ def load_saved_language() -> str:
         if cfg.get("language") in LANGS:
             _lang = cfg["language"]
             return _lang
-    except (OSError, ValueError):
-        pass
+    except FileNotFoundError:
+        pass  # primera vez: se detecta el idioma del sistema
+    except (OSError, ValueError) as e:
+        logger.warning("Configuración de idioma ilegible: %s", e)
     _lang = system_language()
     return _lang
 
@@ -76,8 +82,8 @@ def set_language(lang: str, save: bool = True):
                     cfg = {}
             cfg["language"] = lang
             p.write_text(json.dumps(cfg, indent=1), encoding="utf-8")
-        except OSError:
-            pass
+        except OSError as e:
+            logger.warning("No se pudo guardar el idioma elegido: %s", e)
 
 
 def get_language() -> str:

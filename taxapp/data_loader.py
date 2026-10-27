@@ -87,8 +87,3 @@ def code_from_label(label: str) -> str:
         if i["name"].lower() == label.lower():
             return c
     return ""
-
-
-def reload_all():
-    for fn in (federal, states, local, states_info):
-        fn.cache_clear()
