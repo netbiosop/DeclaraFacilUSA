@@ -243,6 +243,7 @@ class App(tk.Tk):
             a.add_command(label=_("Guardar como…"), command=self.save_as)
         if self.can("export"):
             a.add_separator()
+            a.add_command(label=_("Formularios oficiales del IRS…"), command=lambda: self._goto("forms"))
             a.add_command(label=_("Exportar borrador PDF…"), command=self.export_pdf)
             a.add_command(label=_("Exportar HTML (imprimible)…"), command=self.export_html)
         a.add_separator()

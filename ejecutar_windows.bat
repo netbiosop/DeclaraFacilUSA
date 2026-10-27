@@ -13,6 +13,8 @@ if "%PY%"=="" (
 
 REM reportlab es opcional (PDF) / optional (PDF export)
 %PY% -c "import reportlab" >nul 2>nul || %PY% -m pip install --user --quiet reportlab
+REM pypdf llena los formularios oficiales del IRS / fills the official IRS forms
+%PY% -c "import pypdf" >nul 2>nul || %PY% -m pip install --user --quiet pypdf
 
 where pyw >nul 2>nul && (start "" pyw -3 main.py %* & exit /b 0)
 where pythonw >nul 2>nul && (start "" pythonw main.py %* & exit /b 0)

@@ -10,7 +10,8 @@ from .. import data_loader, counties
 from ..engine import fmt_money, balance_text
 from ..i18n import _, N_, tr, reverse
 from ..local import localities_for_state, county_tax_info
-from ..models import (FILING_STATUSES, Dependent, W2, Student, CustomLocalTax, age_at_year_end)
+from ..models import (FILING_STATUSES, Dependent, W2, CustomLocalTax, age_at_year_end)
+from .lists import ListEditor
 from .widgets import (COLORS, Form, ScrollFrame, Dialog, make_tree, font)
 
 NONE_LOC = N_("(ninguna)")
@@ -141,6 +142,10 @@ class PersonalScreen(Screen):
                  _("Requerido (OBBBA) para el EITC, el crédito por hijos y las deducciones de propinas, horas extra y mayores."))
         tp.check(_("Otra persona puede declararme como dependiente"), "can_be_claimed",
                  _("Limita su deducción estándar y le impide reclamar ciertos créditos."))
+        tp.text(_("PIN de Protección de Identidad del IRS (si tiene)"), "ip_pin",
+                _("6 dígitos que el IRS le envía cada año por carta o en su cuenta en línea."), width=10)
+        tp.check(_("Destinar $3 al Fondo de Campaña Presidencial"), "presidential_fund",
+                 _("No cambia su impuesto ni su reembolso."))
 
         self.sp_frame = ttk.Frame(p, style="Card.TFrame")
         self.sp_frame.grid(row=tp.row, column=0, columnspan=3, sticky="ew")
@@ -154,6 +159,8 @@ class PersonalScreen(Screen):
         sp.text(_("Ocupación"), "occupation")
         sp.check(_("Mi cónyuge es legalmente ciego(a)"), "blind")
         sp.check(_("Mi cónyuge tiene SSN válido para trabajar"), "valid_ssn_for_work")
+        sp.text(_("PIN de Protección de Identidad del cónyuge (si tiene)"), "ip_pin", width=10)
+        sp.check(_("Mi cónyuge desea destinar $3 al Fondo de Campaña Presidencial"), "presidential_fund")
         self._status_changed(initial=True)
         self._person_changed(notify=False)
 
@@ -352,7 +359,8 @@ class DependentsScreen(Screen):
             f.integer(_("Meses que vivió con usted en el año"), "months_lived", frm=0, to=12)
             f.check(_("Estudiante de tiempo completo"), "full_time_student")
             f.check(_("Total y permanentemente discapacitado(a)"), "disabled")
-        Dialog(self.app, _("Dependiente"), dep, build, on_ok, height=470)
+            f.check(_("Vivió con usted en los Estados Unidos"), "lived_in_us")
+        Dialog(self.app, _("Dependiente"), dep, build, on_ok, height=500)
 
     def add(self):
         def ok(d):
@@ -402,11 +410,22 @@ class IncomeScreen(Screen):
         f.money(_("Dividendos ordinarios (1099-DIV casilla 1a)"), "ordinary_dividends")
         f.money(_("Dividendos calificados (casilla 1b)"), "qualified_dividends", _("Tributan a 0%, 15% o 20%."))
         f.money(_("Impuesto federal retenido (casilla 4)"), "investment_withheld")
+        f.section(_("Pagadores (para el Anexo B)"),
+                  _("Si sus intereses o dividendos pasan de $1,500, el Anexo B pide el nombre de cada pagador."))
+        f.note(_("Intereses:"))
+        self._grid_list(p, f, "interest_payers")
+        f.note(_("Dividendos:"))
+        self._grid_list(p, f, "dividend_payers")
 
         p = self._tab(nb, _("Inversiones (1099-B)"))
         f = Form(p, inc, self.changed)
-        f.section(_("Ventas de acciones, fondos, criptomonedas y otros activos"))
-        f.money(_("Ganancia/pérdida neta a corto plazo (≤ 1 año)"), "short_term_gain", _("Use número negativo para pérdidas: -1500"))
+        f.section(_("Ventas de acciones, fondos, criptomonedas y otros activos"),
+                  _("Agregue cada venta de su 1099-B (o el total por categoría). Con el detalle se llenan el Anexo D "
+                    "y el Formulario 8949."))
+        self._grid_list(p, f, "sales", height=6)
+        f.section(_("Ganancia neta sin detalle (opcional)"))
+        f.money(_("Ganancia/pérdida neta a corto plazo (≤ 1 año)"), "short_term_gain",
+                _("Solo si NO agregó las ventas arriba. Use número negativo para pérdidas: -1500"))
         f.money(_("Ganancia/pérdida neta a largo plazo (> 1 año)"), "long_term_gain", _("Tasas preferenciales 0/15/20%."))
         f.money(_("Distribuciones de ganancias de capital (1099-DIV 2a)"), "capital_gain_distributions")
         f.money(_("Pérdida de capital arrastrada de años anteriores"), "capital_loss_carryover")
@@ -415,7 +434,14 @@ class IncomeScreen(Screen):
         p = self._tab(nb, _("Negocio propio (Anexo C)"))
         f = Form(p, inc, self._biz_changed)
         f.section(_("Trabajo independiente, 1099-NEC / 1099-K, contratista, gig economy"))
-        f.text(_("Nombre o actividad del negocio"), "business_name", width=34)
+        f.text(_("Nombre comercial del negocio"), "business_name", width=34)
+        f.text(_("Actividad principal (producto o servicio)"), "business_activity", width=34,
+               help_text=_("Ej.: House cleaning, Rideshare driver, Painting. De preferencia en inglés."))
+        f.text(_("Código de actividad (6 dígitos)"), "business_code", width=10,
+               help_text=_("Del listado de las instrucciones del Anexo C. Ej.: 485310 taxi/rideshare, 561720 limpieza."))
+        f.text(_("EIN del negocio (si tiene)"), "business_ein", width=14)
+        f.text(_("Dirección del negocio (si es distinta a su casa)"), "business_address", width=34)
+        f.text(_("Ciudad, estado y ZIP del negocio"), "business_city", width=34)
         f.money(_("Ingresos brutos (incluye 1099-NEC/1099-K)"), "business_gross")
         f.money(_("Devoluciones y descuentos"), "business_returns")
         f.money(_("Costo de mercancía vendida"), "business_cogs")
@@ -424,12 +450,29 @@ class IncomeScreen(Screen):
                           (N_("Seguros"), "exp_insurance"), (N_("Oficina y software"), "exp_office"),
                           (N_("Suministros"), "exp_supplies"),
                           (N_("Teléfono e internet (parte de negocio)"), "exp_phone_internet"),
-                          (N_("Viajes y comidas (las comidas se deducen al 50%)"), "exp_travel_meals"),
+                          (N_("Viajes de negocio (pasajes, hotel)"), "exp_travel"),
+                          (N_("Comidas de negocio (se deducen al 50%)"), "exp_travel_meals"),
                           (N_("Contratistas"), "exp_contract_labor"), (N_("Alquiler"), "exp_rent"),
                           (N_("Otros gastos"), "exp_other")):
             f.money(_(lbl), attr)
+        f.note(_("Si detalla 'otros gastos' abajo, el detalle reemplaza el monto de 'Otros gastos'."))
+        self._grid_list(p, f, "other_expenses", height=3, on_change=self._biz_changed)
         f.money(_("Oficina en casa: pies cuadrados (método simplificado $5/pie², máx. 300)"), "home_office_sqft")
+        f.money(_("Pies cuadrados totales de la vivienda"), "home_total_sqft")
         f.money(_("Impuesto federal retenido (1099)"), "business_withheld")
+        f.section(_("Vehículo (si dedujo gastos de auto)"))
+        f.text(_("Fecha en que empezó a usarlo para el negocio (MM/DD/AAAA)"), "vehicle_in_service", width=14)
+        f.money(_("Millas de negocio"), "miles_business")
+        f.money(_("Millas de ida y vuelta al trabajo"), "miles_commuting")
+        f.money(_("Otras millas (personales)"), "miles_other")
+        f.section(_("Preguntas del Anexo C"))
+        f.combo(_("Método de contabilidad"), "accounting_method", [_("Efectivo (cash)"), _("Acumulación (accrual)")],
+                to_model=lambda v: "accrual" if v == _("Acumulación (accrual)") else "cash",
+                from_model=lambda v: _("Acumulación (accrual)") if v == "accrual" else _("Efectivo (cash)"))
+        f.check(_("Participé materialmente en el negocio"), "material_participation")
+        f.check(_("Empecé o compré el negocio este año"), "business_started")
+        f.check(_("Hice pagos que requieren formularios 1099"), "made_1099_payments")
+        f.check(_("Presenté (o presentaré) esos formularios 1099"), "filed_1099s")
         self.biz_lbl = f.note("", COLORS["primary"])
         self._biz_changed(notify=False)
 
@@ -467,6 +510,12 @@ class IncomeScreen(Screen):
                 _("Propinas voluntarias en ocupaciones que tradicionalmente las reciben. Se reduce con MAGI > $150k ($300k MFJ)."))
         f.money(_("Horas extra calificadas: solo la PRIMA (máx. $12,500 / $25,000 MFJ)"), "qualified_overtime",
                 _("Solo la parte extra del pago 'tiempo y medio' exigido por la ley FLSA. Ej.: $30/h normal, $45/h extra → $15/h."))
+
+    def _grid_list(self, parent, form, kind, height=4, on_change=None):
+        ed = ListEditor(parent, self.app, kind, on_change or self.changed, height=height)
+        ed.grid(row=form.row, column=0, columnspan=3, sticky="ew", padx=4, pady=(2, 8))
+        form.row += 1
+        return ed
 
     def _biz_changed(self, notify=True):
         inc = self.ret.income
@@ -586,7 +635,13 @@ class DeductionsScreen(Screen):
         f = Form(p, d, self.changed)
         f.section(_("Se restan antes de calcular el AGI"))
         f.money(_("Gastos de educador (K-12)"), "educator_expenses", _("Hasta $300 (2025) / $350 (2026) por educador."))
-        f.money(_("Deducción por cuenta HSA (Form 8889)"), "hsa_deduction")
+        f.money(_("Aportes suyos a la cuenta HSA (Form 8889)"), "hsa_deduction",
+                _("Lo que usted aportó (no incluya lo que aportó su empleador por nómina)."))
+        f.combo(_("Cobertura HDHP de la HSA"), "hsa_coverage", ["", _("Individual (self-only)"), _("Familiar (family)")],
+                to_model=lambda v: {"": "", _("Individual (self-only)"): "self", _("Familiar (family)"): "family"}.get(v, ""),
+                from_model=lambda v: {"self": _("Individual (self-only)"), "family": _("Familiar (family)")}.get(v, ""),
+                help_text=_("Con la cobertura se aplica el tope anual del IRS ($4,300 / $8,550 en 2025)."))
+        f.money(_("Aportes del empleador a la HSA (W-2 casilla 12, código W)"), "hsa_employer")
         f.money(_("Deducción por IRA tradicional"), "ira_deduction", _("Solo la parte deducible según su plan de retiro e ingresos."))
         f.money(_("Seguro médico de trabajador independiente"), "se_health_insurance")
         f.money(_("Interés de préstamos estudiantiles (1098-E)"), "student_loan_interest", _("Máximo $2,500; se reduce con ingresos altos."))
@@ -598,6 +653,7 @@ class DeductionsScreen(Screen):
         f.money(_("Interés de préstamo de auto nuevo (1098-VLI)"), "car_loan_interest",
                 _("Hasta $10,000. Vehículo nuevo de uso personal con ensamblaje final en EE.UU., préstamo originado después "
                   "del 31-dic-2024 y garantizado por el vehículo. Se reduce si MAGI > $100k ($200k MFJ)."))
+        f.text(_("VIN del vehículo (17 caracteres)"), "car_vin", width=24)
         f.note(_("Propinas y horas extra: se ingresan en Ingresos → 'Propinas y horas extra'.\n"
                  "Deducción de $6,000 para mayores de 65: se aplica automáticamente según su fecha de nacimiento "
                  "(se reduce si MAGI > $75k / $150k MFJ)."))
@@ -658,6 +714,10 @@ class CreditsScreen(Screen):
         f.money(_("Gastos de cuidado pagados"), "care_expenses", _("Límite $3,000 (1 persona) o $6,000 (2+)."))
         f.integer(_("Personas cuidadas (0 = calcular con dependientes)"), "care_persons", frm=0, to=6)
         f.money(_("Beneficios de cuidado del empleador (W-2 casilla 10)"), "dependent_care_benefits")
+        f.note(_("Proveedores de cuidado (obligatorio para el Formulario 2441):"))
+        ed = ListEditor(p, self.app, "care_providers", self.changed, height=3)
+        ed.grid(row=f.row, column=0, columnspan=3, sticky="ew", padx=4, pady=(2, 8))
+        f.row += 1
         f.section(_("Ahorro para la jubilación (crédito del ahorrador, Form 8880)"))
         f.money(_("Sus aportes a IRA/401(k)"), "retirement_contrib_taxpayer")
         f.money(_("Aportes de su cónyuge"), "retirement_contrib_spouse")
@@ -669,43 +729,13 @@ class CreditsScreen(Screen):
 
         f.section(_("Educación universitaria (Formulario 8863)"),
                   _("AOTC: hasta $2,500 por estudiante en los primeros 4 años (40% reembolsable). LLC: 20% de hasta $10,000."))
-        self.stree = make_tree(p, ("n", "c", "e"), (_("Estudiante"), _("Crédito"), _("Gastos calificados")),
-                               widths=(220, 80, 140), height=4, anchors=("w", "center", "e"))
-        self.stree.frame.grid(row=f.row, column=0, columnspan=3, sticky="ew", padx=4)
+        self.students = ListEditor(p, self.app, "students", self.changed, height=4)
+        self.students.grid(row=f.row, column=0, columnspan=3, sticky="ew", padx=4)
         f.row += 1
-        bar = ttk.Frame(p, style="Card.TFrame")
-        bar.grid(row=f.row, column=0, columnspan=3, sticky="w", pady=4)
-        ttk.Button(bar, text=_("+ Agregar estudiante"), command=self.add_student).pack(side="left")
-        ttk.Button(bar, text=_("Eliminar"), command=self.remove_student).pack(side="left", padx=6)
-        self.refresh_students()
 
         ttk.Label(right, text=_("Créditos calculados"), style="Section.TLabel").pack(anchor="w")
         self.tree = result_tree(right, height=14)
         self.tree.frame.pack(fill="y", expand=True, pady=6)
-
-    def refresh_students(self):
-        self.stree.delete(*self.stree.get_children())
-        for i, s in enumerate(self.ret.credits.students):
-            self.stree.insert("", "end", iid=str(i), values=(s.name, s.credit, fmt_money(s.expenses)))
-
-    def add_student(self):
-        def build(f):
-            f.text(_("Nombre del estudiante"), "name")
-            f.combo(_("Crédito"), "credit", ["AOTC", "LLC"])
-            f.money(_("Matrícula y gastos calificados (1098-T)"), "expenses")
-
-        def ok(s):
-            self.ret.credits.students.append(s)
-            self.refresh_students()
-            self.changed()
-        Dialog(self.app, _("Estudiante"), Student(), build, ok, height=260)
-
-    def remove_student(self):
-        sel = self.stree.selection()
-        if sel:
-            del self.ret.credits.students[int(sel[0])]
-            self.refresh_students()
-            self.changed()
 
     def on_result(self, res):
         c = res["federal"]["credits"]
@@ -969,8 +999,10 @@ class SummaryScreen(Screen):
         bar = ttk.Frame(outer, style="Card.TFrame")
         bar.pack(fill="x")
         if self.app.can("export"):
-            ttk.Button(bar, text=_("Exportar borrador PDF"), style="Accent.TButton", command=self.app.export_pdf).pack(side="left")
-            ttk.Button(bar, text=_("Exportar HTML / imprimir"), command=self.app.export_html).pack(side="left", padx=6)
+            ttk.Button(bar, text=_("Llenar formularios oficiales del IRS  ›"), style="Accent.TButton",
+                       command=lambda: self.app.workspace.show("forms")).pack(side="left")
+            ttk.Button(bar, text=_("Resumen PDF"), command=self.app.export_pdf).pack(side="left", padx=6)
+            ttk.Button(bar, text=_("Exportar HTML / imprimir"), command=self.app.export_html).pack(side="left", padx=(0, 6))
         if not self.app.readonly:
             ttk.Button(bar, text=_("Guardar declaración"), command=self.app.save).pack(side="left")
         if self.app.can("use_ai"):
@@ -990,8 +1022,8 @@ class SummaryScreen(Screen):
         self.state_link.pack(side="left", padx=8)
         self.state_link.bind("<Button-1>", lambda e: webbrowser.open(self.app.result["state"]["url"])
                              if self.app.result and self.app.result["state"].get("url") else None)
-        ttk.Label(outer, text=_("Nota: IRS Direct File no está disponible para la temporada 2026. Esta aplicación no presenta "
-                                "electrónicamente; genera un borrador para transcribir a los formularios oficiales o a un "
+        ttk.Label(outer, text=_("Nota: esta aplicación no presenta electrónicamente. En 'Formularios oficiales del IRS' "
+                                "genera el 1040 y sus anexos llenos en PDF para firmar y enviar por correo, o puede usar un "
                                 "proveedor de e-file autorizado."), style="CardMuted.TLabel", wraplength=860).pack(anchor="w", pady=6)
 
     def on_result(self, res):

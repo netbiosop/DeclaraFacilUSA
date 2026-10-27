@@ -8,6 +8,7 @@ from tkinter import ttk
 from ..engine import fmt_money, balance_text
 from ..i18n import _, N_, tr
 from . import theme
+from .forms_view import FormsScreen
 from .screens import SCREENS
 from .theme import icon, icon_font
 from .ui import C, Pill, Progress, IconButton, flat_button, user_chip, label
@@ -16,10 +17,11 @@ from .widgets import COLORS, font, Tooltip
 SECTIONS = [("personal", N_("Información personal")), ("address", N_("Dirección, estado y condado")),
             ("dependents", N_("Dependientes")), ("income", N_("Ingresos")), ("deductions", N_("Deducciones")),
             ("credits", N_("Créditos")), ("payments", N_("Pagos y retenciones")), ("state", N_("Declaración estatal")),
-            ("local", N_("Impuestos locales")), ("review", N_("Revisión")), ("summary", N_("Resumen y presentar"))]
+            ("local", N_("Impuestos locales")), ("review", N_("Revisión")), ("summary", N_("Resumen y presentar")),
+            ("forms", N_("Formularios del IRS"))]
 PHASES = [(N_("Usted y su familia"), ["personal", "address", "dependents"]), (N_("Ingresos"), ["income"]),
           (N_("Deducciones y créditos"), ["deductions", "credits", "payments"]),
-          (N_("Estado y local"), ["state", "local"]), (N_("Revisar y presentar"), ["review", "summary"])]
+          (N_("Estado y local"), ["state", "local"]), (N_("Revisar y presentar"), ["review", "summary", "forms"])]
 KEYS = [k for k, _l in SECTIONS]
 
 
@@ -219,7 +221,7 @@ class Workspace(tk.Frame):
         if self.current and self.current in self.screens:
             self.screens[self.current].frame.pack_forget()
         if key not in self.screens:
-            cls = {c.key: c for c in SCREENS}[key]
+            cls = {c.key: c for c in SCREENS + [FormsScreen]}[key]
             self.screens[key] = cls(self.app, self.content)
             if self.app.readonly:
                 lock_widgets(self.screens[key].frame)
@@ -234,7 +236,7 @@ class Workspace(tk.Frame):
             self.next_btn.configure(text=tr("Continuar: {s}  ›", s=_(dict(SECTIONS)[KEYS[idx + 1]])))
             self.next_btn.state(["!disabled"])
         else:
-            self.next_btn.configure(text=_("Exportar PDF"))
+            self.next_btn.configure(text=_("Generar formularios"))
             self.next_btn.state(["!disabled"] if self.app.can("export") else ["disabled"])
         scr.on_show()
         if self.app.result:
@@ -274,7 +276,7 @@ class Workspace(tk.Frame):
         if idx < len(KEYS) - 1:
             self.show(KEYS[idx + 1])
         else:
-            self.app.export_pdf()
+            self.screens["forms"].generate_final()
 
     def prev(self):
         idx = KEYS.index(self.current)

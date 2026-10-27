@@ -26,8 +26,8 @@ if not defined PY (
 echo Usando / Using: %PY%
 
 echo.
-echo Instalando herramientas / Installing tools (PyInstaller, reportlab)...
-%PY% -m pip install --user --upgrade pyinstaller reportlab
+echo Instalando herramientas / Installing tools (PyInstaller, reportlab, pypdf)...
+%PY% -m pip install --user --upgrade pyinstaller reportlab pypdf
 if errorlevel 1 goto fail
 
 echo.
@@ -46,7 +46,7 @@ for /d /r "%SRC%taxapp" %%d in (__pycache__) do if exist "%%d" rmdir /s /q "%%d"
   --icon "%SRC%assets\DeclaraFacilUSA.ico" ^
   --add-data "%SRC%data;data" --add-data "%SRC%docs;docs" --add-data "%SRC%assets;assets" ^
   --add-data "%SRC%taxapp;taxapp" ^
-  --paths "%SRC%." --collect-submodules taxapp ^
+  --paths "%SRC%." --collect-submodules taxapp --collect-submodules pypdf ^
   --collect-submodules tkinter --collect-submodules json --collect-submodules email --collect-submodules xml ^
   --collect-submodules urllib --collect-submodules http --collect-submodules importlib ^
   --hidden-import csv --hidden-import decimal --hidden-import fractions --hidden-import statistics ^

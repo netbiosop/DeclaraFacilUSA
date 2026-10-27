@@ -515,6 +515,29 @@ class SettingsView(tk.Frame):
         self.remember = tk.BooleanVar(value=bool(s.get("remember_user", True)))
         ttk.Checkbutton(k, text=_("Recordar el último usuario en la pantalla de inicio de sesión"),
                         variable=self.remember).pack(anchor="w", pady=(8, 0))
+        self.h2(p, _("Formularios del IRS: preparador pagado"))
+        label(p, _("Si prepara declaraciones para otras personas a cambio de pago, estos datos se imprimen en la sección "
+                   "'Paid Preparer Use Only' del 1040. Déjelos en blanco si cada persona prepara la suya."), 9,
+              fg=c["muted"], wraplength=740, justify="left", bg=c["bg"]).pack(anchor="w", pady=(0, 6))
+        k2 = card(p)
+        k2.pack(fill="x")
+        prep = s.get("preparer") or {}
+        self.pv = {}
+        for key, text, w in (("name", _("Nombre del preparador"), 34), ("ptin", _("PTIN (P + 8 dígitos)"), 14),
+                             ("firm", _("Nombre de la empresa"), 34), ("firm_address", _("Dirección de la empresa"), 40),
+                             ("firm_phone", _("Teléfono de la empresa"), 18), ("firm_ein", _("EIN de la empresa"), 14)):
+            r = tk.Frame(k2, bg=c["card"])
+            r.pack(fill="x", pady=4)
+            label(r, text, 10).pack(side="left")
+            v = tk.StringVar(value=str(prep.get(key, "") or ""))
+            ttk.Entry(r, textvariable=v, width=w).pack(side="right")
+            self.pv[key] = v
+        self.prep_self = tk.BooleanVar(value=bool(prep.get("self_employed")))
+        ttk.Checkbutton(k2, text=_("El preparador trabaja por cuenta propia (self-employed)"),
+                        variable=self.prep_self).pack(anchor="w", pady=(6, 0))
+        self.forms_editable = tk.BooleanVar(value=bool(s.get("forms_editable")))
+        ttk.Checkbutton(k2, text=_("Por defecto, dejar editables los campos de los PDF generados"),
+                        variable=self.forms_editable).pack(anchor="w", pady=(4, 0))
         ttk.Button(p, text=_("Guardar"), style="Accent.TButton", command=self._save_general).pack(anchor="w", pady=14)
         note = tk.Frame(p, bg=c["surface"], padx=14, pady=12)
         note.pack(fill="x")
@@ -531,6 +554,10 @@ class SettingsView(tk.Frame):
                 messagebox.showerror(APP_NAME, _("Valor numérico inválido."), parent=self)
                 return
         vals["remember_user"] = bool(self.remember.get())
+        prep = {k: v.get().strip() for k, v in self.pv.items()}
+        prep["self_employed"] = bool(self.prep_self.get())
+        vals["preparer"] = prep
+        vals["forms_editable"] = bool(self.forms_editable.get())
         accounts.update_settings(self.app.user["username"], **vals)
         self.app.reset_idle_timer()
         messagebox.showinfo(APP_NAME, _("Guardado."), parent=self)

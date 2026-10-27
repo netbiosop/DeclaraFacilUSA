@@ -63,7 +63,9 @@ DEFAULT_MATRIX = {
                "updates": False},
 }
 DEFAULT_SETTINGS = {"max_attempts": 5, "lock_minutes": 15, "min_password": 8, "idle_minutes": 0,
-                    "force_style": False, "global_prefs": None, "remember_user": True, "last_user": ""}
+                    "force_style": False, "global_prefs": None, "remember_user": True, "last_user": "",
+                    "preparer": None, "forms_editable": False}
+PREPARER_FIELDS = ("name", "ptin", "firm", "firm_address", "firm_phone", "firm_ein", "self_employed")
 DEFAULT_PREFS = {"theme": "A", "accent": "", "font": "", "size": "normal", "language": "",
                  "meter": "", "ai_docked": None, "autosave": 5}
 USERNAME_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{1,31}$")
@@ -480,6 +482,7 @@ EVENT_LABELS = {
     "return_exported": N_("Declaración exportada"), "backup_created": N_("Respaldo creado"),
     "idle_logout": N_("Cierre por inactividad"),
     "update_installed": N_("Actualización iniciada"),
+    "forms_generated": N_("Formularios del IRS generados"),
 }
 
 

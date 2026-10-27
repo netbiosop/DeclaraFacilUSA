@@ -5,3 +5,5 @@ dist/
 instalador_salida/
 *.spec
 *.tmp
+/formularios/
+descargar_formularios_irs.bat

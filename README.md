@@ -6,11 +6,29 @@ Aplicación de escritorio para Windows (Python + Tkinter), **bilingüe español 
 de impuestos de EE.UU. **federales, estatales (50 estados + DC) y locales (condados y ciudades)** para los años fiscales
 **2025 y 2026**, con un flujo de entrevista paso a paso inspirado en TurboTax y en IRS Direct File.
 
-> Es un estimador y preparador de borradores. No es asesoría fiscal y no presenta electrónicamente al IRS.
+> Es un estimador y preparador de declaraciones. No es asesoría fiscal y no presenta electrónicamente al IRS:
+> genera los formularios oficiales llenos en PDF para firmar y enviar por correo.
 
 ## Requisitos
 - Windows 10/11 y Python 3.9+ desde https://www.python.org/downloads/ (marque "Add python.exe to PATH")
-- Opcional: `reportlab` para PDF (`pip install reportlab`); sin él se exporta HTML imprimible.
+- `pypdf` para llenar los formularios oficiales del IRS (`pip install pypdf`; `ejecutar_windows.bat` lo instala solo).
+- Opcional: `reportlab` para el resumen en PDF (`pip install reportlab`); sin él se exporta HTML imprimible.
+
+## Formularios oficiales del IRS (v1.5)
+En la sección **Formularios del IRS** (después de *Resumen*):
+1. **Responder preguntas (guiado)**: una pregunta a la vez, solo lo que los formularios necesitan y falta (SSN,
+   depósito directo, datos del negocio, pagadores del Anexo B, proveedores de cuidado, etc.).
+2. **Generar formularios finales**: primero pregunta si desea un **borrador** con marca de agua
+   "BORRADOR - NO PRESENTAR" para revisarlo; luego genera los finales para firmar.
+3. Resultado en `Documentos\DeclaraFacilUSA\Declaraciones\<usuario>\<Apellido_Nombre>_<año>_formularios\`:
+   un PDF por formulario, el archivo **COMPLETO** en el orden de adjuntos del IRS, el comprobante **1040-V** si hay
+   saldo a pagar y la hoja **LEAME_Instrucciones_de_envio.pdf** con la dirección del IRS para su estado y qué firmar.
+
+Formularios: 1040 / 1040-SR; Anexos 1, 1-A, 2, 3, A, B, C, D, SE, 8812, EIC; Formularios 8949, 8863, 2441, 8880,
+8995, 8889, 6251, 8959, 8960; 1040-V. Los PDF en blanco del IRS van incluidos en `data/formularios/<año>/` y el mapa
+de campos en `data/formularios/<año>.json` (se genera y valida con `herramientas/mapear_formularios.py`). Los
+formularios de 2026 se agregarán cuando el IRS los publique (diciembre-enero). Datos del preparador pagado (PTIN,
+empresa): *Configuración → Ajustes generales*.
 
 ## Cómo ejecutar
 1. Descomprima la carpeta `DeclaraFacilUSA`.
@@ -228,6 +246,14 @@ OpenAI-compatible service (OpenRouter, Groq, DeepSeek, LM Studio…). No extra l
   you can also use `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` or `GEMINI_API_KEY`.
 - AI can be wrong: the official amounts come from the app's engine; verify with the IRS forms.
 
+### Official IRS forms (v1.5)
+Section **IRS forms** (after *Summary*): answer the guided questions, generate a **draft** (watermarked) to review,
+then the **final forms** to sign and mail. Output: one PDF per form, the **COMPLETE** file in IRS attachment order,
+Form **1040-V** when you owe, and a mailing-instructions sheet with the IRS address for your state. Requires `pypdf`.
+Forms: 1040 / 1040-SR; Schedules 1, 1-A, 2, 3, A, B, C, D, SE, 8812, EIC; Forms 8949, 8863, 2441, 8880, 8995, 8889,
+6251, 8959, 8960; 1040-V. Blank IRS PDFs ship in `data/formularios/<year>/`; the field map is
+`data/formularios/<year>.json` (built and validated by `herramientas/mapear_formularios.py`).
+
 ### Project structure
 ```
 main.py                     Entry point
@@ -242,6 +268,7 @@ taxapp/reports.py           PDF/HTML draft
 taxapp/assistant.py         AI providers, redacted context, encrypted keys
 taxapp/accounts.py          Users, roles, permissions, lockout, activity log, backups
 taxapp/updater.py           Automatic updates from GitHub Releases
+taxapp/forms/               Official IRS forms: catalog, builders, PDF filling, guided questions, mailing
 taxapp/gui/theme.py         Themes A/B/C, colors, fonts, ttk styles
 taxapp/gui/login.py         Sign-in and first-run Administrator setup
 taxapp/gui/home.py          Main menu in three styles, My returns

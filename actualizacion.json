@@ -1,17 +1,17 @@
 {
  "app": "DeclaraFacilUSA",
- "version": "1.4.0",
- "base": "1.4.0",
+ "version": "1.5.0",
+ "base": "1.5.0",
  "published": "2026-10-26",
- "notes": "## Novedades / What's new\n\n- **Actualizaciones por archivos**: las mejoras llegan descargando solo los archivos que cambiaron, sin reinstalar. Si una versión nueva no arranca, la app vuelve sola a la anterior.\n- **File-level updates**: improvements arrive by downloading only the changed files, without reinstalling. If a new version fails to start, the app goes back to the previous one.\n- Instalador con ícono propio, accesos directos y desinstalación desde Windows.\n",
+ "notes": "## Novedades / What's new\n\n- **Formularios oficiales del IRS llenos en PDF**: el 1040 (o 1040-SR) y los anexos que su declaración necesita — 1, 1-A, 2, 3, A, B, C, D, SE, 8812, EIC y los formularios 8949, 8863, 2441, 8880, 8995, 8889, 6251, 8959, 8960 y el comprobante 1040-V.\n- **Preguntas guiadas**: la aplicación pregunta solo lo que falta para llenar los formularios (SSN, depósito directo, datos del negocio, pagadores, proveedores de cuidado...).\n- **Borrador primero**: genere un borrador con marca de agua para revisarlo y luego los formularios finales para firmar.\n- **Paquete de envío**: archivo completo en el orden de adjuntos, hoja de instrucciones con la dirección del IRS de su estado y lista de verificación.\n- Nuevos datos: ventas de inversiones (1099-B), pagadores de intereses/dividendos, detalle de gastos del negocio, cobertura HSA, VIN del auto y datos del preparador pagado (Configuración → Ajustes generales).\n\n- **Official IRS forms filled in as PDF**: Form 1040 (or 1040-SR) and every schedule your return needs, plus Form 1040-V.\n- **Guided questions** for the data the forms need, **draft first** with a watermark, and a **mailing package** with the IRS address for your state.\n- Esta versión necesita el instalador completo (agrega el componente para llenar PDF). / This version needs the full installer (it adds the PDF-filling component).\n",
  "files": {
   "taxapp/__init__.py": {
-   "sha256": "17709cb819c06a04e9e7011c822b4ba689ef69763647ea822a7bcb400b8aa9c3",
+   "sha256": "5c2cabe1547e75836b94bd1af66f0a04049aceb365084c78afeea615f9cfeb61",
    "size": 405
   },
   "taxapp/accounts.py": {
-   "sha256": "84d91983188d0488eaf3618f962a58c8128792d54a0f4d1a4af4fe4a5ca696ab",
-   "size": 19207
+   "sha256": "0523ac5a824c994bfe65835bb41fb757b844818419897c3a9b9fbfcfc5a7f531",
+   "size": 19432
   },
   "taxapp/assistant.py": {
    "sha256": "061e721f5b891184214e41aed7079cd9edd9130def3d2bb0f4fe0d3aeae8f845",
@@ -30,36 +30,68 @@
    "size": 1275
   },
   "taxapp/federal.py": {
-   "sha256": "873a1c2a877fc142f85cf05570b049a4aaed391bcbcc176c0b72c7484801f0c3",
-   "size": 25764
+   "sha256": "9ca4123f2e3e4a87cbdd75f772d69537eb95717b3878ff93597bbc6d5b5e681f",
+   "size": 29925
+  },
+  "taxapp/forms/__init__.py": {
+   "sha256": "d6d99042f34eeb044e091d500952218d287098a612efa4f6132e1b87923ae1f8",
+   "size": 10778
+  },
+  "taxapp/forms/build.py": {
+   "sha256": "a7e90cfb14d477d66670533565d24fd7366323f552d0efd2994f4c4712b25745",
+   "size": 51031
+  },
+  "taxapp/forms/catalog.py": {
+   "sha256": "6034cb0b60d437490ab02f0a8af5167828015c0796f5c618db0ed9e66b506143",
+   "size": 2981
+  },
+  "taxapp/forms/mailing.py": {
+   "sha256": "7f7c1bf8fead516252f88b319da00112d8ebb08ea6851c166ee2a528f3f7f960",
+   "size": 2546
+  },
+  "taxapp/forms/pdf.py": {
+   "sha256": "4eea55da6109ce95e5bcd777b454ba156e4732a2341d938065a79dbe34485362",
+   "size": 12841
+  },
+  "taxapp/forms/questions.py": {
+   "sha256": "96319d2e7c8eb69a9f89c00eae0e2f87e68da621fbf1efe1c461f0f4c6565dbc",
+   "size": 19232
   },
   "taxapp/gui/__init__.py": {
    "sha256": "8791b6432ea0a76eaf4a1698d3d2f4876cd13b57c8844eeb828b8632cede8805",
    "size": 56
   },
   "taxapp/gui/app.py": {
-   "sha256": "2cc45c457b53f9f87829ad07ae36886b470731194f047b50dc8d6fa9ca2caf19",
-   "size": 28304
+   "sha256": "a2e775750a878fe3ab0deb109bfa373fb08024d1730815efcc8b52063bf1ccdc",
+   "size": 28412
   },
   "taxapp/gui/assistant.py": {
    "sha256": "811f8b118d58d0ff90212d5a8cd4fbf593972ea344e642f9432722b47327da80",
    "size": 24177
   },
+  "taxapp/gui/forms_view.py": {
+   "sha256": "da00a4c3202717dd072cca5f6b180a5d45c893b0f1834a764367b263b98e9f98",
+   "size": 28546
+  },
   "taxapp/gui/home.py": {
    "sha256": "714de0765199cd71d8f8e9beaaca551fc1548626560be130a2d3a18987c1d303",
    "size": 24207
+  },
+  "taxapp/gui/lists.py": {
+   "sha256": "19fd6a19eaa449b4862317bf94b333d85e298e8dc17d89a15f7f90e37eaaed64",
+   "size": 8239
   },
   "taxapp/gui/login.py": {
    "sha256": "32a055fee44c347716bc0bfa2c93d36b94a73fe1927a6e4f1b3c9db8ebaa08ce",
    "size": 10871
   },
   "taxapp/gui/screens.py": {
-   "sha256": "f71b821607b7a35bbceb03625e18adbbc9e26904a73e6fcb3e57395251a422b4",
-   "size": 58391
+   "sha256": "6d5772fd2aa8da44c2e097ff749adc2f8fa5c445e7419fce30ed4c65ee715f68",
+   "size": 61884
   },
   "taxapp/gui/settings.py": {
-   "sha256": "285bda38ac38d7233a7fa7088f8122d04c6e732a3475de4c068c11d51519877b",
-   "size": 41928
+   "sha256": "d0f3427d2d6821b9aae44bf2530806329e662310e6847fd23f6edf735e2006d9",
+   "size": 43826
   },
   "taxapp/gui/theme.py": {
    "sha256": "ebae4859ee58613ffe34e0610d4d8792f263d1e1775395782ca84b3d969887af",
@@ -82,16 +114,16 @@
    "size": 14051
   },
   "taxapp/gui/workspace.py": {
-   "sha256": "566e660397d726d3c4f74df7ad90107834e02b0ed76408e1d17ad77db6bec7be",
-   "size": 14809
+   "sha256": "556ecfb7db0c1f3e8204becbe01ff6d1f65ad7121f1ab52722d199f8a5044c76",
+   "size": 14944
   },
   "taxapp/i18n.py": {
    "sha256": "2a7dbfe7fcd8521d2bf22a94ff48bb7d34f5b6ebfbb97c67ccbb50994aba9fd2",
    "size": 3084
   },
   "taxapp/lang_en.py": {
-   "sha256": "dbf3a354aeb7147f77b95a2298a12f627f41de762a879e0cd6e259871987e9f5",
-   "size": 93212
+   "sha256": "274df26705b3b34ee6d5012cb8d16464a1be911f941d598ee802c49d0f7878dd",
+   "size": 127704
   },
   "taxapp/lang_en_data.py": {
    "sha256": "da094de3048f7a7c84959516c1b4d2254ddec49df68dfcd6f0592e42d26cc2b0",
@@ -102,12 +134,12 @@
    "size": 7364
   },
   "taxapp/models.py": {
-   "sha256": "27444d9616d4991a580ed6e22ab8a4024233ed898fa0862777f50e49f43dc2b3",
-   "size": 13431
+   "sha256": "91f0c56c45ca9d0a87c03415e97af68204fd4e7f47282fdc4e40ce62752594e2",
+   "size": 20784
   },
   "taxapp/reports.py": {
-   "sha256": "36cd756017426424daa3a5ec9e461143c27e55d1a5dc023ec733f000da8767d6",
-   "size": 15084
+   "sha256": "40c8cb5adcbf4e8258d87e28dbbbe4b5d503e793efdcd55ee18a79c7765bbd7c",
+   "size": 15066
   },
   "taxapp/review.py": {
    "sha256": "2bb6ed2430b74c0a9160b264c28164fb552d7b45586283a9c8c92651aa2c79e9",
@@ -134,12 +166,108 @@
    "size": 1788
   },
   "data/federal_2025.json": {
-   "sha256": "bcfd9878ea1af08064f69cacef52f9643f5bb217005bad59d340eebba3248d71",
-   "size": 6698
+   "sha256": "96d6d618b0add1dc70afe388e1d4cdeb916c6de75df8d37eb3f4956eaee3debe",
+   "size": 6772
   },
   "data/federal_2026.json": {
-   "sha256": "92d17eabacc158810842fe32bce3ebc4efafbd8d3b8f68972127110800f25f5e",
-   "size": 6867
+   "sha256": "62431af4ddd7adc23a110ce8f569fc32ee48f7b3357602729a4df99c9b3acb41",
+   "size": 6941
+  },
+  "data/formularios/2025/f1040.pdf": {
+   "sha256": "3d31c226df0d189ced80e039d01cf0f8820c1019681a0f0ca6264de277b7e982",
+   "size": 220237
+  },
+  "data/formularios/2025/f1040s.pdf": {
+   "sha256": "162a646c25af23338d103193f1a82a058ae61f9086b41d445edfb8672d5d0072",
+   "size": 233429
+  },
+  "data/formularios/2025/f1040s1.pdf": {
+   "sha256": "8dafec719f6a4716c259a2bdaca546d9bb9e262d1eabef885fe116a7327458fa",
+   "size": 99940
+  },
+  "data/formularios/2025/f1040s1a.pdf": {
+   "sha256": "64f97b38ff4218e2f188fd55a8aab7043556687487c82bbefe0b6dd1a956ecd4",
+   "size": 94224
+  },
+  "data/formularios/2025/f1040s2.pdf": {
+   "sha256": "64d867b683334cfc533993e37ccb0d143449ec29428a78206be2e4de333941e8",
+   "size": 96526
+  },
+  "data/formularios/2025/f1040s3.pdf": {
+   "sha256": "008cfd3fe3ebd0860452069b90fd0a3d53dda6dd8a5d870278370aa899a63f82",
+   "size": 69852
+  },
+  "data/formularios/2025/f1040s8.pdf": {
+   "sha256": "6936462d67e2309d14a795aa0b88ef613cc6d79617431cfda3a2edf44aea52db",
+   "size": 100829
+  },
+  "data/formularios/2025/f1040sa.pdf": {
+   "sha256": "c14acf3478f4c33f27ac6e8ecd9f94b6fb25b16745b341728bd27847d2ef56bb",
+   "size": 79008
+  },
+  "data/formularios/2025/f1040sb.pdf": {
+   "sha256": "dd1ec3719954532bd219343d81385a2ada3c8e9573fc755a3893f1fbbecc63e2",
+   "size": 76411
+  },
+  "data/formularios/2025/f1040sc.pdf": {
+   "sha256": "ddf401dbe060467d39f90ad2abf645df1de31512821a150dc68a3882bbf19716",
+   "size": 122589
+  },
+  "data/formularios/2025/f1040sd.pdf": {
+   "sha256": "90564c8b7e49280363612639b804d113ebedb516c2e87c70649f29c844da1d2e",
+   "size": 97968
+  },
+  "data/formularios/2025/f1040sei.pdf": {
+   "sha256": "b6dab52511ece16e710899542d952db578bf6c872d2580ee6760fb88ed77c4ba",
+   "size": 112439
+  },
+  "data/formularios/2025/f1040sse.pdf": {
+   "sha256": "05bc2b3e1dfca65d8c6fc6d652af4fa3736e953c6575d6e9f82590484677d347",
+   "size": 80290
+  },
+  "data/formularios/2025/f1040v.pdf": {
+   "sha256": "2426bb330ac54b765b32fbc3eceb878544aa333a3a823e1170aa8261a40fd251",
+   "size": 97663
+  },
+  "data/formularios/2025/f2441.pdf": {
+   "sha256": "6c3c2d19163fa4c4de829abf9a89b43f08b4f4f3cb169740fc7da43e914269ce",
+   "size": 121040
+  },
+  "data/formularios/2025/f6251.pdf": {
+   "sha256": "6995bfd29c6fe1b80fdc396c9c4796c7cef58a966070db0346721eae815fea3f",
+   "size": 104434
+  },
+  "data/formularios/2025/f8863.pdf": {
+   "sha256": "a251a1cfbd613d5dd81646b276b1cc3562d7efb8bed969491eada7c8eb0d8e00",
+   "size": 111888
+  },
+  "data/formularios/2025/f8880.pdf": {
+   "sha256": "ba2b28770bc82d318ab0b884e56a572771030ce1a3ec80d85bafd2eea3a2778e",
+   "size": 91662
+  },
+  "data/formularios/2025/f8889.pdf": {
+   "sha256": "15ed4587f75bec57b0b343dfd001b4016f09698af970afee633ca1a364d5f49f",
+   "size": 74277
+  },
+  "data/formularios/2025/f8949.pdf": {
+   "sha256": "274513891e4e281d11e14286f14b9df724c24b6030fca0f0681da64fb2e7f525",
+   "size": 128770
+  },
+  "data/formularios/2025/f8959.pdf": {
+   "sha256": "13e64004948331d2b708c80b1b664bf69675028edd0b84f2de6e3ca9afaa996d",
+   "size": 71969
+  },
+  "data/formularios/2025/f8960.pdf": {
+   "sha256": "9b323b7166b5845a776f781b8c82eef94ccd998354e88fc33a1051c3b3789731",
+   "size": 76922
+  },
+  "data/formularios/2025/f8995.pdf": {
+   "sha256": "55380ad230303e1586ce97f0f224265b8337ad18c9204f0fb7325e95a76b5cde",
+   "size": 72273
+  },
+  "data/formularios/2025.json": {
+   "sha256": "e1a3a68a507491c9496dea51429436d562d257175bd541b51a4b212765a745ea",
+   "size": 87809
   },
   "data/local_2025.json": {
    "sha256": "2cbcb14349fa819c05dd9ebc520b286c24a17b9d61364e5390022fdee9701f39",

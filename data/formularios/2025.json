@@ -1,0 +1,2556 @@
+{
+ "year": 2025,
+ "forms": {
+  "1040": {
+   "file": "f1040.pdf",
+   "seq": "",
+   "title": [
+    "Formulario 1040 – Declaración de impuestos",
+    "Form 1040 – Individual Income Tax Return"
+   ],
+   "pages": 2,
+   "fields": {
+    "first": "topmostSubform[0].Page1[0].f1_14[0]",
+    "last": "topmostSubform[0].Page1[0].f1_15[0]",
+    "ssn": [
+     "topmostSubform[0].Page1[0].f1_16[0]",
+     null,
+     9
+    ],
+    "sp_first": "topmostSubform[0].Page1[0].f1_17[0]",
+    "sp_last": "topmostSubform[0].Page1[0].f1_18[0]",
+    "sp_ssn": [
+     "topmostSubform[0].Page1[0].f1_19[0]",
+     null,
+     9
+    ],
+    "street": "topmostSubform[0].Page1[0].Address_ReadOrder[0].f1_20[0]",
+    "apt": "topmostSubform[0].Page1[0].Address_ReadOrder[0].f1_21[0]",
+    "city": "topmostSubform[0].Page1[0].Address_ReadOrder[0].f1_22[0]",
+    "state": "topmostSubform[0].Page1[0].Address_ReadOrder[0].f1_23[0]",
+    "zip": "topmostSubform[0].Page1[0].Address_ReadOrder[0].f1_24[0]",
+    "f_country": "topmostSubform[0].Page1[0].Address_ReadOrder[0].f1_25[0]",
+    "f_province": "topmostSubform[0].Page1[0].Address_ReadOrder[0].f1_26[0]",
+    "f_postal": "topmostSubform[0].Page1[0].Address_ReadOrder[0].f1_27[0]",
+    "home_us": [
+     "topmostSubform[0].Page1[0].c1_5[0]",
+     "/1"
+    ],
+    "pec_you": [
+     "topmostSubform[0].Page1[0].c1_6[0]",
+     "/1"
+    ],
+    "pec_spouse": [
+     "topmostSubform[0].Page1[0].c1_7[0]",
+     "/1"
+    ],
+    "fs_single": [
+     "topmostSubform[0].Page1[0].Checkbox_ReadOrder[0].c1_8[0]",
+     "/1"
+    ],
+    "fs_mfj": [
+     "topmostSubform[0].Page1[0].Checkbox_ReadOrder[0].c1_8[1]",
+     "/2"
+    ],
+    "fs_mfs": [
+     "topmostSubform[0].Page1[0].Checkbox_ReadOrder[0].c1_8[2]",
+     "/3"
+    ],
+    "mfs_spouse_name": "topmostSubform[0].Page1[0].Checkbox_ReadOrder[0].f1_28[0]",
+    "fs_hoh": [
+     "topmostSubform[0].Page1[0].c1_8[0]",
+     "/4"
+    ],
+    "fs_qss": [
+     "topmostSubform[0].Page1[0].c1_8[1]",
+     "/5"
+    ],
+    "hoh_child": "topmostSubform[0].Page1[0].f1_29[0]",
+    "digital_yes": [
+     "topmostSubform[0].Page1[0].c1_10[0]",
+     "/1"
+    ],
+    "digital_no": [
+     "topmostSubform[0].Page1[0].c1_10[1]",
+     "/2"
+    ],
+    "dep_more": [
+     "topmostSubform[0].Page1[0].Dependents_ReadOrder[0].c1_11[0]",
+     "/1"
+    ],
+    "lived_apart": [
+     "topmostSubform[0].Page1[0].c1_32[0]",
+     "/1"
+    ],
+    "L1a": "topmostSubform[0].Page1[0].f1_47[0]",
+    "L1b": "topmostSubform[0].Page1[0].f1_48[0]",
+    "L1c": "topmostSubform[0].Page1[0].f1_49[0]",
+    "L1d": "topmostSubform[0].Page1[0].f1_50[0]",
+    "L1e": "topmostSubform[0].Page1[0].f1_51[0]",
+    "L1f": "topmostSubform[0].Page1[0].f1_52[0]",
+    "L1g": "topmostSubform[0].Page1[0].f1_53[0]",
+    "L1h_type": "topmostSubform[0].Page1[0].f1_54[0]",
+    "L1h": "topmostSubform[0].Page1[0].f1_55[0]",
+    "L1i": "topmostSubform[0].Page1[0].f1_56[0]",
+    "L1z": "topmostSubform[0].Page1[0].f1_57[0]",
+    "L2a": "topmostSubform[0].Page1[0].f1_58[0]",
+    "L2b": "topmostSubform[0].Page1[0].f1_59[0]",
+    "L3a": "topmostSubform[0].Page1[0].f1_60[0]",
+    "L3b": "topmostSubform[0].Page1[0].f1_61[0]",
+    "L4a": "topmostSubform[0].Page1[0].f1_62[0]",
+    "L4b": "topmostSubform[0].Page1[0].f1_63[0]",
+    "L4c_rollover": [
+     "topmostSubform[0].Page1[0].c1_35[0]",
+     "/1"
+    ],
+    "L5a": "topmostSubform[0].Page1[0].f1_65[0]",
+    "L5b": "topmostSubform[0].Page1[0].f1_66[0]",
+    "L5c_rollover": [
+     "topmostSubform[0].Page1[0].c1_38[0]",
+     "/1"
+    ],
+    "L6a": "topmostSubform[0].Page1[0].f1_68[0]",
+    "L6b": "topmostSubform[0].Page1[0].f1_69[0]",
+    "L7a": "topmostSubform[0].Page1[0].f1_70[0]",
+    "L7b_nosd": [
+     "topmostSubform[0].Page1[0].c1_43[0]",
+     "/1"
+    ],
+    "L8": "topmostSubform[0].Page1[0].f1_72[0]",
+    "L9": "topmostSubform[0].Page1[0].f1_73[0]",
+    "L10": "topmostSubform[0].Page1[0].f1_74[0]",
+    "L11a": "topmostSubform[0].Page1[0].f1_75[0]",
+    "L11b": "topmostSubform[0].Page2[0].f2_01[0]",
+    "L12a_you": [
+     "topmostSubform[0].Page2[0].c2_1[0]",
+     "/1"
+    ],
+    "L12a_spouse": [
+     "topmostSubform[0].Page2[0].c2_2[0]",
+     "/1"
+    ],
+    "L12b": [
+     "topmostSubform[0].Page2[0].c2_3[0]",
+     "/1"
+    ],
+    "L12d_you65": [
+     "topmostSubform[0].Page2[0].c2_5[0]",
+     "/1"
+    ],
+    "L12d_youblind": [
+     "topmostSubform[0].Page2[0].c2_6[0]",
+     "/1"
+    ],
+    "L12d_sp65": [
+     "topmostSubform[0].Page2[0].c2_7[0]",
+     "/1"
+    ],
+    "L12d_spblind": [
+     "topmostSubform[0].Page2[0].c2_8[0]",
+     "/1"
+    ],
+    "L12e": "topmostSubform[0].Page2[0].f2_02[0]",
+    "L13a": "topmostSubform[0].Page2[0].f2_03[0]",
+    "L13b": "topmostSubform[0].Page2[0].f2_04[0]",
+    "L14": "topmostSubform[0].Page2[0].f2_05[0]",
+    "L15": "topmostSubform[0].Page2[0].f2_06[0]",
+    "L16": "topmostSubform[0].Page2[0].f2_08[0]",
+    "L17": "topmostSubform[0].Page2[0].f2_09[0]",
+    "L18": "topmostSubform[0].Page2[0].f2_10[0]",
+    "L19": "topmostSubform[0].Page2[0].f2_11[0]",
+    "L20": "topmostSubform[0].Page2[0].f2_12[0]",
+    "L21": "topmostSubform[0].Page2[0].f2_13[0]",
+    "L22": "topmostSubform[0].Page2[0].f2_14[0]",
+    "L23": "topmostSubform[0].Page2[0].f2_15[0]",
+    "L24": "topmostSubform[0].Page2[0].f2_16[0]",
+    "L25a": "topmostSubform[0].Page2[0].f2_17[0]",
+    "L25b": "topmostSubform[0].Page2[0].f2_18[0]",
+    "L25c": "topmostSubform[0].Page2[0].f2_19[0]",
+    "L25d": "topmostSubform[0].Page2[0].f2_20[0]",
+    "L26": "topmostSubform[0].Page2[0].f2_21[0]",
+    "L27a": "topmostSubform[0].Page2[0].f2_23[0]",
+    "L27c_noeic": [
+     "topmostSubform[0].Page2[0].c2_13[0]",
+     "/1"
+    ],
+    "L28": "topmostSubform[0].Page2[0].f2_24[0]",
+    "L29": "topmostSubform[0].Page2[0].f2_25[0]",
+    "L30": "topmostSubform[0].Page2[0].f2_26[0]",
+    "L31": "topmostSubform[0].Page2[0].f2_27[0]",
+    "L32": "topmostSubform[0].Page2[0].f2_28[0]",
+    "L33": "topmostSubform[0].Page2[0].f2_29[0]",
+    "L34": "topmostSubform[0].Page2[0].f2_30[0]",
+    "L35a": "topmostSubform[0].Page2[0].f2_31[0]",
+    "routing": [
+     "topmostSubform[0].Page2[0].RoutingNo[0].f2_32[0]",
+     null,
+     9
+    ],
+    "acct_checking": [
+     "topmostSubform[0].Page2[0].c2_16[0]",
+     "/1"
+    ],
+    "acct_savings": [
+     "topmostSubform[0].Page2[0].c2_16[1]",
+     "/2"
+    ],
+    "account": [
+     "topmostSubform[0].Page2[0].AccountNo[0].f2_33[0]",
+     null,
+     17
+    ],
+    "L36": "topmostSubform[0].Page2[0].f2_34[0]",
+    "L37": "topmostSubform[0].Page2[0].f2_35[0]",
+    "L38": "topmostSubform[0].Page2[0].f2_36[0]",
+    "designee_yes": [
+     "topmostSubform[0].Page2[0].c2_17[0]",
+     "/1"
+    ],
+    "designee_no": [
+     "topmostSubform[0].Page2[0].c2_17[1]",
+     "/2"
+    ],
+    "designee_name": "topmostSubform[0].Page2[0].f2_37[0]",
+    "designee_phone": "topmostSubform[0].Page2[0].f2_38[0]",
+    "designee_pin": [
+     "topmostSubform[0].Page2[0].f2_39[0]",
+     null,
+     5
+    ],
+    "occupation": "topmostSubform[0].Page2[0].f2_40[0]",
+    "ippin": [
+     "topmostSubform[0].Page2[0].f2_41[0]",
+     null,
+     6
+    ],
+    "sp_occupation": "topmostSubform[0].Page2[0].f2_42[0]",
+    "sp_ippin": [
+     "topmostSubform[0].Page2[0].f2_43[0]",
+     null,
+     6
+    ],
+    "phone": "topmostSubform[0].Page2[0].f2_44[0]",
+    "email": "topmostSubform[0].Page2[0].f2_45[0]",
+    "prep_name": "topmostSubform[0].Page2[0].f2_46[0]",
+    "prep_ptin": [
+     "topmostSubform[0].Page2[0].f2_47[0]",
+     null,
+     11
+    ],
+    "prep_self": [
+     "topmostSubform[0].Page2[0].c2_18[0]",
+     "/1"
+    ],
+    "prep_firm": "topmostSubform[0].Page2[0].f2_48[0]",
+    "prep_phone": "topmostSubform[0].Page2[0].f2_49[0]",
+    "prep_address": "topmostSubform[0].Page2[0].f2_50[0]",
+    "prep_ein": [
+     "topmostSubform[0].Page2[0].f2_51[0]",
+     null,
+     10
+    ],
+    "dep0_first": "topmostSubform[0].Page1[0].Table_Dependents[0].Row1[0].f1_31[0]",
+    "dep0_last": "topmostSubform[0].Page1[0].Table_Dependents[0].Row2[0].f1_35[0]",
+    "dep0_ssn": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row3[0].f1_39[0]",
+     null,
+     9
+    ],
+    "dep0_rel": "topmostSubform[0].Page1[0].Table_Dependents[0].Row4[0].f1_43[0]",
+    "dep0_lived": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row5[0].Dependent1[0].c1_12[0]",
+     "/1"
+    ],
+    "dep0_us": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row5[0].Dependent1[0].c1_13[0]",
+     "/1"
+    ],
+    "dep0_student": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row6[0].Dependent1[0].c1_20[0]",
+     "/1"
+    ],
+    "dep0_disabled": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row6[0].Dependent1[0].c1_21[0]",
+     "/1"
+    ],
+    "dep0_ctc": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row7[0].Dependent1[0].c1_28[0]",
+     "/1"
+    ],
+    "dep0_odc": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row7[0].Dependent1[0].c1_28[1]",
+     "/2"
+    ],
+    "dep1_first": "topmostSubform[0].Page1[0].Table_Dependents[0].Row1[0].f1_32[0]",
+    "dep1_last": "topmostSubform[0].Page1[0].Table_Dependents[0].Row2[0].f1_36[0]",
+    "dep1_ssn": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row3[0].f1_40[0]",
+     null,
+     9
+    ],
+    "dep1_rel": "topmostSubform[0].Page1[0].Table_Dependents[0].Row4[0].f1_44[0]",
+    "dep1_lived": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row5[0].Dependent2[0].c1_14[0]",
+     "/1"
+    ],
+    "dep1_us": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row5[0].Dependent2[0].c1_15[0]",
+     "/1"
+    ],
+    "dep1_student": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row6[0].Dependent2[0].c1_22[0]",
+     "/1"
+    ],
+    "dep1_disabled": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row6[0].Dependent2[0].c1_23[0]",
+     "/1"
+    ],
+    "dep1_ctc": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row7[0].Dependent2[0].c1_29[0]",
+     "/1"
+    ],
+    "dep1_odc": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row7[0].Dependent2[0].c1_29[1]",
+     "/2"
+    ],
+    "dep2_first": "topmostSubform[0].Page1[0].Table_Dependents[0].Row1[0].f1_33[0]",
+    "dep2_last": "topmostSubform[0].Page1[0].Table_Dependents[0].Row2[0].f1_37[0]",
+    "dep2_ssn": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row3[0].f1_41[0]",
+     null,
+     9
+    ],
+    "dep2_rel": "topmostSubform[0].Page1[0].Table_Dependents[0].Row4[0].f1_45[0]",
+    "dep2_lived": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row5[0].Dependent3[0].c1_16[0]",
+     "/1"
+    ],
+    "dep2_us": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row5[0].Dependent3[0].c1_17[0]",
+     "/1"
+    ],
+    "dep2_student": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row6[0].Dependent3[0].c1_24[0]",
+     "/1"
+    ],
+    "dep2_disabled": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row6[0].Dependent3[0].c1_25[0]",
+     "/1"
+    ],
+    "dep2_ctc": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row7[0].Dependent3[0].c1_30[0]",
+     "/1"
+    ],
+    "dep2_odc": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row7[0].Dependent3[0].c1_30[1]",
+     "/2"
+    ],
+    "dep3_first": "topmostSubform[0].Page1[0].Table_Dependents[0].Row1[0].f1_34[0]",
+    "dep3_last": "topmostSubform[0].Page1[0].Table_Dependents[0].Row2[0].f1_38[0]",
+    "dep3_ssn": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row3[0].f1_42[0]",
+     null,
+     9
+    ],
+    "dep3_rel": "topmostSubform[0].Page1[0].Table_Dependents[0].Row4[0].f1_46[0]",
+    "dep3_lived": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row5[0].Dependent4[0].c1_18[0]",
+     "/1"
+    ],
+    "dep3_us": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row5[0].Dependent4[0].c1_19[0]",
+     "/1"
+    ],
+    "dep3_student": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row6[0].Dependent4[0].c1_26[0]",
+     "/1"
+    ],
+    "dep3_disabled": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row6[0].Dependent4[0].c1_27[0]",
+     "/1"
+    ],
+    "dep3_ctc": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row7[0].Dependent4[0].c1_31[0]",
+     "/1"
+    ],
+    "dep3_odc": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row7[0].Dependent4[0].c1_31[1]",
+     "/2"
+    ]
+   }
+  },
+  "1040sr": {
+   "file": "f1040s.pdf",
+   "seq": "",
+   "title": [
+    "Formulario 1040-SR – Declaración para mayores de 65",
+    "Form 1040-SR – Return for Seniors"
+   ],
+   "pages": 4,
+   "fields": {
+    "first": "topmostSubform[0].Page1[0].f1_14[0]",
+    "last": "topmostSubform[0].Page1[0].f1_15[0]",
+    "ssn": [
+     "topmostSubform[0].Page1[0].YourSocial[0].f1_16[0]",
+     null,
+     9
+    ],
+    "sp_first": "topmostSubform[0].Page1[0].f1_17[0]",
+    "sp_last": "topmostSubform[0].Page1[0].f1_18[0]",
+    "sp_ssn": [
+     "topmostSubform[0].Page1[0].f1_19[0]",
+     null,
+     9
+    ],
+    "street": "topmostSubform[0].Page1[0].Address[0].f1_20[0]",
+    "apt": "topmostSubform[0].Page1[0].Address[0].f1_21[0]",
+    "city": "topmostSubform[0].Page1[0].Address[0].f1_22[0]",
+    "state": "topmostSubform[0].Page1[0].Address[0].f1_23[0]",
+    "zip": "topmostSubform[0].Page1[0].Address[0].f1_24[0]",
+    "f_country": "topmostSubform[0].Page1[0].Address[0].f1_25[0]",
+    "f_province": "topmostSubform[0].Page1[0].Address[0].f1_26[0]",
+    "f_postal": "topmostSubform[0].Page1[0].Address[0].f1_27[0]",
+    "home_us": [
+     "topmostSubform[0].Page1[0].c1_5[0]",
+     "/1"
+    ],
+    "pec_you": [
+     "topmostSubform[0].Page1[0].c1_6[0]",
+     "/1"
+    ],
+    "pec_spouse": [
+     "topmostSubform[0].Page1[0].c1_7[0]",
+     "/1"
+    ],
+    "fs_single": [
+     "topmostSubform[0].Page1[0].Single_ReadOrder[0].c1_8[0]",
+     "/1"
+    ],
+    "fs_mfj": [
+     "topmostSubform[0].Page1[0].Single_ReadOrder[0].c1_8[1]",
+     "/2"
+    ],
+    "fs_mfs": [
+     "topmostSubform[0].Page1[0].Single_ReadOrder[0].c1_8[2]",
+     "/3"
+    ],
+    "mfs_spouse_name": "topmostSubform[0].Page1[0].Single_ReadOrder[0].f1_28[0]",
+    "fs_hoh": [
+     "topmostSubform[0].Page1[0].c1_8[0]",
+     "/4"
+    ],
+    "fs_qss": [
+     "topmostSubform[0].Page1[0].c1_8[1]",
+     "/5"
+    ],
+    "hoh_child": "topmostSubform[0].Page1[0].f1_29[0]",
+    "digital_yes": [
+     "topmostSubform[0].Page1[0].c1_10[0]",
+     "/1"
+    ],
+    "digital_no": [
+     "topmostSubform[0].Page1[0].c1_10[1]",
+     "/2"
+    ],
+    "dep_more": [
+     "topmostSubform[0].Page1[0].Dependents_ReadOrder[0].c1_11[0]",
+     "/1"
+    ],
+    "lived_apart": [
+     "topmostSubform[0].Page1[0].c1_32[0]",
+     "/1"
+    ],
+    "L1a": "topmostSubform[0].Page1[0].f1_47[0]",
+    "L1b": "topmostSubform[0].Page1[0].f1_48[0]",
+    "L1c": "topmostSubform[0].Page1[0].f1_49[0]",
+    "L1d": "topmostSubform[0].Page1[0].f1_50[0]",
+    "L1e": "topmostSubform[0].Page1[0].f1_51[0]",
+    "L1f": "topmostSubform[0].Page1[0].f1_52[0]",
+    "L1g": "topmostSubform[0].Page1[0].f1_53[0]",
+    "L1h_type": "topmostSubform[0].Page1[0].Line1h_ReadOrder[0].f1_54[0]",
+    "L1h": "topmostSubform[0].Page1[0].f1_55[0]",
+    "L1i": "topmostSubform[0].Page1[0].f1_56[0]",
+    "L1z": "topmostSubform[0].Page1[0].f1_57[0]",
+    "L2a": "topmostSubform[0].Page2[0].f2_01[0]",
+    "L2b": "topmostSubform[0].Page2[0].f2_02[0]",
+    "L3a": "topmostSubform[0].Page2[0].f2_03[0]",
+    "L3b": "topmostSubform[0].Page2[0].f2_04[0]",
+    "L4a": "topmostSubform[0].Page2[0].Line4a_ReadOrder[0].f2_05[0]",
+    "L4b": "topmostSubform[0].Page2[0].f2_06[0]",
+    "L4c_rollover": [
+     "topmostSubform[0].Page2[0].c2_3[0]",
+     "/1"
+    ],
+    "L5a": "topmostSubform[0].Page2[0].Line5a_ReadOrder[0].f2_08[0]",
+    "L5b": "topmostSubform[0].Page2[0].f2_09[0]",
+    "L5c_rollover": [
+     "topmostSubform[0].Page2[0].c2_6[0]",
+     "/1"
+    ],
+    "L6a": "topmostSubform[0].Page2[0].Line6a_ReadOrder[0].f2_11[0]",
+    "L6b": "topmostSubform[0].Page2[0].f2_12[0]",
+    "L7a": "topmostSubform[0].Page2[0].f2_13[0]",
+    "L7b_nosd": [
+     "topmostSubform[0].Page2[0].c2_11[0]",
+     "/1"
+    ],
+    "L8": "topmostSubform[0].Page2[0].f2_15[0]",
+    "L9": "topmostSubform[0].Page2[0].f2_16[0]",
+    "L10": "topmostSubform[0].Page2[0].f2_17[0]",
+    "L11a": "topmostSubform[0].Page2[0].f2_18[0]",
+    "L11b": "topmostSubform[0].Page2[0].f2_19[0]",
+    "L12a_you": [
+     "topmostSubform[0].Page2[0].c2_13[0]",
+     "/1"
+    ],
+    "L12a_spouse": [
+     "topmostSubform[0].Page2[0].c2_14[0]",
+     "/1"
+    ],
+    "L12b": [
+     "topmostSubform[0].Page2[0].c2_15[0]",
+     "/1"
+    ],
+    "L12d_you65": [
+     "topmostSubform[0].Page2[0].Line12d_ReadOrder[0].c2_17[0]",
+     "/1"
+    ],
+    "L12d_youblind": [
+     "topmostSubform[0].Page2[0].Line12d_ReadOrder[0].c2_18[0]",
+     "/1"
+    ],
+    "L12d_sp65": [
+     "topmostSubform[0].Page2[0].Line12d_ReadOrder[0].c2_19[0]",
+     "/1"
+    ],
+    "L12d_spblind": [
+     "topmostSubform[0].Page2[0].Line12d_ReadOrder[0].c2_20[0]",
+     "/1"
+    ],
+    "L12e": "topmostSubform[0].Page2[0].f2_20[0]",
+    "L13a": "topmostSubform[0].Page2[0].f2_21[0]",
+    "L13b": "topmostSubform[0].Page2[0].f2_22[0]",
+    "L14": "topmostSubform[0].Page2[0].f2_23[0]",
+    "L15": "topmostSubform[0].Page2[0].f2_24[0]",
+    "L16": "topmostSubform[0].Page2[0].f2_26[0]",
+    "L17": "topmostSubform[0].Page2[0].f2_27[0]",
+    "L18": "topmostSubform[0].Page2[0].f2_28[0]",
+    "L19": "topmostSubform[0].Page2[0].f2_29[0]",
+    "L20": "topmostSubform[0].Page2[0].f2_30[0]",
+    "L21": "topmostSubform[0].Page2[0].f2_31[0]",
+    "L22": "topmostSubform[0].Page2[0].f2_32[0]",
+    "L23": "topmostSubform[0].Page2[0].f2_33[0]",
+    "L24": "topmostSubform[0].Page2[0].f2_34[0]",
+    "L25a": "topmostSubform[0].Page3[0].f3_01[0]",
+    "L25b": "topmostSubform[0].Page3[0].f3_02[0]",
+    "L25c": "topmostSubform[0].Page3[0].f3_03[0]",
+    "L25d": "topmostSubform[0].Page3[0].f3_04[0]",
+    "L26": "topmostSubform[0].Page3[0].f3_05[0]",
+    "L27a": "topmostSubform[0].Page3[0].f3_07[0]",
+    "L27c_noeic": [
+     "topmostSubform[0].Page3[0].c3_2[0]",
+     "/1"
+    ],
+    "L28": "topmostSubform[0].Page3[0].f3_08[0]",
+    "L29": "topmostSubform[0].Page3[0].f3_09[0]",
+    "L30": "topmostSubform[0].Page3[0].f3_10[0]",
+    "L31": "topmostSubform[0].Page3[0].f3_11[0]",
+    "L32": "topmostSubform[0].Page3[0].f3_12[0]",
+    "L33": "topmostSubform[0].Page3[0].f3_13[0]",
+    "L34": "topmostSubform[0].Page3[0].f3_14[0]",
+    "L35a": "topmostSubform[0].Page3[0].f3_15[0]",
+    "routing": [
+     "topmostSubform[0].Page3[0].RoutingNo[0].f3_16[0]",
+     null,
+     9
+    ],
+    "acct_checking": [
+     "topmostSubform[0].Page3[0].c3_5[0]",
+     "/1"
+    ],
+    "acct_savings": [
+     "topmostSubform[0].Page3[0].c3_5[1]",
+     "/2"
+    ],
+    "account": [
+     "topmostSubform[0].Page3[0].AccountNo[0].f3_17[0]",
+     null,
+     17
+    ],
+    "L36": "topmostSubform[0].Page3[0].f3_18[0]",
+    "L37": "topmostSubform[0].Page3[0].f3_19[0]",
+    "L38": "topmostSubform[0].Page3[0].Line38_ReadOrder[0].f3_20[0]",
+    "designee_yes": [
+     "topmostSubform[0].Page3[0].c3_6[0]",
+     "/1"
+    ],
+    "designee_no": [
+     "topmostSubform[0].Page3[0].c3_6[1]",
+     "/2"
+    ],
+    "designee_name": "topmostSubform[0].Page3[0].f3_21[0]",
+    "designee_phone": "topmostSubform[0].Page3[0].f3_22[0]",
+    "designee_pin": [
+     "topmostSubform[0].Page3[0].f3_23[0]",
+     null,
+     5
+    ],
+    "occupation": "topmostSubform[0].Page3[0].f3_24[0]",
+    "ippin": [
+     "topmostSubform[0].Page3[0].f3_25[0]",
+     null,
+     6
+    ],
+    "sp_occupation": "topmostSubform[0].Page3[0].f3_26[0]",
+    "sp_ippin": [
+     "topmostSubform[0].Page3[0].f3_27[0]",
+     null,
+     6
+    ],
+    "phone": "topmostSubform[0].Page3[0].f3_28[0]",
+    "email": "topmostSubform[0].Page3[0].f3_29[0]",
+    "prep_name": "topmostSubform[0].Page3[0].f3_30[0]",
+    "prep_ptin": [
+     "topmostSubform[0].Page3[0].f3_31[0]",
+     null,
+     11
+    ],
+    "prep_self": [
+     "topmostSubform[0].Page3[0].CheckIf[0].c3_7[0]",
+     "/1"
+    ],
+    "prep_firm": "topmostSubform[0].Page3[0].f3_32[0]",
+    "prep_phone": "topmostSubform[0].Page3[0].f3_33[0]",
+    "prep_address": "topmostSubform[0].Page3[0].f3_34[0]",
+    "prep_ein": [
+     "topmostSubform[0].Page3[0].f3_35[0]",
+     null,
+     10
+    ],
+    "dep0_first": "topmostSubform[0].Page1[0].Table_Dependents[0].Row1[0].f1_31[0]",
+    "dep0_last": "topmostSubform[0].Page1[0].Table_Dependents[0].Row2[0].f1_35[0]",
+    "dep0_ssn": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row3[0].f1_39[0]",
+     null,
+     9
+    ],
+    "dep0_rel": "topmostSubform[0].Page1[0].Table_Dependents[0].Row4[0].f1_43[0]",
+    "dep0_lived": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row5[0].Dependent1[0].c1_12[0]",
+     "/1"
+    ],
+    "dep0_us": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row5[0].Dependent1[0].c1_13[0]",
+     "/1"
+    ],
+    "dep0_student": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row7[0].Dependent1[0].c1_20[0]",
+     "/1"
+    ],
+    "dep0_disabled": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row7[0].Dependent1[0].c1_21[0]",
+     "/1"
+    ],
+    "dep0_ctc": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row8[0].Dependent1[0].c1_28[0]",
+     "/1"
+    ],
+    "dep0_odc": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row8[0].Dependent1[0].c1_28[1]",
+     "/2"
+    ],
+    "dep1_first": "topmostSubform[0].Page1[0].Table_Dependents[0].Row1[0].f1_32[0]",
+    "dep1_last": "topmostSubform[0].Page1[0].Table_Dependents[0].Row2[0].f1_36[0]",
+    "dep1_ssn": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row3[0].f1_40[0]",
+     null,
+     9
+    ],
+    "dep1_rel": "topmostSubform[0].Page1[0].Table_Dependents[0].Row4[0].f1_44[0]",
+    "dep1_lived": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row5[0].Dependent2[0].c1_14[0]",
+     "/1"
+    ],
+    "dep1_us": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row5[0].Dependent2[0].c1_15[0]",
+     "/1"
+    ],
+    "dep1_student": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row7[0].Dependent2[0].c1_22[0]",
+     "/1"
+    ],
+    "dep1_disabled": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row7[0].Dependent2[0].c1_23[0]",
+     "/1"
+    ],
+    "dep1_ctc": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row8[0].Dependent2[0].c1_29[0]",
+     "/1"
+    ],
+    "dep1_odc": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row8[0].Dependent2[0].c1_29[1]",
+     "/2"
+    ],
+    "dep2_first": "topmostSubform[0].Page1[0].Table_Dependents[0].Row1[0].f1_33[0]",
+    "dep2_last": "topmostSubform[0].Page1[0].Table_Dependents[0].Row2[0].f1_37[0]",
+    "dep2_ssn": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row3[0].f1_41[0]",
+     null,
+     9
+    ],
+    "dep2_rel": "topmostSubform[0].Page1[0].Table_Dependents[0].Row4[0].f1_45[0]",
+    "dep2_lived": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row5[0].Dependent3[0].c1_16[0]",
+     "/1"
+    ],
+    "dep2_us": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row5[0].Dependent3[0].c1_17[0]",
+     "/1"
+    ],
+    "dep2_student": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row7[0].Dependent3[0].c1_24[0]",
+     "/1"
+    ],
+    "dep2_disabled": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row7[0].Dependent3[0].c1_25[0]",
+     "/1"
+    ],
+    "dep2_ctc": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row8[0].Dependent3[0].c1_30[0]",
+     "/1"
+    ],
+    "dep2_odc": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row8[0].Dependent3[0].c1_30[1]",
+     "/2"
+    ],
+    "dep3_first": "topmostSubform[0].Page1[0].Table_Dependents[0].Row1[0].f1_34[0]",
+    "dep3_last": "topmostSubform[0].Page1[0].Table_Dependents[0].Row2[0].f1_38[0]",
+    "dep3_ssn": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row3[0].f1_42[0]",
+     null,
+     9
+    ],
+    "dep3_rel": "topmostSubform[0].Page1[0].Table_Dependents[0].Row4[0].f1_46[0]",
+    "dep3_lived": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row5[0].Dependent4[0].c1_18[0]",
+     "/1"
+    ],
+    "dep3_us": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row5[0].Dependent4[0].c1_19[0]",
+     "/1"
+    ],
+    "dep3_student": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row7[0].Dependent4[0].c1_26[0]",
+     "/1"
+    ],
+    "dep3_disabled": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row7[0].Dependent4[0].c1_27[0]",
+     "/1"
+    ],
+    "dep3_ctc": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row8[0].Dependent4[0].c1_31[0]",
+     "/1"
+    ],
+    "dep3_odc": [
+     "topmostSubform[0].Page1[0].Table_Dependents[0].Row8[0].Dependent4[0].c1_31[1]",
+     "/2"
+    ]
+   }
+  },
+  "s1": {
+   "file": "f1040s1.pdf",
+   "seq": "01",
+   "title": [
+    "Anexo 1 – Ingresos adicionales y ajustes",
+    "Schedule 1 – Additional Income and Adjustments"
+   ],
+   "pages": 2,
+   "fields": {
+    "name": "topmostSubform[0].Page1[0].f1_01[0]",
+    "ssn": [
+     "topmostSubform[0].Page1[0].f1_02[0]",
+     null,
+     11
+    ],
+    "L1": "topmostSubform[0].Page1[0].f1_04[0]",
+    "L3": "topmostSubform[0].Page1[0].f1_07[0]",
+    "L7": "topmostSubform[0].Page1[0].f1_12[0]",
+    "L8b": "topmostSubform[0].Page1[0].f1_14[0]",
+    "L8z_type": "topmostSubform[0].Page1[0].Line8z_ReadOrder[0].f1_35[0]",
+    "L8z": "topmostSubform[0].Page1[0].f1_36[0]",
+    "L9": "topmostSubform[0].Page1[0].f1_37[0]",
+    "L10": "topmostSubform[0].Page1[0].f1_38[0]",
+    "L11": "topmostSubform[0].Page2[0].f2_01[0]",
+    "L13": "topmostSubform[0].Page2[0].f2_03[0]",
+    "L15": "topmostSubform[0].Page2[0].f2_05[0]",
+    "L17": "topmostSubform[0].Page2[0].f2_07[0]",
+    "L20": "topmostSubform[0].Page2[0].f2_12[0]",
+    "L21": "topmostSubform[0].Page2[0].f2_13[0]",
+    "L24z_type": "topmostSubform[0].Page2[0].Line24z_ReadOrder[0].f2_27[0]",
+    "L24z": "topmostSubform[0].Page2[0].f2_28[0]",
+    "L25": "topmostSubform[0].Page2[0].f2_29[0]",
+    "L26": "topmostSubform[0].Page2[0].f2_30[0]"
+   }
+  },
+  "s1a": {
+   "file": "f1040s1a.pdf",
+   "seq": "1A",
+   "title": [
+    "Anexo 1-A – Deducciones adicionales",
+    "Schedule 1-A – Additional Deductions"
+   ],
+   "pages": 2,
+   "fields": {
+    "name": "form1[0].Page1[0].f1_01[0]",
+    "ssn": [
+     "form1[0].Page1[0].f1_02[0]",
+     null,
+     11
+    ],
+    "L1": "form1[0].Page1[0].f1_03[0]",
+    "L2e": "form1[0].Page1[0].f1_08[0]",
+    "L3": "form1[0].Page1[0].f1_09[0]",
+    "L4a": "form1[0].Page1[0].f1_10[0]",
+    "L4b": "form1[0].Page1[0].f1_11[0]",
+    "L4c": "form1[0].Page1[0].f1_12[0]",
+    "L5": "form1[0].Page1[0].f1_13[0]",
+    "L6": "form1[0].Page1[0].f1_14[0]",
+    "L7": "form1[0].Page1[0].f1_15[0]",
+    "L8": "form1[0].Page1[0].f1_16[0]",
+    "L9": "form1[0].Page1[0].f1_17[0]",
+    "L10": "form1[0].Page1[0].f1_18[0]",
+    "L11": "form1[0].Page1[0].f1_19[0]",
+    "L12": "form1[0].Page1[0].f1_20[0]",
+    "L13": "form1[0].Page1[0].f1_21[0]",
+    "L14a": "form1[0].Page1[0].f1_22[0]",
+    "L14b": "form1[0].Page1[0].f1_23[0]",
+    "L14c": "form1[0].Page1[0].f1_24[0]",
+    "L15": "form1[0].Page1[0].f1_25[0]",
+    "L16": "form1[0].Page1[0].f1_26[0]",
+    "L17": "form1[0].Page1[0].f1_27[0]",
+    "L18": "form1[0].Page1[0].f1_28[0]",
+    "L19": "form1[0].Page1[0].f1_29[0]",
+    "L20": "form1[0].Page1[0].f1_30[0]",
+    "L21": "form1[0].Page1[0].f1_31[0]",
+    "L22a_vin": [
+     "form1[0].Page2[0].Table_Line22[0].Line22a[0].VIN-1_Comb[0].f2_01[0]",
+     null,
+     17
+    ],
+    "L22a_ii": "form1[0].Page2[0].Table_Line22[0].Line22a[0].f2_02[0]",
+    "L22a_iii": "form1[0].Page2[0].Table_Line22[0].Line22a[0].f2_03[0]",
+    "L23": "form1[0].Page2[0].f2_07[0]",
+    "L24": "form1[0].Page2[0].f2_08[0]",
+    "L25": "form1[0].Page2[0].f2_09[0]",
+    "L26": "form1[0].Page2[0].f2_10[0]",
+    "L27": "form1[0].Page2[0].f2_11[0]",
+    "L28": "form1[0].Page2[0].f2_12[0]",
+    "L29": "form1[0].Page2[0].f2_13[0]",
+    "L30": "form1[0].Page2[0].f2_14[0]",
+    "L31": "form1[0].Page2[0].f2_15[0]",
+    "L32": "form1[0].Page2[0].f2_16[0]",
+    "L33": "form1[0].Page2[0].f2_17[0]",
+    "L34": "form1[0].Page2[0].f2_18[0]",
+    "L35": "form1[0].Page2[0].f2_19[0]",
+    "L36a": "form1[0].Page2[0].f2_20[0]",
+    "L36b": "form1[0].Page2[0].f2_21[0]",
+    "L37": "form1[0].Page2[0].f2_22[0]",
+    "L38": "form1[0].Page2[0].f2_23[0]"
+   }
+  },
+  "s2": {
+   "file": "f1040s2.pdf",
+   "seq": "02",
+   "title": [
+    "Anexo 2 – Impuestos adicionales",
+    "Schedule 2 – Additional Taxes"
+   ],
+   "pages": 2,
+   "fields": {
+    "name": "form1[0].Page1[0].f1_01[0]",
+    "ssn": [
+     "form1[0].Page1[0].f1_02[0]",
+     null,
+     11
+    ],
+    "L1z": "form1[0].Page1[0].f1_11[0]",
+    "L2": "form1[0].Page1[0].f1_12[0]",
+    "L3": "form1[0].Page1[0].f1_13[0]",
+    "L4": "form1[0].Page1[0].f1_15[0]",
+    "L11": "form1[0].Page1[0].f1_22[0]",
+    "L12": "form1[0].Page1[0].f1_23[0]",
+    "L21": "form1[0].Page2[0].f2_24[0]"
+   }
+  },
+  "s3": {
+   "file": "f1040s3.pdf",
+   "seq": "03",
+   "title": [
+    "Anexo 3 – Créditos y pagos adicionales",
+    "Schedule 3 – Additional Credits and Payments"
+   ],
+   "pages": 1,
+   "fields": {
+    "name": "topmostSubform[0].Page1[0].f1_01[0]",
+    "ssn": [
+     "topmostSubform[0].Page1[0].f1_02[0]",
+     null,
+     11
+    ],
+    "L1": "topmostSubform[0].Page1[0].f1_03[0]",
+    "L2": "topmostSubform[0].Page1[0].f1_04[0]",
+    "L3": "topmostSubform[0].Page1[0].f1_05[0]",
+    "L4": "topmostSubform[0].Page1[0].f1_06[0]",
+    "L6z_type": "topmostSubform[0].Page1[0].Line6z_ReadOrder[0].f2_22[0]",
+    "L6z": "topmostSubform[0].Page1[0].f1_23[0]",
+    "L7": "topmostSubform[0].Page1[0].f1_24[0]",
+    "L8": "topmostSubform[0].Page1[0].f1_25[0]",
+    "L10": "topmostSubform[0].Page1[0].f1_27[0]",
+    "L11": "topmostSubform[0].Page1[0].f1_28[0]",
+    "L13z_type": "topmostSubform[0].Page1[0].Line13z_ReadOrder[0].f1_34[0]",
+    "L13z": "topmostSubform[0].Page1[0].f1_35[0]",
+    "L14": "topmostSubform[0].Page1[0].f1_36[0]",
+    "L15": "topmostSubform[0].Page1[0].f1_37[0]"
+   }
+  },
+  "sa": {
+   "file": "f1040sa.pdf",
+   "seq": "07",
+   "title": [
+    "Anexo A – Deducciones detalladas",
+    "Schedule A – Itemized Deductions"
+   ],
+   "pages": 1,
+   "fields": {
+    "name": "form1[0].Page1[0].f1_1[0]",
+    "ssn": [
+     "form1[0].Page1[0].f1_2[0]",
+     null,
+     11
+    ],
+    "L1": "form1[0].Page1[0].f1_3[0]",
+    "L2": "form1[0].Page1[0].Line2_ReadOrder[0].f1_4[0]",
+    "L3": "form1[0].Page1[0].f1_5[0]",
+    "L4": "form1[0].Page1[0].f1_6[0]",
+    "L5a_sales": [
+     "form1[0].Page1[0].c1_1[0]",
+     "/1"
+    ],
+    "L5a": "form1[0].Page1[0].f1_7[0]",
+    "L5b": "form1[0].Page1[0].f1_8[0]",
+    "L5c": "form1[0].Page1[0].f1_9[0]",
+    "L5d": "form1[0].Page1[0].f1_10[0]",
+    "L5e": "form1[0].Page1[0].f1_11[0]",
+    "L7": "form1[0].Page1[0].f1_14[0]",
+    "L8a": "form1[0].Page1[0].f1_15[0]",
+    "L8e": "form1[0].Page1[0].f1_20[0]",
+    "L9": "form1[0].Page1[0].f1_21[0]",
+    "L10": "form1[0].Page1[0].f1_22[0]",
+    "L11": "form1[0].Page1[0].f1_23[0]",
+    "L12": "form1[0].Page1[0].f1_24[0]",
+    "L14": "form1[0].Page1[0].f1_26[0]",
+    "L15": "form1[0].Page1[0].f1_27[0]",
+    "L16_type": "form1[0].Page1[0].f1_28[0]",
+    "L16": "form1[0].Page1[0].f1_29[0]",
+    "L17": "form1[0].Page1[0].f1_30[0]",
+    "L18": [
+     "form1[0].Page1[0].Line18_ReadOrder[0].c1_3[0]",
+     "/1"
+    ]
+   }
+  },
+  "sb": {
+   "file": "f1040sb.pdf",
+   "seq": "08",
+   "title": [
+    "Anexo B – Intereses y dividendos",
+    "Schedule B – Interest and Dividends"
+   ],
+   "pages": 1,
+   "fields": {
+    "name": "topmostSubform[0].Page1[0].f1_01[0]",
+    "ssn": [
+     "topmostSubform[0].Page1[0].f1_02[0]",
+     null,
+     11
+    ],
+    "L2": "topmostSubform[0].Page1[0].f1_31[0]",
+    "L3": "topmostSubform[0].Page1[0].f1_32[0]",
+    "L4": "topmostSubform[0].Page1[0].f1_33[0]",
+    "L6": "topmostSubform[0].Page1[0].f1_64[0]",
+    "L7a_yes": [
+     "topmostSubform[0].Page1[0].TagcorrectingSubform[0].c1_1[0]",
+     "/1"
+    ],
+    "L7a_no": [
+     "topmostSubform[0].Page1[0].TagcorrectingSubform[0].c1_1[1]",
+     "/2"
+    ],
+    "fbar_yes": [
+     "topmostSubform[0].Page1[0].c1_2[0]",
+     "/1"
+    ],
+    "fbar_no": [
+     "topmostSubform[0].Page1[0].c1_2[1]",
+     "/2"
+    ],
+    "L7b": "topmostSubform[0].Page1[0].f1_65[0]",
+    "L8_yes": [
+     "topmostSubform[0].Page1[0].c1_3[0]",
+     "/1"
+    ],
+    "L8_no": [
+     "topmostSubform[0].Page1[0].c1_3[1]",
+     "/2"
+    ],
+    "int0_name": "topmostSubform[0].Page1[0].Line1_ReadOrder[0].f1_03[0]",
+    "int0_amt": "topmostSubform[0].Page1[0].f1_04[0]",
+    "int1_name": "topmostSubform[0].Page1[0].f1_05[0]",
+    "int1_amt": "topmostSubform[0].Page1[0].f1_06[0]",
+    "int2_name": "topmostSubform[0].Page1[0].f1_07[0]",
+    "int2_amt": "topmostSubform[0].Page1[0].f1_08[0]",
+    "int3_name": "topmostSubform[0].Page1[0].f1_09[0]",
+    "int3_amt": "topmostSubform[0].Page1[0].f1_10[0]",
+    "int4_name": "topmostSubform[0].Page1[0].f1_11[0]",
+    "int4_amt": "topmostSubform[0].Page1[0].f1_12[0]",
+    "int5_name": "topmostSubform[0].Page1[0].f1_13[0]",
+    "int5_amt": "topmostSubform[0].Page1[0].f1_14[0]",
+    "int6_name": "topmostSubform[0].Page1[0].f1_15[0]",
+    "int6_amt": "topmostSubform[0].Page1[0].f1_16[0]",
+    "int7_name": "topmostSubform[0].Page1[0].f1_17[0]",
+    "int7_amt": "topmostSubform[0].Page1[0].f1_18[0]",
+    "int8_name": "topmostSubform[0].Page1[0].f1_19[0]",
+    "int8_amt": "topmostSubform[0].Page1[0].f1_20[0]",
+    "int9_name": "topmostSubform[0].Page1[0].f1_21[0]",
+    "int9_amt": "topmostSubform[0].Page1[0].f1_22[0]",
+    "int10_name": "topmostSubform[0].Page1[0].f1_23[0]",
+    "int10_amt": "topmostSubform[0].Page1[0].f1_24[0]",
+    "int11_name": "topmostSubform[0].Page1[0].f1_25[0]",
+    "int11_amt": "topmostSubform[0].Page1[0].f1_26[0]",
+    "int12_name": "topmostSubform[0].Page1[0].f1_27[0]",
+    "int12_amt": "topmostSubform[0].Page1[0].f1_28[0]",
+    "int13_name": "topmostSubform[0].Page1[0].f1_29[0]",
+    "int13_amt": "topmostSubform[0].Page1[0].f1_30[0]",
+    "div0_name": "topmostSubform[0].Page1[0].ReadOrderControl[0].f1_34[0]",
+    "div0_amt": "topmostSubform[0].Page1[0].f1_35[0]",
+    "div1_name": "topmostSubform[0].Page1[0].f1_36[0]",
+    "div1_amt": "topmostSubform[0].Page1[0].f1_37[0]",
+    "div2_name": "topmostSubform[0].Page1[0].f1_38[0]",
+    "div2_amt": "topmostSubform[0].Page1[0].f1_39[0]",
+    "div3_name": "topmostSubform[0].Page1[0].f1_40[0]",
+    "div3_amt": "topmostSubform[0].Page1[0].f1_41[0]",
+    "div4_name": "topmostSubform[0].Page1[0].f1_42[0]",
+    "div4_amt": "topmostSubform[0].Page1[0].f1_43[0]",
+    "div5_name": "topmostSubform[0].Page1[0].f1_44[0]",
+    "div5_amt": "topmostSubform[0].Page1[0].f1_45[0]",
+    "div6_name": "topmostSubform[0].Page1[0].f1_46[0]",
+    "div6_amt": "topmostSubform[0].Page1[0].f1_47[0]",
+    "div7_name": "topmostSubform[0].Page1[0].f1_48[0]",
+    "div7_amt": "topmostSubform[0].Page1[0].f1_49[0]",
+    "div8_name": "topmostSubform[0].Page1[0].f1_50[0]",
+    "div8_amt": "topmostSubform[0].Page1[0].f1_51[0]",
+    "div9_name": "topmostSubform[0].Page1[0].f1_52[0]",
+    "div9_amt": "topmostSubform[0].Page1[0].f1_53[0]",
+    "div10_name": "topmostSubform[0].Page1[0].f1_54[0]",
+    "div10_amt": "topmostSubform[0].Page1[0].f1_55[0]",
+    "div11_name": "topmostSubform[0].Page1[0].f1_56[0]",
+    "div11_amt": "topmostSubform[0].Page1[0].f1_57[0]",
+    "div12_name": "topmostSubform[0].Page1[0].f1_58[0]",
+    "div12_amt": "topmostSubform[0].Page1[0].f1_59[0]",
+    "div13_name": "topmostSubform[0].Page1[0].f1_60[0]",
+    "div13_amt": "topmostSubform[0].Page1[0].f1_61[0]",
+    "div14_name": "topmostSubform[0].Page1[0].f1_62[0]",
+    "div14_amt": "topmostSubform[0].Page1[0].f1_63[0]"
+   }
+  },
+  "sc": {
+   "file": "f1040sc.pdf",
+   "seq": "09",
+   "title": [
+    "Anexo C – Ganancias o pérdidas de un negocio",
+    "Schedule C – Profit or Loss From Business"
+   ],
+   "pages": 2,
+   "fields": {
+    "name": "topmostSubform[0].Page1[0].f1_1[0]",
+    "ssn": [
+     "topmostSubform[0].Page1[0].f1_2[0]",
+     null,
+     11
+    ],
+    "A": "topmostSubform[0].Page1[0].f1_3[0]",
+    "B": [
+     "topmostSubform[0].Page1[0].BComb[0].f1_4[0]",
+     null,
+     6
+    ],
+    "C": "topmostSubform[0].Page1[0].f1_5[0]",
+    "D": [
+     "topmostSubform[0].Page1[0].DComb[0].f1_6[0]",
+     null,
+     9
+    ],
+    "E_addr": "topmostSubform[0].Page1[0].f1_7[0]",
+    "E_city": "topmostSubform[0].Page1[0].f1_8[0]",
+    "F_cash": [
+     "topmostSubform[0].Page1[0].c1_1[0]",
+     "/1"
+    ],
+    "F_accrual": [
+     "topmostSubform[0].Page1[0].c1_1[1]",
+     "/2"
+    ],
+    "G_yes": [
+     "topmostSubform[0].Page1[0].c1_2[0]",
+     "/Yes"
+    ],
+    "G_no": [
+     "topmostSubform[0].Page1[0].c1_2[1]",
+     "/No"
+    ],
+    "H": [
+     "topmostSubform[0].Page1[0].c1_3[0]",
+     "/1"
+    ],
+    "I_yes": [
+     "topmostSubform[0].Page1[0].c1_4[0]",
+     "/Yes"
+    ],
+    "I_no": [
+     "topmostSubform[0].Page1[0].c1_4[1]",
+     "/No"
+    ],
+    "J_yes": [
+     "topmostSubform[0].Page1[0].c1_5[0]",
+     "/Yes"
+    ],
+    "J_no": [
+     "topmostSubform[0].Page1[0].c1_5[1]",
+     "/No"
+    ],
+    "L1": "topmostSubform[0].Page1[0].f1_10[0]",
+    "L2": "topmostSubform[0].Page1[0].f1_11[0]",
+    "L3": "topmostSubform[0].Page1[0].f1_12[0]",
+    "L4": "topmostSubform[0].Page1[0].f1_13[0]",
+    "L5": "topmostSubform[0].Page1[0].f1_14[0]",
+    "L6": "topmostSubform[0].Page1[0].f1_15[0]",
+    "L7": "topmostSubform[0].Page1[0].f1_16[0]",
+    "L8": "topmostSubform[0].Page1[0].Lines8-17[0].f1_17[0]",
+    "L9": "topmostSubform[0].Page1[0].Lines8-17[0].f1_18[0]",
+    "L11": "topmostSubform[0].Page1[0].Lines8-17[0].f1_20[0]",
+    "L15": "topmostSubform[0].Page1[0].Lines8-17[0].f1_24[0]",
+    "L18": "topmostSubform[0].Page1[0].Lines18-27[0].f1_28[0]",
+    "L20b": "topmostSubform[0].Page1[0].Lines18-27[0].f1_31[0]",
+    "L22": "topmostSubform[0].Page1[0].Lines18-27[0].f1_33[0]",
+    "L24a": "topmostSubform[0].Page1[0].Lines18-27[0].f1_35[0]",
+    "L24b": "topmostSubform[0].Page1[0].Lines18-27[0].f1_36[0]",
+    "L25": "topmostSubform[0].Page1[0].Lines18-27[0].f1_37[0]",
+    "L27b": "topmostSubform[0].Page1[0].Lines18-27[0].f1_39[0]",
+    "L28": "topmostSubform[0].Page1[0].f1_41[0]",
+    "L29": "topmostSubform[0].Page1[0].f1_42[0]",
+    "L30a": "topmostSubform[0].Page1[0].Line30_ReadOrder[0].f1_43[0]",
+    "L30b": "topmostSubform[0].Page1[0].Line30_ReadOrder[0].f1_44[0]",
+    "L30": "topmostSubform[0].Page1[0].f1_45[0]",
+    "L31": "topmostSubform[0].Page1[0].f1_46[0]",
+    "L32a": [
+     "topmostSubform[0].Page1[0].c1_7[0]",
+     "/1"
+    ],
+    "L33a": [
+     "topmostSubform[0].Page2[0].c2_1[0]",
+     "/1"
+    ],
+    "L34_no": [
+     "topmostSubform[0].Page2[0].c2_4[1]",
+     "/2"
+    ],
+    "L35": "topmostSubform[0].Page2[0].f2_1[0]",
+    "L36": "topmostSubform[0].Page2[0].f2_2[0]",
+    "L40": "topmostSubform[0].Page2[0].f2_6[0]",
+    "L41": "topmostSubform[0].Page2[0].f2_7[0]",
+    "L42": "topmostSubform[0].Page2[0].f2_8[0]",
+    "L43_mm": [
+     "topmostSubform[0].Page2[0].f2_9[0]",
+     null,
+     2
+    ],
+    "L43_dd": [
+     "topmostSubform[0].Page2[0].f2_10[0]",
+     null,
+     2
+    ],
+    "L43_yyyy": [
+     "topmostSubform[0].Page2[0].f2_11[0]",
+     null,
+     4
+    ],
+    "L44a": "topmostSubform[0].Page2[0].f2_12[0]",
+    "L44b": "topmostSubform[0].Page2[0].f2_13[0]",
+    "L44c": "topmostSubform[0].Page2[0].f2_14[0]",
+    "L45_yes": [
+     "topmostSubform[0].Page2[0].c2_5[0]",
+     "/1"
+    ],
+    "L45_no": [
+     "topmostSubform[0].Page2[0].c2_5[1]",
+     "/2"
+    ],
+    "L46_yes": [
+     "topmostSubform[0].Page2[0].c2_6[0]",
+     "/1"
+    ],
+    "L46_no": [
+     "topmostSubform[0].Page2[0].c2_6[1]",
+     "/2"
+    ],
+    "L47a_yes": [
+     "topmostSubform[0].Page2[0].c2_7[0]",
+     "/1"
+    ],
+    "L47a_no": [
+     "topmostSubform[0].Page2[0].c2_7[1]",
+     "/2"
+    ],
+    "L47b_yes": [
+     "topmostSubform[0].Page2[0].c2_8[0]",
+     "/1"
+    ],
+    "L47b_no": [
+     "topmostSubform[0].Page2[0].c2_8[1]",
+     "/2"
+    ],
+    "L48": "topmostSubform[0].Page2[0].f2_33[0]",
+    "oth0_desc": "topmostSubform[0].Page2[0].PartVTable[0].Item1[0].f2_15[0]",
+    "oth0_amt": "topmostSubform[0].Page2[0].PartVTable[0].Item1[0].f2_16[0]",
+    "oth1_desc": "topmostSubform[0].Page2[0].PartVTable[0].Item2[0].f2_17[0]",
+    "oth1_amt": "topmostSubform[0].Page2[0].PartVTable[0].Item2[0].f2_18[0]",
+    "oth2_desc": "topmostSubform[0].Page2[0].PartVTable[0].Item3[0].f2_19[0]",
+    "oth2_amt": "topmostSubform[0].Page2[0].PartVTable[0].Item3[0].f2_20[0]",
+    "oth3_desc": "topmostSubform[0].Page2[0].PartVTable[0].Item4[0].f2_21[0]",
+    "oth3_amt": "topmostSubform[0].Page2[0].PartVTable[0].Item4[0].f2_22[0]",
+    "oth4_desc": "topmostSubform[0].Page2[0].PartVTable[0].Item5[0].f2_23[0]",
+    "oth4_amt": "topmostSubform[0].Page2[0].PartVTable[0].Item5[0].f2_24[0]",
+    "oth5_desc": "topmostSubform[0].Page2[0].PartVTable[0].Item6[0].f2_25[0]",
+    "oth5_amt": "topmostSubform[0].Page2[0].PartVTable[0].Item6[0].f2_26[0]",
+    "oth6_desc": "topmostSubform[0].Page2[0].PartVTable[0].Item7[0].f2_27[0]",
+    "oth6_amt": "topmostSubform[0].Page2[0].PartVTable[0].Item7[0].f2_28[0]",
+    "oth7_desc": "topmostSubform[0].Page2[0].PartVTable[0].Item8[0].f2_29[0]",
+    "oth7_amt": "topmostSubform[0].Page2[0].PartVTable[0].Item8[0].f2_30[0]",
+    "oth8_desc": "topmostSubform[0].Page2[0].PartVTable[0].Item9[0].f2_31[0]",
+    "oth8_amt": "topmostSubform[0].Page2[0].PartVTable[0].Item9[0].f2_32[0]"
+   }
+  },
+  "sd": {
+   "file": "f1040sd.pdf",
+   "seq": "12",
+   "title": [
+    "Anexo D – Ganancias y pérdidas de capital",
+    "Schedule D – Capital Gains and Losses"
+   ],
+   "pages": 2,
+   "fields": {
+    "name": "topmostSubform[0].Page1[0].f1_1[0]",
+    "ssn": [
+     "topmostSubform[0].Page1[0].f1_2[0]",
+     null,
+     11
+    ],
+    "qof_yes": [
+     "topmostSubform[0].Page1[0].c1_1[0]",
+     "/1"
+    ],
+    "qof_no": [
+     "topmostSubform[0].Page1[0].c1_1[1]",
+     "/2"
+    ],
+    "L6": "topmostSubform[0].Page1[0].f1_21[0]",
+    "L7": "topmostSubform[0].Page1[0].f1_22[0]",
+    "L13": "topmostSubform[0].Page1[0].f1_41[0]",
+    "L14": "topmostSubform[0].Page1[0].f1_42[0]",
+    "L15": "topmostSubform[0].Page1[0].f1_43[0]",
+    "L16": "topmostSubform[0].Page2[0].f2_1[0]",
+    "L17_yes": [
+     "topmostSubform[0].Page2[0].c2_1[0]",
+     "/1"
+    ],
+    "L17_no": [
+     "topmostSubform[0].Page2[0].c2_1[1]",
+     "/2"
+    ],
+    "L18": "topmostSubform[0].Page2[0].f2_2[0]",
+    "L19": "topmostSubform[0].Page2[0].f2_3[0]",
+    "L20_yes": [
+     "topmostSubform[0].Page2[0].c2_2[0]",
+     "/1"
+    ],
+    "L20_no": [
+     "topmostSubform[0].Page2[0].c2_2[1]",
+     "/2"
+    ],
+    "L21": "topmostSubform[0].Page2[0].f2_4[0]",
+    "L22_yes": [
+     "topmostSubform[0].Page2[0].c2_3[0]",
+     "/1"
+    ],
+    "L22_no": [
+     "topmostSubform[0].Page2[0].c2_3[1]",
+     "/2"
+    ],
+    "L1ad": "topmostSubform[0].Page1[0].Table_PartI[0].Row1a[0].f1_3[0]",
+    "L1ae": "topmostSubform[0].Page1[0].Table_PartI[0].Row1a[0].f1_4[0]",
+    "L1ag": "topmostSubform[0].Page1[0].Table_PartI[0].Row1a[0].f1_5[0]",
+    "L1ah": "topmostSubform[0].Page1[0].Table_PartI[0].Row1a[0].f1_6[0]",
+    "L1bd": "topmostSubform[0].Page1[0].Table_PartI[0].Row1b[0].f1_7[0]",
+    "L1be": "topmostSubform[0].Page1[0].Table_PartI[0].Row1b[0].f1_8[0]",
+    "L1bg": "topmostSubform[0].Page1[0].Table_PartI[0].Row1b[0].f1_9[0]",
+    "L1bh": "topmostSubform[0].Page1[0].Table_PartI[0].Row1b[0].f1_10[0]",
+    "L2d": "topmostSubform[0].Page1[0].Table_PartI[0].Row2[0].f1_11[0]",
+    "L2e": "topmostSubform[0].Page1[0].Table_PartI[0].Row2[0].f1_12[0]",
+    "L2g": "topmostSubform[0].Page1[0].Table_PartI[0].Row2[0].f1_13[0]",
+    "L2h": "topmostSubform[0].Page1[0].Table_PartI[0].Row2[0].f1_14[0]",
+    "L3d": "topmostSubform[0].Page1[0].Table_PartI[0].Row3[0].f1_15[0]",
+    "L3e": "topmostSubform[0].Page1[0].Table_PartI[0].Row3[0].f1_16[0]",
+    "L3g": "topmostSubform[0].Page1[0].Table_PartI[0].Row3[0].f1_17[0]",
+    "L3h": "topmostSubform[0].Page1[0].Table_PartI[0].Row3[0].f1_18[0]",
+    "L8ad": "topmostSubform[0].Page1[0].Table_PartII[0].Row8a[0].f1_23[0]",
+    "L8ae": "topmostSubform[0].Page1[0].Table_PartII[0].Row8a[0].f1_24[0]",
+    "L8ag": "topmostSubform[0].Page1[0].Table_PartII[0].Row8a[0].f1_25[0]",
+    "L8ah": "topmostSubform[0].Page1[0].Table_PartII[0].Row8a[0].f1_26[0]",
+    "L8bd": "topmostSubform[0].Page1[0].Table_PartII[0].Row8b[0].f1_27[0]",
+    "L8be": "topmostSubform[0].Page1[0].Table_PartII[0].Row8b[0].f1_28[0]",
+    "L8bg": "topmostSubform[0].Page1[0].Table_PartII[0].Row8b[0].f1_29[0]",
+    "L8bh": "topmostSubform[0].Page1[0].Table_PartII[0].Row8b[0].f1_30[0]",
+    "L9d": "topmostSubform[0].Page1[0].Table_PartII[0].Row9[0].f1_31[0]",
+    "L9e": "topmostSubform[0].Page1[0].Table_PartII[0].Row9[0].f1_32[0]",
+    "L9g": "topmostSubform[0].Page1[0].Table_PartII[0].Row9[0].f1_33[0]",
+    "L9h": "topmostSubform[0].Page1[0].Table_PartII[0].Row9[0].f1_34[0]",
+    "L10d": "topmostSubform[0].Page1[0].Table_PartII[0].Row10[0].f1_35[0]",
+    "L10e": "topmostSubform[0].Page1[0].Table_PartII[0].Row10[0].f1_36[0]",
+    "L10g": "topmostSubform[0].Page1[0].Table_PartII[0].Row10[0].f1_37[0]",
+    "L10h": "topmostSubform[0].Page1[0].Table_PartII[0].Row10[0].f1_38[0]"
+   }
+  },
+  "8949": {
+   "file": "f8949.pdf",
+   "seq": "12A",
+   "title": [
+    "Formulario 8949 – Ventas de activos de capital",
+    "Form 8949 – Sales of Capital Assets"
+   ],
+   "pages": 2,
+   "fields": {
+    "name": "topmostSubform[0].Page1[0].f1_01[0]",
+    "ssn": [
+     "topmostSubform[0].Page1[0].f1_02[0]",
+     null,
+     11
+    ],
+    "name2": "topmostSubform[0].Page2[0].f2_01[0]",
+    "ssn2": [
+     "topmostSubform[0].Page2[0].f2_02[0]",
+     null,
+     11
+    ],
+    "boxA": [
+     "topmostSubform[0].Page1[0].c1_1[0]",
+     "/1"
+    ],
+    "boxB": [
+     "topmostSubform[0].Page1[0].c1_1[1]",
+     "/2"
+    ],
+    "boxC": [
+     "topmostSubform[0].Page1[0].c1_1[2]",
+     "/3"
+    ],
+    "boxG": [
+     "topmostSubform[0].Page1[0].c1_1[3]",
+     "/4"
+    ],
+    "boxH": [
+     "topmostSubform[0].Page1[0].c1_1[4]",
+     "/5"
+    ],
+    "boxI": [
+     "topmostSubform[0].Page1[0].c1_1[5]",
+     "/6"
+    ],
+    "boxD": [
+     "topmostSubform[0].Page2[0].c2_1[0]",
+     "/1"
+    ],
+    "boxE": [
+     "topmostSubform[0].Page2[0].c2_1[1]",
+     "/2"
+    ],
+    "boxF": [
+     "topmostSubform[0].Page2[0].c2_1[2]",
+     "/3"
+    ],
+    "boxJ": [
+     "topmostSubform[0].Page2[0].c2_1[3]",
+     "/4"
+    ],
+    "boxK": [
+     "topmostSubform[0].Page2[0].c2_1[4]",
+     "/5"
+    ],
+    "boxL": [
+     "topmostSubform[0].Page2[0].c2_1[5]",
+     "/6"
+    ],
+    "p1r0a": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row1[0].f1_03[0]",
+    "p1r0b": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row1[0].f1_04[0]",
+    "p1r0c": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row1[0].f1_05[0]",
+    "p1r0d": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row1[0].f1_06[0]",
+    "p1r0e": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row1[0].f1_07[0]",
+    "p1r0f": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row1[0].f1_08[0]",
+    "p1r0g": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row1[0].f1_09[0]",
+    "p1r0h": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row1[0].f1_10[0]",
+    "p1r1a": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row2[0].f1_11[0]",
+    "p1r1b": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row2[0].f1_12[0]",
+    "p1r1c": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row2[0].f1_13[0]",
+    "p1r1d": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row2[0].f1_14[0]",
+    "p1r1e": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row2[0].f1_15[0]",
+    "p1r1f": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row2[0].f1_16[0]",
+    "p1r1g": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row2[0].f1_17[0]",
+    "p1r1h": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row2[0].f1_18[0]",
+    "p1r2a": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row3[0].f1_19[0]",
+    "p1r2b": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row3[0].f1_20[0]",
+    "p1r2c": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row3[0].f1_21[0]",
+    "p1r2d": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row3[0].f1_22[0]",
+    "p1r2e": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row3[0].f1_23[0]",
+    "p1r2f": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row3[0].f1_24[0]",
+    "p1r2g": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row3[0].f1_25[0]",
+    "p1r2h": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row3[0].f1_26[0]",
+    "p1r3a": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row4[0].f1_27[0]",
+    "p1r3b": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row4[0].f1_28[0]",
+    "p1r3c": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row4[0].f1_29[0]",
+    "p1r3d": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row4[0].f1_30[0]",
+    "p1r3e": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row4[0].f1_31[0]",
+    "p1r3f": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row4[0].f1_32[0]",
+    "p1r3g": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row4[0].f1_33[0]",
+    "p1r3h": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row4[0].f1_34[0]",
+    "p1r4a": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row5[0].f1_35[0]",
+    "p1r4b": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row5[0].f1_36[0]",
+    "p1r4c": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row5[0].f1_37[0]",
+    "p1r4d": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row5[0].f1_38[0]",
+    "p1r4e": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row5[0].f1_39[0]",
+    "p1r4f": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row5[0].f1_40[0]",
+    "p1r4g": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row5[0].f1_41[0]",
+    "p1r4h": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row5[0].f1_42[0]",
+    "p1r5a": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row6[0].f1_43[0]",
+    "p1r5b": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row6[0].f1_44[0]",
+    "p1r5c": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row6[0].f1_45[0]",
+    "p1r5d": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row6[0].f1_46[0]",
+    "p1r5e": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row6[0].f1_47[0]",
+    "p1r5f": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row6[0].f1_48[0]",
+    "p1r5g": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row6[0].f1_49[0]",
+    "p1r5h": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row6[0].f1_50[0]",
+    "p1r6a": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row7[0].f1_51[0]",
+    "p1r6b": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row7[0].f1_52[0]",
+    "p1r6c": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row7[0].f1_53[0]",
+    "p1r6d": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row7[0].f1_54[0]",
+    "p1r6e": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row7[0].f1_55[0]",
+    "p1r6f": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row7[0].f1_56[0]",
+    "p1r6g": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row7[0].f1_57[0]",
+    "p1r6h": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row7[0].f1_58[0]",
+    "p1r7a": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row8[0].f1_59[0]",
+    "p1r7b": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row8[0].f1_60[0]",
+    "p1r7c": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row8[0].f1_61[0]",
+    "p1r7d": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row8[0].f1_62[0]",
+    "p1r7e": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row8[0].f1_63[0]",
+    "p1r7f": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row8[0].f1_64[0]",
+    "p1r7g": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row8[0].f1_65[0]",
+    "p1r7h": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row8[0].f1_66[0]",
+    "p1r8a": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row9[0].f1_67[0]",
+    "p1r8b": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row9[0].f1_68[0]",
+    "p1r8c": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row9[0].f1_69[0]",
+    "p1r8d": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row9[0].f1_70[0]",
+    "p1r8e": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row9[0].f1_71[0]",
+    "p1r8f": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row9[0].f1_72[0]",
+    "p1r8g": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row9[0].f1_73[0]",
+    "p1r8h": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row9[0].f1_74[0]",
+    "p1r9a": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row10[0].f1_75[0]",
+    "p1r9b": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row10[0].f1_76[0]",
+    "p1r9c": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row10[0].f1_77[0]",
+    "p1r9d": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row10[0].f1_78[0]",
+    "p1r9e": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row10[0].f1_79[0]",
+    "p1r9f": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row10[0].f1_80[0]",
+    "p1r9g": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row10[0].f1_81[0]",
+    "p1r9h": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row10[0].f1_82[0]",
+    "p1r10a": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row11[0].f1_83[0]",
+    "p1r10b": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row11[0].f1_84[0]",
+    "p1r10c": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row11[0].f1_85[0]",
+    "p1r10d": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row11[0].f1_86[0]",
+    "p1r10e": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row11[0].f1_87[0]",
+    "p1r10f": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row11[0].f1_88[0]",
+    "p1r10g": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row11[0].f1_89[0]",
+    "p1r10h": "topmostSubform[0].Page1[0].Table_Line1_Part1[0].Row11[0].f1_90[0]",
+    "p1totd": "topmostSubform[0].Page1[0].f1_91[0]",
+    "p1tote": "topmostSubform[0].Page1[0].f1_92[0]",
+    "p1totf": "topmostSubform[0].Page1[0].f1_93[0]",
+    "p1totg": "topmostSubform[0].Page1[0].f1_94[0]",
+    "p1toth": "topmostSubform[0].Page1[0].f1_95[0]",
+    "p2r0a": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row1[0].f2_03[0]",
+    "p2r0b": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row1[0].f2_04[0]",
+    "p2r0c": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row1[0].f2_05[0]",
+    "p2r0d": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row1[0].f2_06[0]",
+    "p2r0e": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row1[0].f2_07[0]",
+    "p2r0f": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row1[0].f2_08[0]",
+    "p2r0g": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row1[0].f2_09[0]",
+    "p2r0h": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row1[0].f2_10[0]",
+    "p2r1a": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row2[0].f2_11[0]",
+    "p2r1b": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row2[0].f2_12[0]",
+    "p2r1c": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row2[0].f2_13[0]",
+    "p2r1d": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row2[0].f2_14[0]",
+    "p2r1e": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row2[0].f2_15[0]",
+    "p2r1f": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row2[0].f2_16[0]",
+    "p2r1g": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row2[0].f2_17[0]",
+    "p2r1h": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row2[0].f2_18[0]",
+    "p2r2a": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row3[0].f2_19[0]",
+    "p2r2b": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row3[0].f2_20[0]",
+    "p2r2c": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row3[0].f2_21[0]",
+    "p2r2d": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row3[0].f2_22[0]",
+    "p2r2e": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row3[0].f2_23[0]",
+    "p2r2f": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row3[0].f2_24[0]",
+    "p2r2g": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row3[0].f2_25[0]",
+    "p2r2h": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row3[0].f2_26[0]",
+    "p2r3a": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row4[0].f2_27[0]",
+    "p2r3b": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row4[0].f2_28[0]",
+    "p2r3c": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row4[0].f2_29[0]",
+    "p2r3d": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row4[0].f2_30[0]",
+    "p2r3e": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row4[0].f2_31[0]",
+    "p2r3f": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row4[0].f2_32[0]",
+    "p2r3g": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row4[0].f2_33[0]",
+    "p2r3h": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row4[0].f2_34[0]",
+    "p2r4a": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row5[0].f2_35[0]",
+    "p2r4b": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row5[0].f2_36[0]",
+    "p2r4c": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row5[0].f2_37[0]",
+    "p2r4d": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row5[0].f2_38[0]",
+    "p2r4e": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row5[0].f2_39[0]",
+    "p2r4f": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row5[0].f2_40[0]",
+    "p2r4g": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row5[0].f2_41[0]",
+    "p2r4h": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row5[0].f2_42[0]",
+    "p2r5a": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row6[0].f2_43[0]",
+    "p2r5b": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row6[0].f2_44[0]",
+    "p2r5c": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row6[0].f2_45[0]",
+    "p2r5d": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row6[0].f2_46[0]",
+    "p2r5e": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row6[0].f2_47[0]",
+    "p2r5f": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row6[0].f2_48[0]",
+    "p2r5g": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row6[0].f2_49[0]",
+    "p2r5h": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row6[0].f2_50[0]",
+    "p2r6a": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row7[0].f2_51[0]",
+    "p2r6b": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row7[0].f2_52[0]",
+    "p2r6c": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row7[0].f2_53[0]",
+    "p2r6d": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row7[0].f2_54[0]",
+    "p2r6e": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row7[0].f2_55[0]",
+    "p2r6f": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row7[0].f2_56[0]",
+    "p2r6g": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row7[0].f2_57[0]",
+    "p2r6h": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row7[0].f2_58[0]",
+    "p2r7a": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row8[0].f2_59[0]",
+    "p2r7b": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row8[0].f2_60[0]",
+    "p2r7c": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row8[0].f2_61[0]",
+    "p2r7d": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row8[0].f2_62[0]",
+    "p2r7e": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row8[0].f2_63[0]",
+    "p2r7f": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row8[0].f2_64[0]",
+    "p2r7g": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row8[0].f2_65[0]",
+    "p2r7h": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row8[0].f2_66[0]",
+    "p2r8a": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row9[0].f2_67[0]",
+    "p2r8b": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row9[0].f2_68[0]",
+    "p2r8c": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row9[0].f2_69[0]",
+    "p2r8d": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row9[0].f2_70[0]",
+    "p2r8e": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row9[0].f2_71[0]",
+    "p2r8f": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row9[0].f2_72[0]",
+    "p2r8g": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row9[0].f2_73[0]",
+    "p2r8h": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row9[0].f2_74[0]",
+    "p2r9a": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row10[0].f2_75[0]",
+    "p2r9b": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row10[0].f2_76[0]",
+    "p2r9c": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row10[0].f2_77[0]",
+    "p2r9d": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row10[0].f2_78[0]",
+    "p2r9e": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row10[0].f2_79[0]",
+    "p2r9f": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row10[0].f2_80[0]",
+    "p2r9g": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row10[0].f2_81[0]",
+    "p2r9h": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row10[0].f2_82[0]",
+    "p2r10a": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row11[0].f2_83[0]",
+    "p2r10b": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row11[0].f2_84[0]",
+    "p2r10c": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row11[0].f2_85[0]",
+    "p2r10d": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row11[0].f2_86[0]",
+    "p2r10e": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row11[0].f2_87[0]",
+    "p2r10f": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row11[0].f2_88[0]",
+    "p2r10g": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row11[0].f2_89[0]",
+    "p2r10h": "topmostSubform[0].Page2[0].Table_Line1_Part2[0].Row11[0].f2_90[0]",
+    "p2totd": "topmostSubform[0].Page2[0].f2_91[0]",
+    "p2tote": "topmostSubform[0].Page2[0].f2_92[0]",
+    "p2totf": "topmostSubform[0].Page2[0].f2_93[0]",
+    "p2totg": "topmostSubform[0].Page2[0].f2_94[0]",
+    "p2toth": "topmostSubform[0].Page2[0].f2_95[0]"
+   }
+  },
+  "sse": {
+   "file": "f1040sse.pdf",
+   "seq": "17",
+   "title": [
+    "Anexo SE – Impuesto sobre el trabajo por cuenta propia",
+    "Schedule SE – Self-Employment Tax"
+   ],
+   "pages": 2,
+   "fields": {
+    "name": "topmostSubform[0].Page1[0].f1_1[0]",
+    "ssn": [
+     "topmostSubform[0].Page1[0].f1_2[0]",
+     null,
+     11
+    ],
+    "L2": "topmostSubform[0].Page1[0].f1_5[0]",
+    "L3": "topmostSubform[0].Page1[0].f1_6[0]",
+    "L4a": "topmostSubform[0].Page1[0].f1_7[0]",
+    "L4c": "topmostSubform[0].Page1[0].f1_9[0]",
+    "L6": "topmostSubform[0].Page1[0].f1_12[0]",
+    "L7": "topmostSubform[0].Page1[0].f1_13[0]",
+    "L8a": "topmostSubform[0].Page1[0].Line8a_ReadOrder[0].f1_14[0]",
+    "L8d": "topmostSubform[0].Page1[0].f1_17[0]",
+    "L9": "topmostSubform[0].Page1[0].f1_18[0]",
+    "L10": "topmostSubform[0].Page1[0].f1_19[0]",
+    "L11": "topmostSubform[0].Page1[0].f1_20[0]",
+    "L12": "topmostSubform[0].Page1[0].f1_21[0]",
+    "L13": "topmostSubform[0].Page1[0].f1_22[0]"
+   }
+  },
+  "2441": {
+   "file": "f2441.pdf",
+   "seq": "21",
+   "title": [
+    "Formulario 2441 – Gastos de cuidado de hijos y dependientes",
+    "Form 2441 – Child and Dependent Care Expenses"
+   ],
+   "pages": 2,
+   "fields": {
+    "name": "topmostSubform[0].Page1[0].f1_1[0]",
+    "ssn": [
+     "topmostSubform[0].Page1[0].f1_2[0]",
+     null,
+     11
+    ],
+    "prov0_name": "topmostSubform[0].Page1[0].PartITable[0].BodyRow1[0].f1_3[0]",
+    "prov0_addr": "topmostSubform[0].Page1[0].PartITable[0].BodyRow1[0].ColB[0].f1_4[0]",
+    "prov0_tin": [
+     "topmostSubform[0].Page1[0].PartITable[0].BodyRow1[0].f1_5[0]",
+     null,
+     11
+    ],
+    "prov0_hh_yes": [
+     "topmostSubform[0].Page1[0].PartITable[0].BodyRow1[0].ColD[0].c1_4[0]",
+     "/1"
+    ],
+    "prov0_hh_no": [
+     "topmostSubform[0].Page1[0].PartITable[0].BodyRow1[0].ColD[0].c1_4[1]",
+     "/2"
+    ],
+    "prov0_amt": "topmostSubform[0].Page1[0].PartITable[0].BodyRow1[0].f1_6[0]",
+    "q0_first": "topmostSubform[0].Page1[0].Table_Line2[0].Row1[0].f1_15[0]",
+    "q0_last": "topmostSubform[0].Page1[0].Table_Line2[0].Row1[0].f1_16[0]",
+    "q0_ssn": [
+     "topmostSubform[0].Page1[0].Table_Line2[0].Row1[0].f1_17[0]",
+     null,
+     11
+    ],
+    "q0_disabled": [
+     "topmostSubform[0].Page1[0].Table_Line2[0].Row1[0].c1_8[0]",
+     "/1"
+    ],
+    "q0_exp": "topmostSubform[0].Page1[0].Table_Line2[0].Row1[0].f1_18[0]",
+    "prov1_name": "topmostSubform[0].Page1[0].PartITable[0].BodyRow2[0].f1_7[0]",
+    "prov1_addr": "topmostSubform[0].Page1[0].PartITable[0].BodyRow2[0].ColB[0].f1_8[0]",
+    "prov1_tin": [
+     "topmostSubform[0].Page1[0].PartITable[0].BodyRow2[0].f1_9[0]",
+     null,
+     11
+    ],
+    "prov1_hh_yes": [
+     "topmostSubform[0].Page1[0].PartITable[0].BodyRow2[0].ColD[0].c1_5[0]",
+     "/1"
+    ],
+    "prov1_hh_no": [
+     "topmostSubform[0].Page1[0].PartITable[0].BodyRow2[0].ColD[0].c1_5[1]",
+     "/2"
+    ],
+    "prov1_amt": "topmostSubform[0].Page1[0].PartITable[0].BodyRow2[0].f1_10[0]",
+    "q1_first": "topmostSubform[0].Page1[0].Table_Line2[0].Row2[0].f1_19[0]",
+    "q1_last": "topmostSubform[0].Page1[0].Table_Line2[0].Row2[0].f1_20[0]",
+    "q1_ssn": [
+     "topmostSubform[0].Page1[0].Table_Line2[0].Row2[0].f1_21[0]",
+     null,
+     11
+    ],
+    "q1_disabled": [
+     "topmostSubform[0].Page1[0].Table_Line2[0].Row2[0].c1_9[0]",
+     "/1"
+    ],
+    "q1_exp": "topmostSubform[0].Page1[0].Table_Line2[0].Row2[0].f1_22[0]",
+    "prov2_name": "topmostSubform[0].Page1[0].PartITable[0].BodyRow3[0].f1_11[0]",
+    "prov2_addr": "topmostSubform[0].Page1[0].PartITable[0].BodyRow3[0].ColB[0].f1_12[0]",
+    "prov2_tin": [
+     "topmostSubform[0].Page1[0].PartITable[0].BodyRow3[0].f1_13[0]",
+     null,
+     11
+    ],
+    "prov2_hh_yes": [
+     "topmostSubform[0].Page1[0].PartITable[0].BodyRow3[0].ColD[0].c1_6[0]",
+     "/1"
+    ],
+    "prov2_hh_no": [
+     "topmostSubform[0].Page1[0].PartITable[0].BodyRow3[0].ColD[0].c1_6[1]",
+     "/2"
+    ],
+    "prov2_amt": "topmostSubform[0].Page1[0].PartITable[0].BodyRow3[0].f1_14[0]",
+    "q2_first": "topmostSubform[0].Page1[0].Table_Line2[0].Row3[0].f1_23[0]",
+    "q2_last": "topmostSubform[0].Page1[0].Table_Line2[0].Row3[0].f1_24[0]",
+    "q2_ssn": [
+     "topmostSubform[0].Page1[0].Table_Line2[0].Row3[0].f1_25[0]",
+     null,
+     11
+    ],
+    "q2_disabled": [
+     "topmostSubform[0].Page1[0].Table_Line2[0].Row3[0].c1_10[0]",
+     "/1"
+    ],
+    "q2_exp": "topmostSubform[0].Page1[0].Table_Line2[0].Row3[0].f1_26[0]",
+    "L3": [
+     "topmostSubform[0].Page1[0].f1_27[0]",
+     null,
+     50
+    ],
+    "L4": [
+     "topmostSubform[0].Page1[0].f1_28[0]",
+     null,
+     50
+    ],
+    "L5": [
+     "topmostSubform[0].Page1[0].f1_29[0]",
+     null,
+     50
+    ],
+    "L6": [
+     "topmostSubform[0].Page1[0].f1_30[0]",
+     null,
+     50
+    ],
+    "L7": "topmostSubform[0].Page1[0].f1_31[0]",
+    "L8": [
+     "topmostSubform[0].Page1[0].f1_32[0]",
+     null,
+     2
+    ],
+    "L9a": [
+     "topmostSubform[0].Page1[0].f1_33[0]",
+     null,
+     50
+    ],
+    "L9b": [
+     "topmostSubform[0].Page1[0].f1_34[0]",
+     null,
+     50
+    ],
+    "L9c": [
+     "topmostSubform[0].Page1[0].f1_35[0]",
+     null,
+     50
+    ],
+    "L10": "topmostSubform[0].Page1[0].f1_36[0]",
+    "L11": [
+     "topmostSubform[0].Page1[0].f1_37[0]",
+     null,
+     50
+    ],
+    "L12": [
+     "topmostSubform[0].Page2[0].f2_1[0]",
+     null,
+     50
+    ],
+    "L13": [
+     "topmostSubform[0].Page2[0].f2_2[0]",
+     null,
+     50
+    ],
+    "L14": "topmostSubform[0].Page2[0].f2_3[0]",
+    "L15": [
+     "topmostSubform[0].Page2[0].f2_4[0]",
+     null,
+     50
+    ],
+    "L16": [
+     "topmostSubform[0].Page2[0].Line16_ReadOrder[0].f2_5[0]",
+     null,
+     50
+    ],
+    "L17": [
+     "topmostSubform[0].Page2[0].f2_6[0]",
+     null,
+     50
+    ],
+    "L18": [
+     "topmostSubform[0].Page2[0].f2_7[0]",
+     null,
+     50
+    ],
+    "L19": [
+     "topmostSubform[0].Page2[0].f2_8[0]",
+     null,
+     50
+    ],
+    "L20": [
+     "topmostSubform[0].Page2[0].f2_9[0]",
+     null,
+     50
+    ],
+    "L21": [
+     "topmostSubform[0].Page2[0].f2_10[0]",
+     null,
+     50
+    ],
+    "L22_no": [
+     "topmostSubform[0].Page2[0].c2_1[0]",
+     "/1"
+    ],
+    "L22_yes": [
+     "topmostSubform[0].Page2[0].c2_1[1]",
+     "/2"
+    ],
+    "L22": [
+     "topmostSubform[0].Page2[0].f2_11[0]",
+     null,
+     50
+    ],
+    "L23": [
+     "topmostSubform[0].Page2[0].f2_12[0]",
+     null,
+     50
+    ],
+    "L24": [
+     "topmostSubform[0].Page2[0].f2_13[0]",
+     null,
+     50
+    ],
+    "L25": [
+     "topmostSubform[0].Page2[0].f2_14[0]",
+     null,
+     50
+    ],
+    "L26": "topmostSubform[0].Page2[0].f2_15[0]",
+    "L27": [
+     "topmostSubform[0].Page2[0].f2_16[0]",
+     null,
+     50
+    ],
+    "L28": [
+     "topmostSubform[0].Page2[0].f2_17[0]",
+     null,
+     50
+    ],
+    "L29": [
+     "topmostSubform[0].Page2[0].f2_18[0]",
+     null,
+     50
+    ],
+    "L30": [
+     "topmostSubform[0].Page2[0].f2_19[0]",
+     null,
+     50
+    ],
+    "L31": [
+     "topmostSubform[0].Page2[0].f2_20[0]",
+     null,
+     50
+    ]
+   }
+  },
+  "6251": {
+   "file": "f6251.pdf",
+   "seq": "32",
+   "title": [
+    "Formulario 6251 – Impuesto mínimo alternativo",
+    "Form 6251 – Alternative Minimum Tax"
+   ],
+   "pages": 2,
+   "fields": {
+    "name": "topmostSubform[0].Page1[0].f1_1[0]",
+    "ssn": [
+     "topmostSubform[0].Page1[0].f1_2[0]",
+     null,
+     11
+    ],
+    "L1a": "topmostSubform[0].Page1[0].f1_3[0]",
+    "L1b": "topmostSubform[0].Page1[0].f1_4[0]",
+    "L2a": "topmostSubform[0].Page1[0].f1_5[0]",
+    "L4": "topmostSubform[0].Page1[0].f1_26[0]",
+    "L5": "topmostSubform[0].Page1[0].f1_27[0]",
+    "L6": "topmostSubform[0].Page1[0].f1_28[0]",
+    "L7": "topmostSubform[0].Page1[0].f1_29[0]",
+    "L8": "topmostSubform[0].Page1[0].f1_30[0]",
+    "L9": "topmostSubform[0].Page1[0].f1_31[0]",
+    "L10": "topmostSubform[0].Page1[0].f1_32[0]",
+    "L11": "topmostSubform[0].Page1[0].f1_33[0]"
+   }
+  },
+  "sei": {
+   "file": "f1040sei.pdf",
+   "seq": "43",
+   "title": [
+    "Anexo EIC – Crédito por ingreso del trabajo",
+    "Schedule EIC – Earned Income Credit"
+   ],
+   "pages": 1,
+   "fields": {
+    "name": "topmostSubform[0].Page1[0].f1_01[0]",
+    "ssn": [
+     "topmostSubform[0].Page1[0].f1_02[0]",
+     null,
+     11
+    ],
+    "c0_name": "topmostSubform[0].Page1[0].f1_03[0]",
+    "c0_ssn": [
+     "topmostSubform[0].Page1[0].f1_06[0]",
+     null,
+     11
+    ],
+    "c0_rel": "topmostSubform[0].Page1[0].f1_21[0]",
+    "c0_y0": [
+     "topmostSubform[0].Page1[0].Year1_ReadOrder[0].f1_09[0]",
+     null,
+     1
+    ],
+    "c0_y1": [
+     "topmostSubform[0].Page1[0].Year1_ReadOrder[0].f1_10[0]",
+     null,
+     1
+    ],
+    "c0_y2": [
+     "topmostSubform[0].Page1[0].Year1_ReadOrder[0].f1_11[0]",
+     null,
+     1
+    ],
+    "c0_y3": [
+     "topmostSubform[0].Page1[0].Year1_ReadOrder[0].f1_12[0]",
+     null,
+     1
+    ],
+    "c1_name": "topmostSubform[0].Page1[0].f1_04[0]",
+    "c1_ssn": [
+     "topmostSubform[0].Page1[0].f1_07[0]",
+     null,
+     11
+    ],
+    "c1_rel": "topmostSubform[0].Page1[0].f1_22[0]",
+    "c1_y0": [
+     "topmostSubform[0].Page1[0].Year2_ReadOrder[0].f1_13[0]",
+     null,
+     1
+    ],
+    "c1_y1": [
+     "topmostSubform[0].Page1[0].Year2_ReadOrder[0].f1_14[0]",
+     null,
+     1
+    ],
+    "c1_y2": [
+     "topmostSubform[0].Page1[0].Year2_ReadOrder[0].f1_15[0]",
+     null,
+     1
+    ],
+    "c1_y3": [
+     "topmostSubform[0].Page1[0].Year2_ReadOrder[0].f1_16[0]",
+     null,
+     1
+    ],
+    "c2_name": "topmostSubform[0].Page1[0].f1_05[0]",
+    "c2_ssn": [
+     "topmostSubform[0].Page1[0].f1_08[0]",
+     null,
+     11
+    ],
+    "c2_rel": "topmostSubform[0].Page1[0].f1_23[0]",
+    "c2_y0": [
+     "topmostSubform[0].Page1[0].f1_17[0]",
+     null,
+     1
+    ],
+    "c2_y1": [
+     "topmostSubform[0].Page1[0].f1_18[0]",
+     null,
+     1
+    ],
+    "c2_y2": [
+     "topmostSubform[0].Page1[0].f1_19[0]",
+     null,
+     1
+    ],
+    "c2_y3": [
+     "topmostSubform[0].Page1[0].f1_20[0]",
+     null,
+     1
+    ],
+    "c0_months": [
+     "topmostSubform[0].Page1[0].Line6_Child1_ReadOrder[0].f1_24[0]",
+     null,
+     2
+    ],
+    "c1_months": [
+     "topmostSubform[0].Page1[0].Line6_Child2_ReadOrder[0].f1_25[0]",
+     null,
+     2
+    ],
+    "c2_months": [
+     "topmostSubform[0].Page1[0].f1_26[0]",
+     null,
+     2
+    ],
+    "c0_4a_yes": [
+     "topmostSubform[0].Page1[0].Line4a_Child1_ReadOrder[0].Yes_ReadOrder[0].c1_1[0]",
+     "/1"
+    ],
+    "c0_4a_no": [
+     "topmostSubform[0].Page1[0].Line4a_Child1_ReadOrder[0].c1_1[0]",
+     "/2"
+    ],
+    "c1_4a_yes": [
+     "topmostSubform[0].Page1[0].Line4a_Child2_ReadOrder[0].Yes_ReadOrder[0].c1_2[0]",
+     "/1"
+    ],
+    "c1_4a_no": [
+     "topmostSubform[0].Page1[0].Line4a_Child2_ReadOrder[0].c1_2[0]",
+     "/2"
+    ],
+    "c2_4a_yes": [
+     "topmostSubform[0].Page1[0].Line4a_Child3_Yes_ReadOrder[0].c1_3[0]",
+     "/1"
+    ],
+    "c2_4a_no": [
+     "topmostSubform[0].Page1[0].c1_3[0]",
+     "/2"
+    ],
+    "c0_4b_yes": [
+     "topmostSubform[0].Page1[0].Line4b_Child1_ReadOrder[0].Yes_ReadOrder[0].c1_4[0]",
+     "/1"
+    ],
+    "c0_4b_no": [
+     "topmostSubform[0].Page1[0].Line4b_Child1_ReadOrder[0].c1_4[0]",
+     "/2"
+    ],
+    "c1_4b_yes": [
+     "topmostSubform[0].Page1[0].Line4b_Child2_ReadOrder[0].Yes_ReadOrder[0].c1_5[0]",
+     "/1"
+    ],
+    "c1_4b_no": [
+     "topmostSubform[0].Page1[0].Line4b_Child2_ReadOrder[0].c1_5[0]",
+     "/2"
+    ],
+    "c2_4b_yes": [
+     "topmostSubform[0].Page1[0].Line4b_Child3_Yes_ReadOrder[0].c1_6[0]",
+     "/1"
+    ],
+    "c2_4b_no": [
+     "topmostSubform[0].Page1[0].c1_6[0]",
+     "/2"
+    ]
+   }
+  },
+  "s8812": {
+   "file": "f1040s8.pdf",
+   "seq": "47",
+   "title": [
+    "Anexo 8812 – Crédito por hijos y otros dependientes",
+    "Schedule 8812 – Credits for Qualifying Children and Other Dependents"
+   ],
+   "pages": 2,
+   "fields": {
+    "name": "topmostSubform[0].Page1[0].f1_1[0]",
+    "ssn": [
+     "topmostSubform[0].Page1[0].f1_2[0]",
+     null,
+     11
+    ],
+    "L1": "topmostSubform[0].Page1[0].f1_3[0]",
+    "L2d": "topmostSubform[0].Page1[0].f1_7[0]",
+    "L3": "topmostSubform[0].Page1[0].f1_8[0]",
+    "L4": "topmostSubform[0].Page1[0].f1_9[0]",
+    "L5": "topmostSubform[0].Page1[0].f1_10[0]",
+    "L6": "topmostSubform[0].Page1[0].Line6ReadOrder[0].f1_11[0]",
+    "L7": "topmostSubform[0].Page1[0].f1_12[0]",
+    "L8": "topmostSubform[0].Page1[0].f1_13[0]",
+    "L9": "topmostSubform[0].Page1[0].f1_14[0]",
+    "L10": "topmostSubform[0].Page1[0].f1_15[0]",
+    "L11": "topmostSubform[0].Page1[0].f1_16[0]",
+    "L12_no": [
+     "topmostSubform[0].Page1[0].c1_1[0]",
+     "/1"
+    ],
+    "L12_yes": [
+     "topmostSubform[0].Page1[0].c1_1[1]",
+     "/2"
+    ],
+    "L12": "topmostSubform[0].Page1[0].f1_17[0]",
+    "L13": "topmostSubform[0].Page1[0].f1_18[0]",
+    "L14": "topmostSubform[0].Page1[0].f1_19[0]",
+    "L16a": "topmostSubform[0].Page2[0].f2_2[0]",
+    "L16b_n": "topmostSubform[0].Page2[0].f2_3[0]",
+    "L16b": "topmostSubform[0].Page2[0].f2_4[0]",
+    "L17": "topmostSubform[0].Page2[0].f2_5[0]",
+    "L18a": "topmostSubform[0].Page2[0].f2_6[0]",
+    "L19_no": [
+     "topmostSubform[0].Page2[0].c2_1[0]",
+     "/1"
+    ],
+    "L19_yes": [
+     "topmostSubform[0].Page2[0].c2_1[1]",
+     "/2"
+    ],
+    "L19": "topmostSubform[0].Page2[0].f2_8[0]",
+    "L20": "topmostSubform[0].Page2[0].f2_9[0]",
+    "L20_no": [
+     "topmostSubform[0].Page2[0].c2_2[0]",
+     "/1"
+    ],
+    "L20_yes": [
+     "topmostSubform[0].Page2[0].c2_2[1]",
+     "/2"
+    ],
+    "L21": "topmostSubform[0].Page2[0].f2_10[0]",
+    "L22": "topmostSubform[0].Page2[0].f2_11[0]",
+    "L23": "topmostSubform[0].Page2[0].f2_12[0]",
+    "L24": "topmostSubform[0].Page2[0].f2_13[0]",
+    "L25": "topmostSubform[0].Page2[0].f2_14[0]",
+    "L26": "topmostSubform[0].Page2[0].f2_15[0]",
+    "L27": "topmostSubform[0].Page2[0].f2_16[0]"
+   }
+  },
+  "8863": {
+   "file": "f8863.pdf",
+   "seq": "50",
+   "title": [
+    "Formulario 8863 – Créditos educativos",
+    "Form 8863 – Education Credits"
+   ],
+   "pages": 2,
+   "fields": {
+    "name": "topmostSubform[0].Page1[0].f1_1[0]",
+    "ssn_a": [
+     "topmostSubform[0].Page1[0].SocialSecurity[0].f1_2[0]",
+     null,
+     3
+    ],
+    "ssn_b": [
+     "topmostSubform[0].Page1[0].SocialSecurity[0].f1_3[0]",
+     null,
+     2
+    ],
+    "ssn_c": [
+     "topmostSubform[0].Page1[0].SocialSecurity[0].f1_4[0]",
+     null,
+     4
+    ],
+    "name2": "topmostSubform[0].Page2[0].f2_1[0]",
+    "ssn2_a": [
+     "topmostSubform[0].Page2[0].SSN[0].f2_2[0]",
+     null,
+     3
+    ],
+    "ssn2_b": [
+     "topmostSubform[0].Page2[0].SSN[0].f2_3[0]",
+     null,
+     2
+    ],
+    "ssn2_c": [
+     "topmostSubform[0].Page2[0].SSN[0].f2_4[0]",
+     null,
+     4
+    ],
+    "L1": "topmostSubform[0].Page1[0].f1_5[0]",
+    "L2": "topmostSubform[0].Page1[0].f1_6[0]",
+    "L3": "topmostSubform[0].Page1[0].f1_7[0]",
+    "L4": "topmostSubform[0].Page1[0].f1_8[0]",
+    "L5": "topmostSubform[0].Page1[0].f1_9[0]",
+    "L6_int": "topmostSubform[0].Page1[0].f1_10[0]",
+    "L6_dec": "topmostSubform[0].Page1[0].f1_11[0]",
+    "L7_under24": [
+     "topmostSubform[0].Page1[0].c1_1[0]",
+     "/1"
+    ],
+    "L7": "topmostSubform[0].Page1[0].f1_12[0]",
+    "L8": "topmostSubform[0].Page1[0].f1_13[0]",
+    "L9": "topmostSubform[0].Page1[0].f1_14[0]",
+    "L10": "topmostSubform[0].Page1[0].f1_15[0]",
+    "L11": "topmostSubform[0].Page1[0].f1_16[0]",
+    "L12": "topmostSubform[0].Page1[0].f1_17[0]",
+    "L13": "topmostSubform[0].Page1[0].f1_18[0]",
+    "L14": "topmostSubform[0].Page1[0].f1_19[0]",
+    "L15": "topmostSubform[0].Page1[0].f1_20[0]",
+    "L16": "topmostSubform[0].Page1[0].f1_21[0]",
+    "L17_int": "topmostSubform[0].Page1[0].f1_22[0]",
+    "L17_dec": "topmostSubform[0].Page1[0].f1_23[0]",
+    "L18": "topmostSubform[0].Page1[0].f1_24[0]",
+    "L19": "topmostSubform[0].Page1[0].f1_25[0]",
+    "L20": "topmostSubform[0].Page2[0].f2-5[0]",
+    "L21_a": [
+     "topmostSubform[0].Page2[0].StudentSSN[0].f2_6[0]",
+     null,
+     3
+    ],
+    "L21_b": [
+     "topmostSubform[0].Page2[0].StudentSSN[0].f2_7[0]",
+     null,
+     2
+    ],
+    "L21_c": [
+     "topmostSubform[0].Page2[0].StudentSSN[0].f2_8[0]",
+     null,
+     4
+    ],
+    "L22a_name": "topmostSubform[0].Page2[0].Line22a[0].f2_9[0]",
+    "L22a_addr": [
+     "topmostSubform[0].Page2[0].Line22a[0].f2_10[0]",
+     null,
+     255
+    ],
+    "L22a_1098_yes": [
+     "topmostSubform[0].Page2[0].Line22a[0].c2_1[0]",
+     "/Yes"
+    ],
+    "L22a_1098_no": [
+     "topmostSubform[0].Page2[0].Line22a[0].c2_1[1]",
+     "/No"
+    ],
+    "L22a_prev_yes": [
+     "topmostSubform[0].Page2[0].Line22a[0].c2_2[0]",
+     "/Yes"
+    ],
+    "L22a_prev_no": [
+     "topmostSubform[0].Page2[0].Line22a[0].c2_2[1]",
+     "/No"
+    ],
+    "L23_yes": [
+     "topmostSubform[0].Page2[0].c2_5[0]",
+     "/Yes"
+    ],
+    "L23_no": [
+     "topmostSubform[0].Page2[0].c2_5[1]",
+     "/No"
+    ],
+    "L24_yes": [
+     "topmostSubform[0].Page2[0].c2_6[0]",
+     "/Yes"
+    ],
+    "L24_no": [
+     "topmostSubform[0].Page2[0].c2_6[1]",
+     "/No"
+    ],
+    "L25_yes": [
+     "topmostSubform[0].Page2[0].c2_7[0]",
+     "/Yes"
+    ],
+    "L25_no": [
+     "topmostSubform[0].Page2[0].c2_7[1]",
+     "/No"
+    ],
+    "L26_yes": [
+     "topmostSubform[0].Page2[0].c2_8[0]",
+     "/Yes"
+    ],
+    "L26_no": [
+     "topmostSubform[0].Page2[0].c2_8[1]",
+     "/No"
+    ],
+    "L27": "topmostSubform[0].Page2[0].f2_31[0]",
+    "L28": "topmostSubform[0].Page2[0].f2_32[0]",
+    "L29": "topmostSubform[0].Page2[0].f2_33[0]",
+    "L30": "topmostSubform[0].Page2[0].f2_34[0]",
+    "L31": "topmostSubform[0].Page2[0].f2_35[0]",
+    "L22a_ein0": [
+     "topmostSubform[0].Page2[0].Line22a[0].f2_11[0]",
+     null,
+     1
+    ],
+    "L22a_ein1": [
+     "topmostSubform[0].Page2[0].Line22a[0].f2_12[0]",
+     null,
+     1
+    ],
+    "L22a_ein2": [
+     "topmostSubform[0].Page2[0].Line22a[0].f2_13[0]",
+     null,
+     1
+    ],
+    "L22a_ein3": [
+     "topmostSubform[0].Page2[0].Line22a[0].f2_14[0]",
+     null,
+     1
+    ],
+    "L22a_ein4": [
+     "topmostSubform[0].Page2[0].Line22a[0].f2_15[0]",
+     null,
+     1
+    ],
+    "L22a_ein5": [
+     "topmostSubform[0].Page2[0].Line22a[0].f2_16[0]",
+     null,
+     1
+    ],
+    "L22a_ein6": [
+     "topmostSubform[0].Page2[0].Line22a[0].f2_17[0]",
+     null,
+     1
+    ],
+    "L22a_ein7": [
+     "topmostSubform[0].Page2[0].Line22a[0].f2_18[0]",
+     null,
+     1
+    ],
+    "L22a_ein8": [
+     "topmostSubform[0].Page2[0].Line22a[0].f2_19[0]",
+     null,
+     1
+    ]
+   }
+  },
+  "8889": {
+   "file": "f8889.pdf",
+   "seq": "52",
+   "title": [
+    "Formulario 8889 – Cuentas de ahorro para la salud (HSA)",
+    "Form 8889 – Health Savings Accounts"
+   ],
+   "pages": 1,
+   "fields": {
+    "name": "topmostSubform[0].Page1[0].f1_1[0]",
+    "ssn": [
+     "topmostSubform[0].Page1[0].f1_2[0]",
+     null,
+     11
+    ],
+    "cov_self": [
+     "topmostSubform[0].Page1[0].c1_1[0]",
+     "/1"
+    ],
+    "cov_family": [
+     "topmostSubform[0].Page1[0].c1_1[1]",
+     "/2"
+    ],
+    "L2": "topmostSubform[0].Page1[0].f1_3[0]",
+    "L3": "topmostSubform[0].Page1[0].f1_4[0]",
+    "L5": "topmostSubform[0].Page1[0].f1_6[0]",
+    "L6": "topmostSubform[0].Page1[0].f1_7[0]",
+    "L7": "topmostSubform[0].Page1[0].f1_8[0]",
+    "L8": "topmostSubform[0].Page1[0].f1_9[0]",
+    "L9": "topmostSubform[0].Page1[0].f1_10[0]",
+    "L11": "topmostSubform[0].Page1[0].f1_12[0]",
+    "L12": "topmostSubform[0].Page1[0].f1_13[0]",
+    "L13": "topmostSubform[0].Page1[0].f1_14[0]"
+   }
+  },
+  "8880": {
+   "file": "f8880.pdf",
+   "seq": "54",
+   "title": [
+    "Formulario 8880 – Crédito por aportes de ahorro para la jubilación",
+    "Form 8880 – Retirement Savings Contributions Credit"
+   ],
+   "pages": 2,
+   "fields": {
+    "name": "topmostSubform[0].Page1[0].f1_1[0]",
+    "ssn": [
+     "topmostSubform[0].Page1[0].f1_2[0]",
+     null,
+     11
+    ],
+    "L1a": "topmostSubform[0].Page1[0].Table_Ln1-6[0].BodyRow1[0].f1_3[0]",
+    "L1b": "topmostSubform[0].Page1[0].Table_Ln1-6[0].BodyRow1[0].f1_4[0]",
+    "L2a": "topmostSubform[0].Page1[0].Table_Ln1-6[0].BodyRow2[0].f1_5[0]",
+    "L2b": "topmostSubform[0].Page1[0].Table_Ln1-6[0].BodyRow2[0].f1_6[0]",
+    "L3a": "topmostSubform[0].Page1[0].Table_Ln1-6[0].BodyRow3[0].f1_7[0]",
+    "L3b": "topmostSubform[0].Page1[0].Table_Ln1-6[0].BodyRow3[0].f1_8[0]",
+    "L4a": "topmostSubform[0].Page1[0].Table_Ln1-6[0].BodyRow4[0].f1_9[0]",
+    "L4b": "topmostSubform[0].Page1[0].Table_Ln1-6[0].BodyRow4[0].f1_10[0]",
+    "L5a": "topmostSubform[0].Page1[0].Table_Ln1-6[0].BodyRow5[0].f1_11[0]",
+    "L5b": "topmostSubform[0].Page1[0].Table_Ln1-6[0].BodyRow5[0].f1_12[0]",
+    "L6a": "topmostSubform[0].Page1[0].Table_Ln1-6[0].BodyRow6[0].f1_13[0]",
+    "L6b": "topmostSubform[0].Page1[0].Table_Ln1-6[0].BodyRow6[0].f1_14[0]",
+    "L7": "topmostSubform[0].Page1[0].f1_15[0]",
+    "L8": "topmostSubform[0].Page1[0].f1_16[0]",
+    "L9": [
+     "topmostSubform[0].Page1[0].f1_17[0]",
+     null,
+     1
+    ],
+    "L10": "topmostSubform[0].Page1[0].f1_18[0]",
+    "L11": "topmostSubform[0].Page1[0].f1_19[0]",
+    "L12": "topmostSubform[0].Page1[0].f1_20[0]"
+   }
+  },
+  "8995": {
+   "file": "f8995.pdf",
+   "seq": "55",
+   "title": [
+    "Formulario 8995 – Deducción por ingreso de negocio calificado",
+    "Form 8995 – Qualified Business Income Deduction"
+   ],
+   "pages": 1,
+   "fields": {
+    "name": "topmostSubform[0].Page1[0].f1_01[0]",
+    "ssn": [
+     "topmostSubform[0].Page1[0].f1_02[0]",
+     null,
+     11
+    ],
+    "b0_name": "topmostSubform[0].Page1[0].Table[0].Row1i[0].f1_03[0]",
+    "b0_tin": [
+     "topmostSubform[0].Page1[0].Table[0].Row1i[0].f1_04[0]",
+     null,
+     11
+    ],
+    "b0_qbi": "topmostSubform[0].Page1[0].Table[0].Row1i[0].f1_05[0]",
+    "b1_name": "topmostSubform[0].Page1[0].Table[0].Row1ii[0].f1_06[0]",
+    "b1_tin": [
+     "topmostSubform[0].Page1[0].Table[0].Row1ii[0].f1_07[0]",
+     null,
+     11
+    ],
+    "b1_qbi": "topmostSubform[0].Page1[0].Table[0].Row1ii[0].f1_08[0]",
+    "b2_name": "topmostSubform[0].Page1[0].Table[0].Row1iii[0].f1_09[0]",
+    "b2_tin": [
+     "topmostSubform[0].Page1[0].Table[0].Row1iii[0].f1_10[0]",
+     null,
+     11
+    ],
+    "b2_qbi": "topmostSubform[0].Page1[0].Table[0].Row1iii[0].f1_11[0]",
+    "b3_name": "topmostSubform[0].Page1[0].Table[0].Row1iv[0].f1_12[0]",
+    "b3_tin": [
+     "topmostSubform[0].Page1[0].Table[0].Row1iv[0].f1_13[0]",
+     null,
+     11
+    ],
+    "b3_qbi": "topmostSubform[0].Page1[0].Table[0].Row1iv[0].f1_14[0]",
+    "b4_name": "topmostSubform[0].Page1[0].Table[0].Row1v[0].f1_15[0]",
+    "b4_tin": [
+     "topmostSubform[0].Page1[0].Table[0].Row1v[0].f1_16[0]",
+     null,
+     11
+    ],
+    "b4_qbi": "topmostSubform[0].Page1[0].Table[0].Row1v[0].f1_17[0]",
+    "L2": "topmostSubform[0].Page1[0].Line2_ReadOrder[0].f1_18[0]",
+    "L3": "topmostSubform[0].Page1[0].f1_19[0]",
+    "L4": "topmostSubform[0].Page1[0].f1_20[0]",
+    "L5": "topmostSubform[0].Page1[0].f1_21[0]",
+    "L10": "topmostSubform[0].Page1[0].f1_26[0]",
+    "L11": "topmostSubform[0].Page1[0].f1_27[0]",
+    "L12": "topmostSubform[0].Page1[0].f1_28[0]",
+    "L13": "topmostSubform[0].Page1[0].f1_29[0]",
+    "L14": "topmostSubform[0].Page1[0].f1_30[0]",
+    "L15": "topmostSubform[0].Page1[0].f1_31[0]"
+   }
+  },
+  "8959": {
+   "file": "f8959.pdf",
+   "seq": "71",
+   "title": [
+    "Formulario 8959 – Impuesto adicional de Medicare",
+    "Form 8959 – Additional Medicare Tax"
+   ],
+   "pages": 1,
+   "fields": {
+    "name": "topmostSubform[0].Page1[0].f1_1[0]",
+    "ssn": [
+     "topmostSubform[0].Page1[0].f1_2[0]",
+     null,
+     11
+    ],
+    "L1": "topmostSubform[0].Page1[0].f1_3[0]",
+    "L2": "topmostSubform[0].Page1[0].f1_4[0]",
+    "L3": "topmostSubform[0].Page1[0].f1_5[0]",
+    "L4": "topmostSubform[0].Page1[0].f1_6[0]",
+    "L5": "topmostSubform[0].Page1[0].f1_7[0]",
+    "L6": "topmostSubform[0].Page1[0].f1_8[0]",
+    "L7": "topmostSubform[0].Page1[0].f1_9[0]",
+    "L8": "topmostSubform[0].Page1[0].f1_10[0]",
+    "L9": "topmostSubform[0].Page1[0].f1_11[0]",
+    "L10": "topmostSubform[0].Page1[0].f1_12[0]",
+    "L11": "topmostSubform[0].Page1[0].f1_13[0]",
+    "L12": "topmostSubform[0].Page1[0].f1_14[0]",
+    "L13": "topmostSubform[0].Page1[0].f1_15[0]",
+    "L18": "topmostSubform[0].Page1[0].f1_20[0]",
+    "L19": "topmostSubform[0].Page1[0].f1_21[0]",
+    "L20": "topmostSubform[0].Page1[0].f1_22[0]",
+    "L21": "topmostSubform[0].Page1[0].f1_23[0]",
+    "L22": "topmostSubform[0].Page1[0].f1_24[0]",
+    "L23": "topmostSubform[0].Page1[0].f1_25[0]",
+    "L24": "topmostSubform[0].Page1[0].f1_26[0]"
+   }
+  },
+  "8960": {
+   "file": "f8960.pdf",
+   "seq": "72",
+   "title": [
+    "Formulario 8960 – Impuesto sobre ingresos netos de inversión",
+    "Form 8960 – Net Investment Income Tax"
+   ],
+   "pages": 1,
+   "fields": {
+    "name": "topmostSubform[0].Page1[0].f1_1[0]",
+    "ssn": [
+     "topmostSubform[0].Page1[0].f1_2[0]",
+     null,
+     11
+    ],
+    "L1": "topmostSubform[0].Page1[0].f1_3[0]",
+    "L2": "topmostSubform[0].Page1[0].f1_4[0]",
+    "L5a": "topmostSubform[0].Page1[0].f1_9[0]",
+    "L5d": "topmostSubform[0].Page1[0].f1_12[0]",
+    "L8": "topmostSubform[0].Page1[0].f1_15[0]",
+    "L11": "topmostSubform[0].Page1[0].f1_21[0]",
+    "L12": "topmostSubform[0].Page1[0].f1_22[0]",
+    "L13": "topmostSubform[0].Page1[0].f1_23[0]",
+    "L14": "topmostSubform[0].Page1[0].f1_24[0]",
+    "L15": "topmostSubform[0].Page1[0].f1_25[0]",
+    "L16": "topmostSubform[0].Page1[0].f1_26[0]",
+    "L17": "topmostSubform[0].Page1[0].f1_27[0]"
+   }
+  },
+  "1040v": {
+   "file": "f1040v.pdf",
+   "seq": "",
+   "title": [
+    "Formulario 1040-V – Comprobante de pago",
+    "Form 1040-V – Payment Voucher"
+   ],
+   "pages": 1,
+   "fields": {
+    "ssn": [
+     "topmostSubform[0].Page1[0].f1_1[0]",
+     null,
+     11
+    ],
+    "sp_ssn": [
+     "topmostSubform[0].Page1[0].f1_2[0]",
+     null,
+     11
+    ],
+    "amount": "topmostSubform[0].Page1[0].f1_3[0]",
+    "first": "topmostSubform[0].Page1[0].f1_5[0]",
+    "last": "topmostSubform[0].Page1[0].f1_6[0]",
+    "sp_first": "topmostSubform[0].Page1[0].f1_7[0]",
+    "sp_last": "topmostSubform[0].Page1[0].f1_8[0]",
+    "street": "topmostSubform[0].Page1[0].f1_9[0]",
+    "apt": "topmostSubform[0].Page1[0].f1_10[0]",
+    "city": "topmostSubform[0].Page1[0].f1_11[0]",
+    "state": [
+     "topmostSubform[0].Page1[0].f1_12[0]",
+     null,
+     2
+    ],
+    "zip": [
+     "topmostSubform[0].Page1[0].f1_13[0]",
+     null,
+     10
+    ]
+   }
+  }
+ }
+}

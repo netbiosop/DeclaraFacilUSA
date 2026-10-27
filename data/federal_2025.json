@@ -424,5 +424,10 @@
     "mfs": 1500,
     "other": 3000
   },
-  "deadline": "2026-04-15"
+  "deadline": "2026-04-15",
+  "hsa": {
+    "self": 4300,
+    "family": 8550,
+    "catchup": 1000
+  }
 }

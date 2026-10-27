@@ -124,7 +124,11 @@ set /p GHUSER=<"%TEMP%\dfusa_user.txt"
 if not defined GHUSER set "GHUSER=DeclaraFacil"
 %GIT% config user.name "%GHUSER%"
 %GIT% config user.email "%GHUSER%@users.noreply.github.com"
-%GIT% pull --rebase=false --no-edit origin main >nul 2>nul
+REM La carpeta de esta PC es la copia maestra: se toma el historial de GitHub y se publica encima lo que hay aqui
+REM (sin mezclar), asi el envio nunca es rechazado. / This folder is the master copy: take GitHub's history and
+REM publish what is here on top of it (no merge), so the push is never rejected.
+%GIT% fetch origin
+%GIT% reset origin/main >nul 2>nul
 %GIT% add -A
 %GIT% diff --cached --quiet
 if errorlevel 1 %GIT% commit -m "DeclaraFacil USA %VER%"

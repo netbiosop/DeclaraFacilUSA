@@ -75,7 +75,7 @@ def build_sections(ret: TaxReturn, res: dict, findings: List[dict]) -> List[Tupl
             (_("Mitad del impuesto de trabajo independiente"), fmt_money(fed["half_se"])),
             (_("Seguro medico de trabajador independiente"), fmt_money(fed["se_health"])),
             (_("Gastos de educador"), fmt_money(fed["educator"])),
-            (_("HSA"), fmt_money(ret.deductions.hsa_deduction)), (_("IRA"), fmt_money(ret.deductions.ira_deduction)),
+            (_("HSA"), fmt_money(fed["hsa"])), (_("IRA"), fmt_money(ret.deductions.ira_deduction)),
             (_("Interes de prestamos estudiantiles"), fmt_money(fed["student_loan"])),
             (_("Total de ajustes"), fmt_money(fed["adjustments"]))]
     S.append((_("Anexo 1 - Ingresos adicionales y ajustes"), sch1))

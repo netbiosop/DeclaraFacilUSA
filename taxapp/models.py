@@ -66,6 +66,8 @@ class Person:
     blind: bool = False
     valid_ssn_for_work: bool = True
     can_be_claimed: bool = False  # puede ser reclamado como dependiente por otra persona
+    ip_pin: str = ""              # PIN de protección de identidad del IRS (6 dígitos), si lo tiene
+    presidential_fund: bool = False  # $3 al fondo de campaña presidencial (no cambia el impuesto)
 
     def full_name(self) -> str:
         return f"{self.first_name} {self.last_name}".strip()
@@ -82,6 +84,7 @@ class Dependent:
     has_ssn: bool = True
     full_time_student: bool = False
     disabled: bool = False
+    lived_in_us: bool = True      # vivió con usted en EE.UU. (columna 5b del 1040 / Anexo EIC)
 
     def full_name(self) -> str:
         return f"{self.first_name} {self.last_name}".strip()
@@ -136,6 +139,59 @@ class W2:
 
 
 @dataclass
+class Payer:
+    """Pagador de intereses o dividendos (Anexo B)."""
+    name: str = ""
+    amount: float = 0.0
+
+    def __post_init__(self):
+        self.amount = _num(self.amount)
+
+
+@dataclass
+class Sale:
+    """Venta de acciones, fondos, criptomonedas u otro activo de capital (1099-B / 1099-DA / Formulario 8949)."""
+    description: str = ""
+    acquired: str = ""            # fecha de compra (MM/DD/AAAA o "VARIOUS")
+    sold: str = ""                # fecha de venta
+    proceeds: float = 0.0         # precio de venta (d)
+    cost: float = 0.0             # costo o base (e)
+    adjustment: float = 0.0       # ajuste (g), p. ej. venta ficticia (wash sale) no permitida
+    code: str = ""                # código de ajuste (f)
+    term: str = "long"            # short | long
+    basis_reported: bool = True   # el 1099-B dice que la base se informó al IRS
+    form_1099: bool = True        # recibió 1099-B / 1099-DA por esta venta
+    digital: bool = False         # activo digital (1099-DA)
+
+    def __post_init__(self):
+        for n in ("proceeds", "cost", "adjustment"):
+            setattr(self, n, _num(getattr(self, n)))
+
+    def gain(self) -> float:
+        return self.proceeds - self.cost + self.adjustment
+
+    def box(self) -> str:
+        """Casilla del Formulario 8949 (A-L)."""
+        short = self.term == "short"
+        if self.digital:
+            k = "GHI" if short else "JKL"
+        else:
+            k = "ABC" if short else "DEF"
+        if not self.form_1099:
+            return k[2]
+        return k[0] if self.basis_reported else k[1]
+
+
+@dataclass
+class OtherExpense:
+    description: str = ""
+    amount: float = 0.0
+
+    def __post_init__(self):
+        self.amount = _num(self.amount)
+
+
+@dataclass
 class Income:
     taxable_interest: float = 0.0
     tax_exempt_interest: float = 0.0
@@ -162,6 +218,9 @@ class Income:
     gambling: float = 0.0
     other_income: float = 0.0
     other_income_desc: str = ""
+    interest_payers: List[Payer] = field(default_factory=list)
+    dividend_payers: List[Payer] = field(default_factory=list)
+    sales: List[Sale] = field(default_factory=list)
     # Trabajo independiente (Schedule C simplificado)
     business_name: str = ""
     business_gross: float = 0.0
@@ -173,12 +232,34 @@ class Income:
     exp_office: float = 0.0
     exp_supplies: float = 0.0
     exp_phone_internet: float = 0.0
-    exp_travel_meals: float = 0.0       # comidas al 50%
+    exp_travel_meals: float = 0.0       # comidas de negocio (se deducen al 50%)
+    exp_travel: float = 0.0             # viajes de negocio (100%)
     exp_contract_labor: float = 0.0
     exp_rent: float = 0.0
     exp_other: float = 0.0
     home_office_sqft: float = 0.0       # metodo simplificado $5/pie2 hasta 300
+    home_total_sqft: float = 0.0        # pies cuadrados totales de la vivienda (Anexo C línea 30)
     business_withheld: float = 0.0
+    # Datos del Anexo C (encabezado y Parte IV)
+    business_activity: str = ""         # A: actividad principal (producto o servicio)
+    business_code: str = ""             # B: código de 6 dígitos de las instrucciones
+    business_ein: str = ""              # D
+    business_address: str = ""          # E
+    business_city: str = ""             # E: ciudad, estado y ZIP
+    accounting_method: str = "cash"     # cash | accrual
+    material_participation: bool = True
+    business_started: bool = False      # H
+    made_1099_payments: bool = False    # I
+    filed_1099s: bool = True            # J
+    other_expenses: List[OtherExpense] = field(default_factory=list)   # Parte V (detalle de 'otros gastos')
+    vehicle_in_service: str = ""        # 43: fecha MM/DD/AAAA
+    miles_business: float = 0.0
+    miles_commuting: float = 0.0
+    miles_other: float = 0.0
+    vehicle_personal_use: bool = True   # 45
+    other_vehicle: bool = True          # 46
+    vehicle_evidence: bool = True       # 47a
+    vehicle_evidence_written: bool = True  # 47b
     # OBBBA (Schedule 1-A)
     qualified_tips: float = 0.0
     qualified_overtime: float = 0.0      # solo la "prima" (la mitad del 1.5x)
@@ -187,13 +268,28 @@ class Income:
         for f in fields(self):
             if f.type in ("float", float):
                 setattr(self, f.name, _num(getattr(self, f.name)))
+        self.interest_payers = [x if isinstance(x, Payer) else _from_dict(Payer, x) for x in (self.interest_payers or [])]
+        self.dividend_payers = [x if isinstance(x, Payer) else _from_dict(Payer, x) for x in (self.dividend_payers or [])]
+        self.sales = [x if isinstance(x, Sale) else _from_dict(Sale, x) for x in (self.sales or [])]
+        self.other_expenses = [x if isinstance(x, OtherExpense) else _from_dict(OtherExpense, x)
+                               for x in (self.other_expenses or [])]
+
+    def other_expenses_total(self) -> float:
+        """'Otros gastos' del Anexo C: el detalle (Parte V) si existe; si no, el monto global."""
+        detail = sum(x.amount for x in self.other_expenses)
+        return detail if self.other_expenses else self.exp_other
+
+    def home_office_deduction(self) -> float:
+        return min(self.home_office_sqft, 300) * 5
+
+    def sales_gain(self, term: str) -> float:
+        return sum(s.gain() for s in self.sales if s.term == term)
 
     def schedule_c_expenses(self) -> float:
         meals_half = self.exp_travel_meals * 0.5
-        home = min(self.home_office_sqft, 300) * 5
         return (self.business_cogs + self.business_returns + self.exp_advertising + self.exp_car + self.exp_insurance
-                + self.exp_office + self.exp_supplies + self.exp_phone_internet + meals_half + self.exp_contract_labor
-                + self.exp_rent + self.exp_other + home)
+                + self.exp_office + self.exp_supplies + self.exp_phone_internet + meals_half + self.exp_travel
+                + self.exp_contract_labor + self.exp_rent + self.other_expenses_total() + self.home_office_deduction())
 
     def schedule_c_profit(self) -> float:
         if not self.business_gross and not self.schedule_c_expenses():
@@ -211,8 +307,11 @@ class Deductions:
     se_health_insurance: float = 0.0
     student_loan_interest: float = 0.0
     other_adjustments: float = 0.0
+    hsa_coverage: str = ""                  # "" (no indicado) | self | family  (Formulario 8889)
+    hsa_employer: float = 0.0               # aportes del empleador a la HSA (W-2 casilla 12, código W)
     # Schedule 1-A (OBBBA)
     car_loan_interest: float = 0.0          # vehiculo nuevo ensamblado en EE.UU., prestamo desde 2025
+    car_vin: str = ""                       # número de identificación del vehículo (VIN, 17 caracteres)
     # Itemizadas (Schedule A)
     medical: float = 0.0
     salt_use_sales_tax: bool = False
@@ -239,9 +338,29 @@ class Student:
     name: str = ""
     credit: str = "AOTC"     # AOTC | LLC
     expenses: float = 0.0
+    ssn: str = ""
+    school: str = ""          # institución educativa
+    school_address: str = ""
+    school_ein: str = ""      # EIN de la institución (Formulario 1098-T)
+    got_1098t: bool = True
+    half_time: bool = True    # matriculado al menos medio tiempo (requisito del AOTC)
+    first_four_years: bool = True  # no había completado 4 años de estudios superiores antes del año
 
     def __post_init__(self):
         self.expenses = _num(self.expenses)
+
+
+@dataclass
+class CareProvider:
+    """Proveedor de cuidado (Formulario 2441, Parte I)."""
+    name: str = ""
+    address: str = ""
+    tin: str = ""             # SSN o EIN del proveedor
+    amount: float = 0.0
+    household_employee: bool = False
+
+    def __post_init__(self):
+        self.amount = _num(self.amount)
 
 
 @dataclass
@@ -250,6 +369,7 @@ class Credits:
     care_persons: int = 0                 # 0 = calcular por dependientes
     dependent_care_benefits: float = 0.0  # W-2 casilla 10
     students: List[Student] = field(default_factory=list)
+    care_providers: List[CareProvider] = field(default_factory=list)
     retirement_contrib_taxpayer: float = 0.0
     retirement_contrib_spouse: float = 0.0
     foreign_tax_paid: float = 0.0
@@ -259,6 +379,8 @@ class Credits:
 
     def __post_init__(self):
         self.students = [s if isinstance(s, Student) else _from_dict(Student, s) for s in (self.students or [])]
+        self.care_providers = [c if isinstance(c, CareProvider) else _from_dict(CareProvider, c)
+                               for c in (self.care_providers or [])]
         for n in ("care_expenses", "dependent_care_benefits", "retirement_contrib_taxpayer", "retirement_contrib_spouse",
                   "foreign_tax_paid", "other_nonrefundable", "other_refundable"):
             setattr(self, n, _num(getattr(self, n)))
@@ -325,6 +447,37 @@ class StateExtras:
 
 
 @dataclass
+class FilingInfo:
+    """Datos que solo se usan para llenar los formularios oficiales (no cambian el cálculo)."""
+    digital_assets: bool = False          # 1040: ¿recibió, vendió o intercambió activos digitales?
+    lived_apart: bool = False             # MFS/HOH: vivió separado del cónyuge los últimos 6 meses
+    hoh_qualifying_name: str = ""         # HOH/QSS: nombre del hijo calificado si NO es su dependiente
+    # Reembolso
+    direct_deposit: bool = False
+    routing: str = ""                     # número de ruta (9 dígitos)
+    account: str = ""                     # número de cuenta
+    account_type: str = "checking"        # checking | savings
+    apply_to_next_year: float = 0.0       # parte del reembolso aplicada a impuestos estimados del próximo año
+    # Tercero designado
+    designee: bool = False
+    designee_name: str = ""
+    designee_phone: str = ""
+    designee_pin: str = ""                # 5 dígitos elegidos por el designado
+    # Anexo B, Parte III
+    foreign_account: bool = False
+    fbar_required: bool = False
+    foreign_countries: str = ""
+    foreign_trust: bool = False
+    # Preparador pagado (datos en Configuración); se imprime si está activado
+    use_preparer: bool = True
+    answered: List[str] = field(default_factory=list)   # preguntas guiadas ya respondidas (claves)
+
+    def __post_init__(self):
+        self.apply_to_next_year = _num(self.apply_to_next_year)
+        self.answered = [str(k) for k in (self.answered or [])]
+
+
+@dataclass
 class TaxReturn:
     tax_year: int = 2025
     filing_status: str = "single"
@@ -338,6 +491,7 @@ class TaxReturn:
     credits: Credits = field(default_factory=Credits)
     payments: Payments = field(default_factory=Payments)
     state_extras: StateExtras = field(default_factory=StateExtras)
+    filing: FilingInfo = field(default_factory=FilingInfo)
     notes: str = ""
     app_version: str = "1.0"
 
@@ -376,5 +530,6 @@ class TaxReturn:
         r.credits = _from_dict(Credits, d.get("credits"))
         r.payments = _from_dict(Payments, d.get("payments"))
         r.state_extras = _from_dict(StateExtras, d.get("state_extras"))
+        r.filing = _from_dict(FilingInfo, d.get("filing"))
         r.notes = d.get("notes", "")
         return r
