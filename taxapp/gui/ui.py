@@ -2,13 +2,35 @@
 barras de progreso, boton de usuario). Todos leen los colores del tema activo (widgets.COLORS)."""
 from __future__ import annotations
 
+import logging
+import os
+import sys
 import tkinter as tk
+import webbrowser
 from datetime import date, timedelta
-from tkinter import ttk
+from pathlib import Path
 
 from ..i18n import _, tr, N_
 from .theme import icon, icon_font, mix
 from .widgets import COLORS, font, Tooltip
+
+logger = logging.getLogger(__name__)
+
+
+def open_path(p, verb=None) -> bool:
+    """Abre un archivo o carpeta con el programa de Windows que corresponda (verb="print" para imprimir)."""
+    try:
+        if sys.platform.startswith("win"):
+            if verb:
+                os.startfile(str(p), verb)  # type: ignore[attr-defined]
+            else:
+                os.startfile(str(p))  # type: ignore[attr-defined]
+        else:
+            webbrowser.open(Path(p).resolve().as_uri())
+    except (OSError, webbrowser.Error) as e:
+        logger.warning("No se pudo abrir %s: %s", p, e)
+        return False
+    return True
 
 
 def C(key):

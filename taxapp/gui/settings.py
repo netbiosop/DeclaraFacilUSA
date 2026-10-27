@@ -8,12 +8,12 @@ import webbrowser
 from datetime import datetime
 from tkinter import ttk, messagebox, filedialog, colorchooser
 
-from .. import APP_NAME, accounts, data_loader, i18n, storage
+from .. import APP_NAME, accounts, data_loader, i18n
 from ..accounts import ROLES, ROLE_LABELS, ROLE_HELP, PERMS
 from ..i18n import _, N_, tr, reverse
 from . import theme
-from .theme import THEMES, ACCENTS, SIZES, icon, icon_font, mix
-from .ui import C, label, card, IconButton, user_chip, flat_button
+from .theme import THEMES, ACCENTS, SIZES, icon, icon_font
+from .ui import C, label, card, IconButton, user_chip
 from .widgets import COLORS, font, ScrollFrame, make_tree, Tooltip
 from . import layout
 

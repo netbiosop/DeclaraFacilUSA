@@ -42,15 +42,6 @@ def money_str(v) -> str:
     return f"{v:,.2f}".rstrip("0").rstrip(".") if v != int(v) else f"{int(v):,}"
 
 
-def setup_styles(root: tk.Tk):
-    from .theme import style_ttk
-    if "on_accent" not in COLORS:   # aun sin tema aplicado
-        from .theme import palette
-        COLORS.clear()
-        COLORS.update(palette("A"))
-    style_ttk(root)
-
-
 # ----------------------------------------------------------------------------- tooltip
 class Tooltip:
     def __init__(self, widget, text: str, wrap=360):
@@ -245,7 +236,7 @@ class Form:
             try:
                 self._set(attr, int(var.get() or 0))
             except ValueError:
-                pass
+                pass  # el número está a medio escribir; se guarda en la próxima tecla válida
 
         var.trace_add("write", changed)
         self.vars[attr] = var
@@ -290,13 +281,6 @@ class Form:
         self.vars[attr] = var
         self.row += 1
         return cb
-
-    def widget_row(self, label, widget_factory, help_text=None):
-        self._label(label, help_text)
-        w = widget_factory(self.parent)
-        w.grid(row=self.row, column=1, sticky="w", pady=3)
-        self.row += 1
-        return w
 
 
 def card(parent, padding=16) -> ttk.Frame:

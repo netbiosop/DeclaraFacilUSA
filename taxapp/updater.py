@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import re
 import ssl
 import subprocess
@@ -28,6 +29,8 @@ from typing import Callable, Optional
 
 from . import __version__, data_loader
 from .i18n import _, tr
+
+logger = logging.getLogger(__name__)
 
 ASSET_RE = re.compile(r"^Instalar_DeclaraFacilUSA_.*\.exe$", re.I)
 API = "https://api.github.com"
@@ -53,7 +56,8 @@ class UpdateConfig:
         from .assistant import unprotect
         try:
             return unprotect(self.token)
-        except Exception:  # noqa: BLE001
+        except (OSError, ValueError, AttributeError) as e:
+            logger.warning("No se pudo descifrar el token de GitHub guardado: %s", e)
             return ""
 
     def set_token(self, tok: str):
@@ -68,11 +72,7 @@ def _user_file() -> Path:
 def load_config() -> UpdateConfig:
     cfg = UpdateConfig()
     for p in (data_loader.data_dir() / "actualizaciones.json", _user_file()):
-        try:
-            d = json.loads(p.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            continue
-        for k, v in d.items():
+        for k, v in data_loader.read_json(p, {}).items():
             if k in UpdateConfig.__dataclass_fields__:
                 setattr(cfg, k, v)
     return cfg
@@ -213,8 +213,8 @@ def check(cfg: UpdateConfig = None, save=True) -> Optional[Release]:
     if save:
         try:
             save_config(cfg)
-        except OSError:
-            pass
+        except OSError as e:
+            logger.warning("No se pudo guardar la configuración de actualizaciones: %s", e)
     return rel if is_newer(rel.version) else None
 
 
@@ -309,10 +309,7 @@ def _state_path() -> Path:
 
 
 def load_state() -> dict:
-    try:
-        return json.loads(_state_path().read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return {}
+    return data_loader.read_json(_state_path(), {})
 
 
 def save_state(st: dict):
@@ -453,8 +450,8 @@ def confirm_code_ok():
         if st.get("trial"):
             st.update(trial=False, attempts=0)
             save_state(st)
-    except OSError:
-        pass
+    except OSError as e:
+        logger.warning("No se pudo confirmar que la versión actual arrancó bien: %s", e)
 
 
 def restart():
