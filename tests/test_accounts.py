@@ -63,6 +63,25 @@ class DamagedFileTests(AccountsBase):
         self.assertEqual(len(copies), 1)
         self.assertEqual(copies[0].read_text(encoding="utf-8"), "{ roto")
 
+    def test_locked_users_file_is_never_overwritten(self):
+        self.admin()
+        before = A._file().read_text(encoding="utf-8")
+        with mock.patch.object(pathlib.Path, "read_text", side_effect=PermissionError("bloqueado")):
+            self.assertEqual(A.load()["users"], [])
+            with self.assertRaises(A.AccountError):
+                A.update_settings("", remember_user=False)
+            with self.assertRaises(A.AccountError):
+                A.create_user("otro", "Otro", "admin", "Clave2025!")
+        self.assertEqual(A._file().read_text(encoding="utf-8"), before)
+        self.assertEqual([u["username"] for u in A.load()["users"]], ["admin"])
+
+    def test_unchanged_settings_are_not_written(self):
+        self.admin()
+        A.update_settings("", remember_user=A.settings()["remember_user"])
+        with mock.patch.object(A, "save") as save:
+            A.update_settings("", remember_user=A.settings()["remember_user"])
+        save.assert_not_called()
+
 
 class UserTests(AccountsBase):
     def test_first_admin_and_login(self):

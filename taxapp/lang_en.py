@@ -1006,6 +1006,7 @@ EN = {
     'Revisar y presentar': 'Review and file',
     'Rol': 'Role',
     'Rol inválido.': 'Invalid role.',
+    'No se pudo leer la lista de usuarios. Cierre otros programas que la usen e intente de nuevo.': 'The user list could not be read. Close other programs that may be using it and try again.',
     'Rol: {r}': 'Role: {r}',
     'Rosa': 'Pink',
     'Se aplican a todos los usuarios de este equipo.': 'They apply to all users on this computer.',

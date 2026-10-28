@@ -87,6 +87,11 @@ def _log_file() -> Path:
     return data_loader.user_dir() / "actividad.log"
 
 
+# Marca de una lista cargada vacía porque el archivo no se pudo leer (bloqueado por el antivirus o la
+# sincronización): guardarla borraría todas las cuentas, así que save() la rechaza.
+_UNREADABLE = "_unreadable"
+
+
 def _empty() -> dict:
     return {"version": 1, "users": [], "matrix": copy.deepcopy(DEFAULT_MATRIX), "settings": dict(DEFAULT_SETTINGS)}
 
@@ -110,9 +115,12 @@ def load() -> dict:
         d = json.loads(p.read_text(encoding="utf-8"))
     except FileNotFoundError:
         return _empty()
-    except (OSError, ValueError) as e:
+    except ValueError as e:
         _keep_damaged(p, e)
         return _empty()
+    except OSError as e:
+        logger.error("No se pudo leer usuarios.json: %s", e)
+        return {**_empty(), _UNREADABLE: True}
     d.setdefault("users", [])
     m = d.setdefault("matrix", {})
     for r in ROLES:
@@ -132,6 +140,8 @@ def load() -> dict:
 
 
 def save(db: dict):
+    if db.get(_UNREADABLE):
+        raise AccountError(_("No se pudo leer la lista de usuarios. Cierre otros programas que la usen e intente de nuevo."))
     p = _file()
     tmp = p.with_suffix(".tmp")
     tmp.write_text(json.dumps(db, indent=1, ensure_ascii=False), encoding="utf-8")
@@ -367,12 +377,13 @@ def settings() -> dict:
 
 def update_settings(by: str, **kw):
     db = load()
-    for k, v in kw.items():
-        if k in DEFAULT_SETTINGS:
-            db["settings"][k] = v
+    changed = {k: v for k, v in kw.items() if k in DEFAULT_SETTINGS and db["settings"].get(k) != v}
+    if not changed:
+        return
+    db["settings"].update(changed)
     save(db)
-    if set(kw) - {"last_user"}:
-        log("settings_changed", by, ", ".join(sorted(kw)))
+    if set(changed) - {"last_user"}:
+        log("settings_changed", by, ", ".join(sorted(changed)))
 
 
 def prefs_for(username: str) -> dict:
