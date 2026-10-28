@@ -16,7 +16,6 @@ COLORS = {
     "refund": "#1E9E5A", "owe": "#C0392B", "warn": "#B9770E", "info": "#2471A3",
 }  # se reemplaza por la paleta del tema activo (theme.apply)
 STYLE = {"family": "Segoe UI", "scale": 1.0}
-FONT = "Segoe UI"
 
 
 def font(size=10, weight="normal"):
@@ -282,11 +281,6 @@ class Form:
         self.vars[attr] = var
         self.row += 1
         return cb
-
-
-def card(parent, padding=16) -> ttk.Frame:
-    f = ttk.Frame(parent, style="Card.TFrame", padding=padding)
-    return f
 
 
 def make_tree(parent, columns, headings, widths=None, height=8, anchors=None) -> ttk.Treeview:

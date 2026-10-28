@@ -193,7 +193,6 @@ class FolderTests(AccountsBase):
         self.assertTrue(A.can_access_path(sup, A.returns_dir("admin") / "vieja.dfusa"))
         self.assertEqual([r["name"] for r in A.list_returns(prep)], ["mia.dfusa"])
         self.assertEqual(len(A.list_returns(sup)), 2)
-        self.assertEqual(A.owner_of(p), "prep")
         self.assertEqual(A.transfer_returns("prep", "sup", "admin"), 1)
         self.assertTrue((A.returns_dir("sup") / "mia.dfusa").exists())
 

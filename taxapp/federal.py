@@ -38,8 +38,6 @@ def pick(d: dict, status: str):
     s = sk(status)
     if s in d:
         return d[s]
-    if s == "mfj" and "mfj" in d:
-        return d["mfj"]
     return d.get("other", d.get("single"))
 
 

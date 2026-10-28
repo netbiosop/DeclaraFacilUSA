@@ -451,17 +451,8 @@ def can_access_path(user: dict, path) -> bool:
     return own == p.parent or own in p.parents
 
 
-def owner_of(path) -> str:
-    try:
-        rel = Path(path).resolve().relative_to(returns_root().resolve())
-        return rel.parts[0] if len(rel.parts) > 1 else ""
-    except (ValueError, OSError):
-        return ""
-
-
 def list_returns(user: dict) -> List[dict]:
     """Declaraciones visibles para el usuario: [{path, owner, name, modified}]."""
-    dirs = []
     if can(user, "view_all"):
         dirs = [d for d in returns_root().iterdir() if d.is_dir()]
     else:
