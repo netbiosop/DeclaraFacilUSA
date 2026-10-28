@@ -53,6 +53,39 @@ class PasswordTests(AccountsBase):
         self.assertIsNotNone(A.validate_username("a"))
 
 
+class DamagedFileTests(AccountsBase):
+    def test_damaged_users_file_is_copied_once(self):
+        self.admin()
+        A._file().write_text("{ roto", encoding="utf-8")
+        self.assertEqual(A.load()["users"], [])
+        A.load()
+        copies = list(A._file().parent.glob("usuarios.danado-*.json"))
+        self.assertEqual(len(copies), 1)
+        self.assertEqual(copies[0].read_text(encoding="utf-8"), "{ roto")
+
+    def test_locked_users_file_is_never_overwritten(self):
+        self.admin()
+        before = A._file().read_text(encoding="utf-8")
+        with mock.patch.object(pathlib.Path, "read_text", side_effect=PermissionError("bloqueado")):
+            self.assertEqual(A.load()["users"], [])
+            user, err = A.authenticate("admin", "Clave2025!")
+            self.assertIsNone(user)
+            self.assertIn("lista de usuarios", err)
+            with self.assertRaises(A.AccountError):
+                A.update_settings("", remember_user=False)
+            with self.assertRaises(A.AccountError):
+                A.create_user("otro", "Otro", "admin", "Clave2025!")
+        self.assertEqual(A._file().read_text(encoding="utf-8"), before)
+        self.assertEqual([u["username"] for u in A.load()["users"]], ["admin"])
+
+    def test_unchanged_settings_are_not_written(self):
+        self.admin()
+        A.update_settings("", remember_user=A.settings()["remember_user"])
+        with mock.patch.object(A, "save") as save:
+            A.update_settings("", remember_user=A.settings()["remember_user"])
+        save.assert_not_called()
+
+
 class UserTests(AccountsBase):
     def test_first_admin_and_login(self):
         self.assertFalse(A.has_users())
@@ -163,7 +196,6 @@ class FolderTests(AccountsBase):
         self.assertTrue(A.can_access_path(sup, A.returns_dir("admin") / "vieja.dfusa"))
         self.assertEqual([r["name"] for r in A.list_returns(prep)], ["mia.dfusa"])
         self.assertEqual(len(A.list_returns(sup)), 2)
-        self.assertEqual(A.owner_of(p), "prep")
         self.assertEqual(A.transfer_returns("prep", "sup", "admin"), 1)
         self.assertTrue((A.returns_dir("sup") / "mia.dfusa").exists())
 

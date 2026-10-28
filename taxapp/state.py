@@ -7,16 +7,11 @@ jubilacion), deduccion estandar, exenciones o creditos personales, tramos por es
 from __future__ import annotations
 
 import math
-from typing import List
 
 from . import data_loader
 from .federal import bracket_tax, marginal_rate, r2
 from .i18n import _, tr
 from .models import TaxReturn
-
-
-def _status_key(status: str) -> str:
-    return {"qss": "mfj", "mfs": "single"}.get(status, status)
 
 
 def _select_brackets(sd: dict, status: str):

@@ -2,20 +2,23 @@
 ajustes generales y seguridad, tablas de impuestos, respaldos y registro de actividad."""
 from __future__ import annotations
 
+import logging
 import threading
 import tkinter as tk
 import webbrowser
 from datetime import datetime
 from tkinter import ttk, messagebox, filedialog, colorchooser
 
-from .. import APP_NAME, accounts, data_loader, i18n, storage
+from .. import APP_NAME, accounts, data_loader, i18n
 from ..accounts import ROLES, ROLE_LABELS, ROLE_HELP, PERMS
 from ..i18n import _, N_, tr, reverse
 from . import theme
-from .theme import THEMES, ACCENTS, SIZES, icon, icon_font, mix
-from .ui import C, label, card, IconButton, user_chip, flat_button
+from .theme import THEMES, ACCENTS, SIZES, icon, icon_font
+from .ui import C, label, card, IconButton, user_chip
 from .widgets import COLORS, font, ScrollFrame, make_tree, Tooltip
 from . import layout
+
+logger = logging.getLogger(__name__)
 
 SECTIONS = [  # clave, titulo, icono, permiso necesario (None = todos)
     ("appearance", N_("Apariencia"), "palette", None),
@@ -574,7 +577,8 @@ class SettingsView(tk.Frame):
         for y in data_loader.SUPPORTED_YEARS:
             try:
                 src = data_loader.federal(y).get("sources", [])
-            except Exception:  # noqa: BLE001
+            except (OSError, ValueError) as e:
+                logger.warning("No se pudieron leer las fuentes de las tablas %s: %s", y, e)
                 src = []
             label(k, tr("Año fiscal {y}", y=y), 11, "bold").pack(anchor="w", pady=(4, 2))
             for s in src[:4]:

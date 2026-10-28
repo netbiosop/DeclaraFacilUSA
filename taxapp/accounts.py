@@ -15,6 +15,7 @@ import copy
 import hashlib
 import hmac
 import json
+import logging
 import os
 import re
 import shutil
@@ -25,6 +26,8 @@ from typing import Dict, List, Optional, Tuple
 
 from . import data_loader
 from .i18n import N_, _, tr
+
+logger = logging.getLogger(__name__)
 
 ITERATIONS = 240_000
 ROLES = ["admin", "supervisor", "preparer", "viewer"]
@@ -84,15 +87,41 @@ def _log_file() -> Path:
     return data_loader.user_dir() / "actividad.log"
 
 
+# Marca de una lista cargada vacía porque el archivo no se pudo leer (bloqueado por el antivirus o la
+# sincronización): guardarla borraría todas las cuentas, así que save() la rechaza.
+_UNREADABLE = "_unreadable"
+_UNREADABLE_MSG = N_("No se pudo leer la lista de usuarios. Cierre otros programas que la usen e intente de nuevo.")
+
+
 def _empty() -> dict:
     return {"version": 1, "users": [], "matrix": copy.deepcopy(DEFAULT_MATRIX), "settings": dict(DEFAULT_SETTINGS)}
 
 
-def load() -> dict:
+def _keep_damaged(p: Path, err: Exception):
+    """Copia un usuarios.json ilegible antes de que el asistente de inicio lo reemplace por uno nuevo."""
+    backup = p.with_name(f"usuarios.danado-{datetime.now():%Y%m%d-%H%M%S}.json")
     try:
-        d = json.loads(_file().read_text(encoding="utf-8"))
-    except (OSError, ValueError):
+        content = p.read_bytes()
+        if any(prev.read_bytes() == content for prev in p.parent.glob("usuarios.danado-*.json")):
+            return  # esta versión dañada ya tiene su copia
+        shutil.copy2(p, backup)
+        logger.error("usuarios.json ilegible (%s); se guardó una copia en %s", err, backup)
+    except OSError as e:
+        logger.error("usuarios.json ilegible (%s) y no se pudo copiar: %s", err, e)
+
+
+def load() -> dict:
+    p = _file()
+    try:
+        d = json.loads(p.read_text(encoding="utf-8"))
+    except FileNotFoundError:
         return _empty()
+    except ValueError as e:
+        _keep_damaged(p, e)
+        return _empty()
+    except OSError as e:
+        logger.error("No se pudo leer usuarios.json: %s", e)
+        return {**_empty(), _UNREADABLE: True}
     d.setdefault("users", [])
     m = d.setdefault("matrix", {})
     for r in ROLES:
@@ -112,6 +141,8 @@ def load() -> dict:
 
 
 def save(db: dict):
+    if db.get(_UNREADABLE):
+        raise AccountError(_(_UNREADABLE_MSG))
     p = _file()
     tmp = p.with_suffix(".tmp")
     tmp.write_text(json.dumps(db, indent=1, ensure_ascii=False), encoding="utf-8")
@@ -264,6 +295,8 @@ def set_password(username: str, new_password: str, by: str, current: str = None,
 def authenticate(username: str, password: str) -> Tuple[Optional[dict], str]:
     """Devuelve (usuario, "") o (None, mensaje)."""
     db = load()
+    if db.get(_UNREADABLE):
+        return None, _(_UNREADABLE_MSG)
     u = find(db, username)
     generic = _("Usuario o contraseña incorrectos.")
     if not u:
@@ -347,12 +380,13 @@ def settings() -> dict:
 
 def update_settings(by: str, **kw):
     db = load()
-    for k, v in kw.items():
-        if k in DEFAULT_SETTINGS:
-            db["settings"][k] = v
+    changed = {k: v for k, v in kw.items() if k in DEFAULT_SETTINGS and db["settings"].get(k) != v}
+    if not changed:
+        return
+    db["settings"].update(changed)
     save(db)
-    if set(kw) - {"last_user"}:
-        log("settings_changed", by, ", ".join(sorted(kw)))
+    if set(changed) - {"last_user"}:
+        log("settings_changed", by, ", ".join(sorted(changed)))
 
 
 def prefs_for(username: str) -> dict:
@@ -420,17 +454,8 @@ def can_access_path(user: dict, path) -> bool:
     return own == p.parent or own in p.parents
 
 
-def owner_of(path) -> str:
-    try:
-        rel = Path(path).resolve().relative_to(returns_root().resolve())
-        return rel.parts[0] if len(rel.parts) > 1 else ""
-    except (ValueError, OSError):
-        return ""
-
-
 def list_returns(user: dict) -> List[dict]:
     """Declaraciones visibles para el usuario: [{path, owner, name, modified}]."""
-    dirs = []
     if can(user, "view_all"):
         dirs = [d for d in returns_root().iterdir() if d.is_dir()]
     else:
@@ -467,8 +492,8 @@ def log(event: str, user: str, detail: str = ""):
     try:
         with open(_log_file(), "a", encoding="utf-8") as fh:
             fh.write(json.dumps({"time": _now(), "user": user, "event": event, "detail": detail}, ensure_ascii=False) + "\n")
-    except OSError:
-        pass
+    except OSError as e:
+        logger.warning("No se pudo anotar en el registro de actividad (%s): %s", event, e)
 
 
 EVENT_LABELS = {

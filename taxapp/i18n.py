@@ -9,9 +9,12 @@ English; any missing key falls back to the Spanish original. `tr()` translates a
 from __future__ import annotations
 
 import json
+import logging
 import os
 import sys
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 LANGS = {"es": "Español", "en": "English"}
 _lang = "es"
@@ -42,21 +45,17 @@ def system_language() -> str:
             return "es" if (lang_id & 0x3FF) == 0x0A else "en"
         loc = (locale.getlocale()[0] or os.environ.get("LANG", "")).lower()
         return "es" if loc.startswith("es") else "en"
-    except Exception:  # noqa: BLE001
+    except (AttributeError, OSError, ValueError) as e:
+        logger.warning("No se pudo detectar el idioma del sistema, se usa español: %s", e)
         return "es"
 
 
 def load_saved_language() -> str:
     """Idioma guardado; la primera vez se usa el idioma del sistema."""
     global _lang
-    try:
-        cfg = json.loads(_config_file().read_text(encoding="utf-8"))
-        if cfg.get("language") in LANGS:
-            _lang = cfg["language"]
-            return _lang
-    except (OSError, ValueError):
-        pass
-    _lang = system_language()
+    from .data_loader import read_json
+    saved = read_json(_config_file(), {}).get("language")
+    _lang = saved if saved in LANGS else system_language()   # la primera vez, el idioma del sistema
     return _lang
 
 
@@ -66,18 +65,14 @@ def set_language(lang: str, save: bool = True):
         return
     _lang = lang
     if save:
+        from .data_loader import read_json
+        p = _config_file()
+        cfg = read_json(p, {})
+        cfg["language"] = lang
         try:
-            p = _config_file()
-            cfg = {}
-            if p.exists():
-                try:
-                    cfg = json.loads(p.read_text(encoding="utf-8"))
-                except ValueError:
-                    cfg = {}
-            cfg["language"] = lang
             p.write_text(json.dumps(cfg, indent=1), encoding="utf-8")
-        except OSError:
-            pass
+        except OSError as e:
+            logger.warning("No se pudo guardar el idioma elegido: %s", e)
 
 
 def get_language() -> str:

@@ -160,6 +160,7 @@
   },
   "ctc": {
     "per_child": 2200,
+    "reduce_per_1000": 50,
     "refundable_max": 1700,
     "odc": 500,
     "phaseout_start": {
@@ -270,6 +271,7 @@
   },
   "educator_max": 350,
   "se": {
+    "min_net": 400,
     "ss_wage_base": 184500,
     "ss_rate": 0.124,
     "medicare_rate": 0.029,
@@ -327,6 +329,9 @@
   },
   "aotc": {
     "max": 2500,
+    "full_expenses": 2000,
+    "max_expenses": 4000,
+    "excess_rate": 0.25,
     "refundable_pct": 0.4,
     "phaseout": {
       "mfj": [

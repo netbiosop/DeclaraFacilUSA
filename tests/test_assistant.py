@@ -218,5 +218,15 @@ class PromptTests(unittest.TestCase):
         self.assertIn("Del W-2", q)
 
 
+class ContextAmountsTests(unittest.TestCase):
+    def test_yes_no_fields_are_not_amounts(self):
+        ret = TaxReturn()
+        ctx = ai.build_context(ret, None)
+        self.assertNotIn("material_participation", ctx)
+        self.assertNotIn("Other income fields", ctx)
+        ret.income.taxable_interest = 120
+        self.assertIn("taxable_interest=$120", ai.build_context(ret, None))
+
+
 if __name__ == "__main__":
     unittest.main()

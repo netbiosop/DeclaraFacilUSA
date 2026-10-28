@@ -1,7 +1,7 @@
 """Formularios oficiales del IRS: preguntas guiadas, borrador y formularios finales / Official IRS forms screen."""
 from __future__ import annotations
 
-import os
+import logging
 import sys
 import threading
 import tkinter as tk
@@ -15,28 +15,16 @@ from ..forms import catalog, questions as qmod
 from ..i18n import _, N_, tr
 from .lists import ListEditor
 from .screens import Screen
-from .ui import C, label
+from .ui import C, label, open_path
 from .widgets import COLORS, font, make_tree, money_str, parse_money, ScrollFrame
 from . import layout
+
+logger = logging.getLogger(__name__)
 
 
 def preparer_info() -> dict:
     p = accounts.settings().get("preparer") or {}
     return {k: p.get(k, "") for k in accounts.PREPARER_FIELDS}
-
-
-def open_path(p, verb=None):
-    try:
-        if sys.platform.startswith("win"):
-            if verb:
-                os.startfile(str(p), verb)  # type: ignore[attr-defined]
-            else:
-                os.startfile(str(p))  # type: ignore[attr-defined]
-        else:
-            webbrowser.open(Path(p).resolve().as_uri())
-    except Exception:  # noqa: BLE001
-        return False
-    return True
 
 
 # ==================================================================================================== pantalla
@@ -267,7 +255,8 @@ class FormsScreen(Screen):
                 out = forms.generate(ret, res, folder, **opts)
                 self.app.after(0, lambda: self._done(out))
             except Exception as e:  # noqa: BLE001
-                self.app.after(0, lambda: self._failed(e))
+                logger.exception("No se pudieron generar los formularios")
+                self.app.after(0, lambda err=e: self._failed(err))
         threading.Thread(target=work, daemon=True).start()
 
     def _restore(self):
