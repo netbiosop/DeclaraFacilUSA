@@ -362,9 +362,7 @@ class App(tk.Tk):
             return False
         if not self.path:
             return self.save_as()
-        storage.save(self.ret, self.path)
-        self._saved()
-        return True
+        return self._write(self.path)
 
     def save_as(self) -> bool:
         if not self.ret or self.readonly:
@@ -377,7 +375,16 @@ class App(tk.Tk):
         if not accounts.can_access_path(self.user, p):
             self._deny(_("Solo puede guardar en su propia carpeta."))
             return False
-        self.path = storage.save(self.ret, p)
+        return self._write(p)
+
+    def _write(self, path) -> bool:
+        """Guarda en disco; storage.save puede cambiar la extensión a .dfusa, así que se usa la ruta que devuelve."""
+        try:
+            self.path = storage.save(self.ret, path)
+        except OSError as e:
+            logger.exception("No se pudo guardar %s", path)
+            messagebox.showerror(APP_NAME, tr("No se pudo guardar la declaración:\n{e}", e=e))
+            return False
         self._saved()
         return True
 
@@ -444,8 +451,11 @@ class App(tk.Tk):
                 idle = int(accounts.settings().get("idle_minutes", 0) or 0)
                 if idle and time.time() - self._last_activity > idle * 60:
                     if self.ret and self.dirty and self.path and not self.readonly:
-                        storage.save(self.ret, self.path)
-                        self.dirty = False
+                        try:
+                            self.path = storage.save(self.ret, self.path)
+                            self.dirty = False
+                        except OSError:
+                            logger.exception("Autoguardado antes de cerrar la sesión: no se pudo guardar %s", self.path)
                     if not self.dirty:
                         self.logout("idle_logout")
                 auto = int(self.prefs.get("autosave", 0) or 0)
