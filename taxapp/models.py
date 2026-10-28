@@ -4,6 +4,7 @@ Todas las clases son dataclasses serializables a JSON con to_dict()/from_dict().
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field, asdict, fields
 from datetime import date
 from typing import List, Optional
@@ -20,11 +21,21 @@ FILING_STATUSES = {
 }
 
 
+# "1500,50" o "12,5": coma decimal (1 o 2 cifras después de la coma y sin punto). "1,500" sigue siendo miles.
+_DECIMAL_COMMA = re.compile(r"^[^.]*\d,\d{1,2}\)?$")
+
+
+def clean_money_text(text: str) -> str:
+    """Quita $, espacios y separadores de miles; convierte la coma decimal en punto."""
+    t = str(text).strip().replace("$", "").replace(" ", "")
+    return t.replace(",", ".") if _DECIMAL_COMMA.match(t) else t.replace(",", "")
+
+
 def _num(v) -> float:
     try:
         if v in (None, ""):
             return 0.0
-        return float(str(v).replace(",", "").replace("$", "").strip() or 0)
+        return float(clean_money_text(v) or 0)
     except (TypeError, ValueError):
         return 0.0
 

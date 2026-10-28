@@ -6,6 +6,7 @@ from tkinter import ttk
 from typing import Callable, List, Optional
 
 from ..i18n import _
+from ..models import clean_money_text
 
 # ----------------------------------------------------------------------------- paleta y fuentes
 COLORS = {
@@ -23,7 +24,7 @@ def font(size=10, weight="normal"):
 
 
 def parse_money(text: str) -> Optional[float]:
-    t = (text or "").strip().replace(",", "").replace("$", "").replace(" ", "")
+    t = clean_money_text(text or "")
     if t in ("", "-", "."):
         return 0.0
     neg = t.startswith("(") and t.endswith(")")

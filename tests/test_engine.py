@@ -9,7 +9,7 @@ import unittest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from taxapp.engine import compute_all  # noqa: E402
-from taxapp.models import TaxReturn, W2, Dependent, Person  # noqa: E402
+from taxapp.models import TaxReturn, W2, Dependent, Person, clean_money_text  # noqa: E402
 from taxapp.review import review  # noqa: E402
 from taxapp import storage  # noqa: E402
 
@@ -168,6 +168,15 @@ class StateLocalTests(unittest.TestCase):
                     s = res["state"]
                     self.assertGreaterEqual(s["tax"], 0, (year, code, status))
                     self.assertLess(s["tax"], 85000 * 0.12, (year, code, status))
+
+
+class MoneyTextTests(unittest.TestCase):
+    def test_decimal_comma_and_thousands(self):
+        cases = {"1500,50": "1500.50", "12,5": "12.5", "-3,25": "-3.25", "1,500": "1500",
+                 "$1,500.25": "1500.25", "1,234,567": "1234567", " $ 2 000 ": "2000"}
+        for text, expected in cases.items():
+            self.assertEqual(clean_money_text(text), expected, text)
+        self.assertEqual(W2(box1_wages="1500,50").box1_wages, 1500.5)
 
 
 class StorageAndReview(unittest.TestCase):
