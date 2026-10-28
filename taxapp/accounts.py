@@ -90,6 +90,7 @@ def _log_file() -> Path:
 # Marca de una lista cargada vacía porque el archivo no se pudo leer (bloqueado por el antivirus o la
 # sincronización): guardarla borraría todas las cuentas, así que save() la rechaza.
 _UNREADABLE = "_unreadable"
+_UNREADABLE_MSG = N_("No se pudo leer la lista de usuarios. Cierre otros programas que la usen e intente de nuevo.")
 
 
 def _empty() -> dict:
@@ -141,7 +142,7 @@ def load() -> dict:
 
 def save(db: dict):
     if db.get(_UNREADABLE):
-        raise AccountError(_("No se pudo leer la lista de usuarios. Cierre otros programas que la usen e intente de nuevo."))
+        raise AccountError(_(_UNREADABLE_MSG))
     p = _file()
     tmp = p.with_suffix(".tmp")
     tmp.write_text(json.dumps(db, indent=1, ensure_ascii=False), encoding="utf-8")
@@ -294,6 +295,8 @@ def set_password(username: str, new_password: str, by: str, current: str = None,
 def authenticate(username: str, password: str) -> Tuple[Optional[dict], str]:
     """Devuelve (usuario, "") o (None, mensaje)."""
     db = load()
+    if db.get(_UNREADABLE):
+        return None, _(_UNREADABLE_MSG)
     u = find(db, username)
     generic = _("Usuario o contraseña incorrectos.")
     if not u:

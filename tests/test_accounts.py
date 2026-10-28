@@ -68,6 +68,9 @@ class DamagedFileTests(AccountsBase):
         before = A._file().read_text(encoding="utf-8")
         with mock.patch.object(pathlib.Path, "read_text", side_effect=PermissionError("bloqueado")):
             self.assertEqual(A.load()["users"], [])
+            user, err = A.authenticate("admin", "Clave2025!")
+            self.assertIsNone(user)
+            self.assertIn("lista de usuarios", err)
             with self.assertRaises(A.AccountError):
                 A.update_settings("", remember_user=False)
             with self.assertRaises(A.AccountError):

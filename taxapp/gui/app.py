@@ -377,13 +377,15 @@ class App(tk.Tk):
             return False
         return self._write(p)
 
-    def _write(self, path) -> bool:
-        """Guarda en disco; storage.save puede cambiar la extensión a .dfusa, así que se usa la ruta que devuelve."""
+    def _write(self, path, quiet: bool = False) -> bool:
+        """Guarda en disco; storage.save puede cambiar la extensión a .dfusa, así que se usa la ruta que devuelve.
+        quiet: guardados automáticos, que se repiten cada 30 s y no deben abrir un diálogo en cada intento."""
         try:
             self.path = storage.save(self.ret, path)
         except OSError as e:
             logger.exception("No se pudo guardar %s", path)
-            messagebox.showerror(APP_NAME, tr("No se pudo guardar la declaración:\n{e}", e=e))
+            if not quiet:
+                messagebox.showerror(APP_NAME, tr("No se pudo guardar la declaración:\n{e}", e=e))
             return False
         self._saved()
         return True
@@ -451,17 +453,14 @@ class App(tk.Tk):
                 idle = int(accounts.settings().get("idle_minutes", 0) or 0)
                 if idle and time.time() - self._last_activity > idle * 60:
                     if self.ret and self.dirty and self.path and not self.readonly:
-                        try:
-                            self.path = storage.save(self.ret, self.path)
-                            self.dirty = False
-                        except OSError:
-                            logger.exception("Autoguardado antes de cerrar la sesión: no se pudo guardar %s", self.path)
+                        self._write(self.path, quiet=True)
                     if not self.dirty:
                         self.logout("idle_logout")
                 auto = int(self.prefs.get("autosave", 0) or 0)
                 if auto and self.ret and self.dirty and self.path and not self.readonly \
-                        and time.time() - self._last_save > auto * 60:
-                    self.save()
+                        and time.time() - self._last_save > auto * 60 and self.can("edit"):
+                    if not self._write(self.path, quiet=True):
+                        self._last_save = time.time()   # reintenta en el próximo intervalo, no en cada tick
         finally:
             try:
                 self.after(30_000, self._tick)

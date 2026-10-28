@@ -218,7 +218,6 @@ class PromptTests(unittest.TestCase):
         self.assertIn("Del W-2", q)
 
 
-
 class ContextAmountsTests(unittest.TestCase):
     def test_yes_no_fields_are_not_amounts(self):
         ret = TaxReturn()

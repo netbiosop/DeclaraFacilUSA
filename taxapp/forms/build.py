@@ -724,10 +724,11 @@ class Builder:
         f, d, c = self.fed, self.d, self.fed["credits"]
         students = [s for s in self.ret.credits.students if s.expenses > 0]
         agi = f["agi"]
-        # Solo "mfj" usa el límite alto; QSS usa el de "other" (el cálculo federal no: ver REVISIONES.md)
-        lo, top = self.data["aotc"]["phaseout"]["mfj" if self.status == "mfj" else "other"]
-        rng = top - lo
         ed = self.data["aotc"]
+        # Solo "mfj" usa el límite alto; QSS usa el de "other". federal.py no (pick() trata QSS como mfj):
+        # pendiente en REVISIONES.md.
+        lo, top = ed["phaseout"]["mfj" if self.status == "mfj" else "other"]
+        rng = top - lo
         l4 = max(0.0, top - agi)
         aotc = [s for s in students if s.credit.upper() == "AOTC"]
         llc = [s for s in students if s.credit.upper() == "LLC"]
