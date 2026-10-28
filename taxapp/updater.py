@@ -200,7 +200,9 @@ def latest_release(cfg: UpdateConfig) -> Release:
             txt = _get_text(sha_asset["url"] if tok else sha_asset["browser_download_url"], tok)
             m = re.search(r"\b[0-9a-fA-F]{64}\b", txt)
             rel.sha256 = m.group(0).lower() if m else ""
-        except (UpdateError, urllib.error.URLError, OSError):
+        except (UpdateError, urllib.error.URLError, OSError) as e:
+            logger.warning("No se pudo leer la huella SHA-256 de %s; la descarga no se verificará: %s",
+                           rel.asset_name, e)
             rel.sha256 = ""
     return rel
 
@@ -472,7 +474,8 @@ def check_any(cfg: UpdateConfig = None):
         return "code", cu
     try:
         rel = check(cfg)
-    except UpdateError:
+    except UpdateError as e:
+        logger.warning("No se pudo buscar el instalador nuevo: %s", e)
         rel = None
     if rel:
         return "installer", rel
