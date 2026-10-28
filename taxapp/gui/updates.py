@@ -110,7 +110,8 @@ class UpdateDialog(tk.Toplevel):
                     res = updater.download(self.upd, progress=progress)
                 self.app.after(0, lambda: self._ready(res))
             except Exception as e:  # noqa: BLE001
-                self.app.after(0, lambda: self._failed(str(e)))
+                logger.exception("La actualización falló")
+                self.app.after(0, lambda msg=str(e): self._failed(msg))
         threading.Thread(target=work, daemon=True).start()
 
     def _progress(self, pct, got, total):

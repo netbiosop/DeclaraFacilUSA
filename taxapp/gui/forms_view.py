@@ -1,6 +1,7 @@
 """Formularios oficiales del IRS: preguntas guiadas, borrador y formularios finales / Official IRS forms screen."""
 from __future__ import annotations
 
+import logging
 import sys
 import threading
 import tkinter as tk
@@ -17,6 +18,8 @@ from .screens import Screen
 from .ui import C, label, open_path
 from .widgets import COLORS, font, make_tree, money_str, parse_money, ScrollFrame
 from . import layout
+
+logger = logging.getLogger(__name__)
 
 
 def preparer_info() -> dict:
@@ -252,7 +255,8 @@ class FormsScreen(Screen):
                 out = forms.generate(ret, res, folder, **opts)
                 self.app.after(0, lambda: self._done(out))
             except Exception as e:  # noqa: BLE001
-                self.app.after(0, lambda: self._failed(e))
+                logger.exception("No se pudieron generar los formularios")
+                self.app.after(0, lambda err=e: self._failed(err))
         threading.Thread(target=work, daemon=True).start()
 
     def _restore(self):
