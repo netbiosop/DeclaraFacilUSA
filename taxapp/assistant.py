@@ -21,7 +21,7 @@ from typing import Dict, List, Optional, Tuple
 
 from . import data_loader
 from .i18n import _, N_, tr, get_language
-from .models import TaxReturn
+from .models import TaxReturn, nonzero_amounts
 
 logger = logging.getLogger(__name__)
 
@@ -192,20 +192,20 @@ def build_context(ret: Optional[TaxReturn], res: Optional[dict], section: str = 
                  f"{_m(w.box2_fed_withheld)}, box12 401k {_m(w.box12_401k)}, state {w.state}, box17 {_m(w.box17_state_withheld)},"
                  f" box19 {_m(w.box19_local_withheld)}.")
     inc = ret.income
-    nz = {k: v for k, v in vars(inc).items() if isinstance(v, (int, float)) and v}
+    nz = nonzero_amounts(inc)
     if nz:
         L.append("Other income fields (non-zero): " + ", ".join(f"{k}={_m(v)}" for k, v in nz.items()) + ".")
-    dd = {k: v for k, v in vars(ret.deductions).items() if isinstance(v, (int, float)) and not isinstance(v, bool) and v}
+    dd = nonzero_amounts(ret.deductions)
     L.append(f"Deduction mode: {ret.deductions.mode}." + (" Deduction inputs: " + ", ".join(f"{k}={_m(v)}" for k, v in dd.items()) + "." if dd else ""))
     cr = ret.credits
-    cnz = {k: v for k, v in vars(cr).items() if isinstance(v, (int, float)) and not isinstance(v, bool) and v}
+    cnz = nonzero_amounts(cr)
     if cnz or cr.students:
         L.append("Credit inputs: " + ", ".join(f"{k}={v}" for k, v in cnz.items())
                  + (f"; students: {[(s.credit, _m(s.expenses)) for s in cr.students]}" if cr.students else "") + ".")
     pnz = {k: v for k, v in vars(ret.payments).items() if v}
     if pnz:
         L.append("Payments: " + ", ".join(f"{k}={_m(v)}" for k, v in pnz.items()) + ".")
-    se = {k: v for k, v in vars(ret.state_extras).items() if isinstance(v, (int, float)) and v}
+    se = nonzero_amounts(ret.state_extras)
     if se:
         L.append("State adjustments: " + ", ".join(f"{k}={_m(v)}" for k, v in se.items()) + ".")
     if res:

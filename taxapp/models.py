@@ -29,6 +29,12 @@ def _num(v) -> float:
         return 0.0
 
 
+def nonzero_amounts(section) -> dict:
+    """Montos distintos de cero de una sección; las casillas sí/no (bool) no son montos."""
+    return {k: v for k, v in vars(section).items()
+            if isinstance(v, (int, float)) and not isinstance(v, bool) and v}
+
+
 def _from_dict(cls, data: dict):
     if data is None:
         return cls()
