@@ -212,5 +212,35 @@ class FolderTests(AccountsBase):
         self.assertFalse(any(n.startswith("Respaldos") for n in names))
 
 
+class AdminOnlyTests(AccountsBase):
+    """Con "Crear usuarios y asignar roles" un Supervisor no puede llegar a Administrador."""
+
+    def setUp(self):
+        super().setUp()
+        self.admin()
+        A.create_user("super", "Sup", "supervisor", "Clave2025!", by="admin")
+
+    def test_non_admin_cannot_promote_self(self):
+        with self.assertRaises(A.AccountError):
+            A.update_user("super", "super", role="admin")
+        self.assertEqual(A.find(A.load(), "super")["role"], "supervisor")
+
+    def test_non_admin_cannot_create_admin(self):
+        with self.assertRaises(A.AccountError):
+            A.create_user("otro", "Otro", "admin", "Clave2025!", by="super")
+
+    def test_non_admin_cannot_reset_admin_password(self):
+        with self.assertRaises(A.AccountError):
+            A.set_password("admin", "Nueva2025!", "super")
+
+    def test_non_admin_cannot_delete_admin(self):
+        A.create_user("admin2", "Admin 2", "admin", "Clave2025!", by="admin")
+        with self.assertRaises(A.AccountError):
+            A.delete_user("admin", "super")
+
+    def test_non_admin_can_still_rename_self(self):
+        self.assertEqual(A.update_user("super", "super", name="Nuevo", role="supervisor")["name"], "Nuevo")
+
+
 if __name__ == "__main__":
     unittest.main()

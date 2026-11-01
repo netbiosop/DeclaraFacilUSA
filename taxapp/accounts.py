@@ -213,6 +213,14 @@ def active_admins(db: dict) -> int:
     return sum(1 for u in db["users"] if u["role"] == "admin" and u.get("active", True))
 
 
+def _require_admin(db: dict, by: str):
+    """Solo un Administrador crea, cambia, restablece o borra cuentas de Administrador (el permiso
+    "Crear usuarios y asignar roles" no alcanza para hacerse Administrador)."""
+    u = find(db, by) if by else None
+    if not (u and u["role"] == "admin"):
+        raise AccountError(_("Solo un Administrador puede crear o cambiar cuentas de Administrador."))
+
+
 def create_user(username: str, name: str, role: str, password: str, by: str = "", db: dict = None) -> dict:
     db = db or load()
     username = normalize_username(username)
@@ -224,6 +232,8 @@ def create_user(username: str, name: str, role: str, password: str, by: str = ""
     if find(db, username):
         raise AccountError(tr("Ya existe el usuario '{u}'.", u=username))
     first = not db["users"]
+    if role == "admin" and not first:
+        _require_admin(db, by)
     u = {"username": username, "name": (name or username).strip(), "role": role, "password": hash_password(password),
          "active": True, "failed": 0, "locked_until": "", "created": _now(), "last_login": "", "prefs": {},
          "must_change": False}
@@ -241,6 +251,8 @@ def update_user(username: str, by: str, name: str = None, role: str = None, acti
     u = find(db, username)
     if not u:
         raise AccountError(_("Usuario no encontrado."))
+    if u["role"] == "admin" or role == "admin":
+        _require_admin(db, by)
     demoting = (role is not None and role != "admin") or active is False
     if u["role"] == "admin" and u.get("active", True) and demoting and active_admins(db) <= 1:
         raise AccountError(_("Debe quedar al menos un Administrador activo."))
@@ -266,6 +278,8 @@ def delete_user(username: str, by: str, transfer_to: str = None):
         raise AccountError(_("Usuario no encontrado."))
     if normalize_username(username) == normalize_username(by):
         raise AccountError(_("No puede eliminar su propia cuenta."))
+    if u["role"] == "admin":
+        _require_admin(db, by)
     if u["role"] == "admin" and active_admins(db) <= 1:
         raise AccountError(_("Debe quedar al menos un Administrador activo."))
     if transfer_to:
@@ -280,6 +294,8 @@ def set_password(username: str, new_password: str, by: str, current: str = None,
     u = find(db, username)
     if not u:
         raise AccountError(_("Usuario no encontrado."))
+    if u["role"] == "admin":
+        _require_admin(db, by)
     if current is not None and not verify_password(current, u["password"]):
         raise AccountError(_("La contraseña actual no es correcta."))
     err = check_password_rules(new_password, db)

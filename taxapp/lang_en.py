@@ -882,6 +882,7 @@ EN = {
     'Cuenta bloqueada por intentos fallidos. Intente en {m} min o pida ayuda al administrador.': 'Account locked after failed attempts. Try again in {m} min or ask the administrator for help.',
     'Cómo funciona todo': 'How it all works',
     'Debe quedar al menos un Administrador activo.': 'At least one Administrator must remain active.',
+    'Solo un Administrador puede crear o cambiar cuentas de Administrador.': 'Only an Administrator can create or change Administrator accounts.',
     'Declaraciones transferidas': 'Returns transferred',
     'Declaración abierta': 'Return opened',
     'Declaración del año {y}': 'Tax year {y} return',
