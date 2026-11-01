@@ -58,8 +58,7 @@ def _from_dict(cls, data: dict):
     return cls(**kwargs)
 
 
-def age_at_year_end(dob: str, year: int) -> Optional[int]:
-    """Edad al 31 de diciembre del ano fiscal. dob en formato AAAA-MM-DD."""
+def _age_on(dob: str, ref: date) -> Optional[int]:
     if not dob:
         return None
     try:
@@ -67,10 +66,14 @@ def age_at_year_end(dob: str, year: int) -> Optional[int]:
         born = date(y, m, d)
     except (ValueError, TypeError):
         return None
-    # El IRS considera que una persona cumple anos el dia ANTERIOR a su cumpleanos, por eso se mide al 1 de enero
-    # del ano siguiente (ej.: nacido el 1-ene-1961 cuenta como 65 anos al cierre de 2025).
-    ref = date(year + 1, 1, 1)
     return ref.year - born.year - ((ref.month, ref.day) < (born.month, born.day))
+
+
+def age_at_year_end(dob: str, year: int) -> Optional[int]:
+    """Edad del contribuyente o cónyuge al cierre del año fiscal. dob en formato AAAA-MM-DD."""
+    # Para los 65 años (y los 55 de la HSA) el IRS considera que se cumplen el día ANTERIOR al cumpleaños, por eso se
+    # mide al 1 de enero del año siguiente (nacido el 1-ene-1961 cuenta como 65 años al cierre de 2025).
+    return _age_on(dob, date(year + 1, 1, 1))
 
 
 @dataclass
@@ -107,7 +110,9 @@ class Dependent:
         return f"{self.first_name} {self.last_name}".strip()
 
     def age(self, year: int) -> Optional[int]:
-        return age_at_year_end(self.dob, year)
+        # Para el CTC, el EITC y el cuidado de dependientes la edad se cumple el día del cumpleaños (Rev. Rul. 2003-72):
+        # nacido el 1-ene-2009 tiene 16 años al cierre de 2025.
+        return _age_on(self.dob, date(year, 12, 31))
 
     def is_child_relation(self) -> bool:
         r = (self.relationship or "").lower()

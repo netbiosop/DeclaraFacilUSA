@@ -245,7 +245,8 @@ def compute_federal(ret: TaxReturn) -> dict:
 
     # ---------------- Deduccion estandar
     std = fed["standard_deduction"][st]
-    earned_income = wages + max(0.0, profit - half_se)
+    # Una pérdida del Anexo C se resta del resto del ingreso del trabajo (Pub. 596, instrucciones del 2441)
+    earned_income = max(0.0, wages + profit - half_se)
     if ret.taxpayer.can_be_claimed:
         dep = fed["dependent_std"]
         std = min(std, max(dep["min"], earned_income + dep["earned_plus"]))
@@ -374,7 +375,7 @@ def compute_federal(ret: TaxReturn) -> dict:
             c = fed["cdcc"]
             limit = c["expense_limit_one"] if n_care == 1 else c["expense_limit_two"]
             exp = max(0.0, min(cr.care_expenses, limit) - cr.dependent_care_benefits)
-            earned_tp = wages_tp + max(0.0, profit - half_se)
+            earned_tp = max(0.0, wages_tp + profit - half_se)
             earned_lowest = min(earned_tp, wages_sp) if ret.is_joint() else earned_tp
             exp = min(exp, earned_lowest)
             rate = max(c["first_floor"], c["max_rate"] - 0.01 * math.ceil(max(0.0, agi - c["first_start"]) / c["first_step"]))
@@ -476,7 +477,7 @@ def compute_federal(ret: TaxReturn) -> dict:
     e = fed["eitc"]
     n_eic = min(3, sum(1 for d in deps if d.qualifies_eitc(year)))
     eitc_ok = cr.claim_eitc and st != "mfs" and not ret.taxpayer.can_be_claimed
-    if eitc_ok and not ret.taxpayer.valid_ssn_for_work:
+    if eitc_ok and not (ret.taxpayer.valid_ssn_for_work and (not ret.is_joint() or ret.spouse.valid_ssn_for_work)):
         eitc_ok = False
         notes.append(_("EITC requiere SSN valido para trabajar."))
     inv_income = inc.taxable_interest + inc.tax_exempt_interest + inc.ordinary_dividends + max(0.0, cap_line7)

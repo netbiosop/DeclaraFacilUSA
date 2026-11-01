@@ -610,7 +610,7 @@ class Builder:
             v.update({f"q{i}_first": upper(dep.first_name), f"q{i}_last": upper(dep.last_name),
                       f"q{i}_ssn": digits(dep.ssn), f"q{i}_disabled": dep.disabled and (a is None or a >= 13),
                       f"q{i}_exp": m(share, True)})
-        earned_tp = sum(w.box1_wages for w in r.w2s if w.owner != "conyuge") + max(0.0, f["profit"] - f["half_se"])
+        earned_tp = max(0.0, sum(w.box1_wages for w in r.w2s if w.owner != "conyuge") + f["profit"] - f["half_se"])
         earned_sp = sum(w.box1_wages for w in r.w2s if w.owner == "conyuge") if r.is_joint() else earned_tp
         benefits = cr.dependent_care_benefits
         if benefits > 0:

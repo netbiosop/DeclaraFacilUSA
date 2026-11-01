@@ -179,6 +179,37 @@ class MoneyTextTests(unittest.TestCase):
         self.assertEqual(W2(box1_wages="1500,50").box1_wages, 1500.5)
 
 
+class EarnedIncomeAndAgeTests(unittest.TestCase):
+    """Reglas del IRS que se aplicaban mal (revisión 2026-11-01)."""
+
+    def kid(self, dob="2015-03-01", ssn="123-45-6787"):
+        return Dependent(first_name="A", dob=dob, ssn=ssn, relationship="hijo", months_lived=12)
+
+    def test_eitc_joint_needs_spouse_ssn_valid_for_work(self):
+        # IRC §32(c)(1)(E) y §32(m): en declaración conjunta los DOS necesitan SSN válido para trabajar
+        r = make(2025, "mfj", wages=25000)
+        r.dependents = [self.kid(), self.kid(ssn="123-45-6786")]
+        r.spouse.valid_ssn_for_work = False
+        self.assertEqual(compute_all(r)["federal"]["credits"]["eitc"], 0)
+
+    def test_schedule_c_loss_reduces_earned_income(self):
+        # Pub. 596: la pérdida neta de trabajo independiente se resta del resto del ingreso del trabajo
+        r = make(2025, wages=20000, business_gross=1000, exp_supplies=11000)
+        r.dependents = [self.kid()]
+        f = compute_all(r)["federal"]
+        self.assertAlmostEqual(f["earned_income"], 10000)
+        self.assertAlmostEqual(f["credits"]["eitc"], 3400, places=0)
+
+    def test_child_born_january_first_is_not_a_year_older(self):
+        # Rev. Rul. 2003-72: para el CTC y el hijo calificado se cumple años EL DÍA del cumpleaños
+        r = make(2025, "hoh", wages=40000)
+        r.dependents = [self.kid(dob="2009-01-01")]
+        self.assertEqual(compute_all(r)["federal"]["credits"]["n_ctc"], 1)
+
+    def test_taxpayer_born_january_first_turns_65_a_day_early(self):
+        self.assertEqual(make(2025, dob="1961-01-01").taxpayer_age(), 65)
+
+
 class StorageAndReview(unittest.TestCase):
     def test_roundtrip(self):
         r = make(2026, "mfj", wages=50000, state="OH", locality="Columbus")
