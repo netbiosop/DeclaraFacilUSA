@@ -238,6 +238,16 @@ class StorageAndReview(unittest.TestCase):
         sev = {x["severity"] for x in review(r, res)}
         self.assertIn("error", sev)
 
+    def test_review_warns_itin_marked_as_ssn(self):
+        # Un ITIN con "tiene SSN" marcado pediría CTC y EITC que no corresponden: la revisión debe avisar
+        r = make(2025, wages=30000)
+        r.taxpayer.ssn = "912-70-1234"
+        r.dependents.append(Dependent(first_name="X", dob="2018-05-05", ssn="912-71-1234", relationship="hijo",
+                                      months_lived=12))
+        msgs = [x["message"] for x in review(r, compute_all(r)) if x["severity"] == "aviso"]
+        self.assertTrue(any("ITIN" in m and "contribuyente" in m for m in msgs), msgs)
+        self.assertTrue(any("ITIN" in m and "X" in m for m in msgs), msgs)
+
 
 if __name__ == "__main__":
     unittest.main()

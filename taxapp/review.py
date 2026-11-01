@@ -32,6 +32,10 @@ def valid_ssn(s: str) -> bool:
     return not (d[:3] in ("000", "666") or d[3:5] == "00" or d[5:] == "0000")
 
 
+def is_itin(s: str) -> bool:
+    return valid_ssn(s) and re.sub(r"\D", "", s)[0] == "9"
+
+
 def money0(v) -> str:
     return f"{v:,.0f}"
 
@@ -47,6 +51,9 @@ def review(ret: TaxReturn, res: dict) -> List[dict]:
         out.append(_f("error", "personal", _("Falta el nombre completo del contribuyente.")))
     if not valid_ssn(tp.ssn):
         out.append(_f("error", "personal", _("El SSN/ITIN del contribuyente falta o no tiene formato valido (###-##-####).")))
+    elif is_itin(tp.ssn) and tp.valid_ssn_for_work:
+        out.append(_f("aviso", "personal", _("El número del contribuyente es un ITIN: desmarque 'Tengo un SSN válido para "
+                                             "trabajar' (con ITIN no hay EITC ni crédito por hijos).")))
     if tp.dob and not DATE_RE.match(tp.dob):
         out.append(_f("error", "personal", _("Fecha de nacimiento del contribuyente: use el formato AAAA-MM-DD.")))
     if not tp.dob:
@@ -56,6 +63,9 @@ def review(ret: TaxReturn, res: dict) -> List[dict]:
             out.append(_f("error", "personal", _("Falta el nombre del conyuge.")))
         if not valid_ssn(ret.spouse.ssn):
             out.append(_f("error", "personal", _("El SSN/ITIN del conyuge falta o no es valido.")))
+        elif is_itin(ret.spouse.ssn) and ret.spouse.valid_ssn_for_work:
+            out.append(_f("aviso", "personal", _("El número del cónyuge es un ITIN: desmarque 'Mi cónyuge tiene SSN válido "
+                                                 "para trabajar'.")))
     if ret.filing_status == "hoh" and not ret.dependents:
         out.append(_f("error", "personal", _("Cabeza de familia requiere una persona calificada (normalmente un dependiente).")))
     if ret.filing_status == "qss" and not ret.dependents:
@@ -87,6 +97,9 @@ def review(ret: TaxReturn, res: dict) -> List[dict]:
             out.append(_f("error", "dependents", tr("Dependiente {n}: fecha de nacimiento faltante o invalida.", n=n)))
         if d.has_ssn and not valid_ssn(d.ssn):
             out.append(_f("aviso", "dependents", tr("Dependiente {n}: SSN faltante o con formato invalido.", n=n)))
+        elif d.has_ssn and is_itin(d.ssn):
+            out.append(_f("aviso", "dependents", tr("Dependiente {n}: el número es un ITIN; desmarque 'Tiene SSN válido' (con ITIN "
+                                                    "solo califica para el crédito de $500 ODC).", n=n)))
         if not d.has_ssn:
             out.append(_f("info", "dependents", tr("Dependiente {n}: sin SSN no califica para CTC ni EITC (solo $500 ODC).", n=n)))
         if d.months_lived <= 6 and d.is_child_relation():
