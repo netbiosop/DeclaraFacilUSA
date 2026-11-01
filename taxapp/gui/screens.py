@@ -207,7 +207,7 @@ class AddressScreen(Screen):
         f.text(_("Apartamento / unidad"), "apt", width=12)
         f.text(_("Ciudad"), "city", width=28)
         labels = [data_loader.state_label(c) for c in data_loader.state_codes_sorted()]
-        self.state_cb = f.combo(_("Estado"), "state", labels, width=32,
+        f.combo(_("Estado"), "state", labels, width=32,
                                 to_model=data_loader.code_from_label,
                                 from_model=lambda c: data_loader.state_label(c) if c else "",
                                 on_select=self._state_selected)

@@ -143,7 +143,8 @@ class UpdateDialog(tk.Toplevel):
                 updater.restart()
             else:
                 updater.install(res)
-        except Exception as e:  # noqa: BLE001
+        except (updater.UpdateError, OSError) as e:
+            logger.exception("No se pudo instalar la actualización")
             self._failed(str(e))
             return
         if self.app.user:

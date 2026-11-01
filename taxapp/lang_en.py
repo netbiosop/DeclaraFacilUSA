@@ -810,7 +810,6 @@ EN = {
     '¿Qué deducciones o créditos podría estar dejando pasar según mi situación? Indica cuánto podrían valer y qué tendría que ingresar.': 'Which deductions or credits might I be missing given my situation? Say how much they could be worth and what I would need to enter.',
     '¿Qué me falta para ahorrar?': 'What am I missing to save?',
     '⚙ Configurar': '⚙ Settings',
-    'Usted': 'You',
 
     # ---- v1.3: cuentas, temas, configuración / accounts, themes, settings
     ' · faltan {n} días': ' · {n} days left',

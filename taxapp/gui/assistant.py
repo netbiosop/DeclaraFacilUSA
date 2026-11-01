@@ -175,7 +175,10 @@ class AISettingsDialog(tk.Toplevel):
                 txt = ai.test_connection(cfg)
                 q.put((True, tr("Conexión correcta con {p} ({m}). Respuesta: {t}", p=provider_label(cfg.provider),
                                 m=cfg.effective_model(), t=txt[:60])))
-            except Exception as e:  # noqa: BLE001
+            except ai.AIError as e:
+                q.put((False, str(e)))
+            except Exception as e:  # noqa: BLE001 - un error de programación no debe dejar la prueba colgada
+                logger.exception("Error inesperado al probar la conexión del asistente")
                 q.put((False, str(e)))
         threading.Thread(target=work, daemon=True).start()
 
@@ -465,7 +468,10 @@ class AssistantPanel(tk.Frame):
         def work():
             try:
                 self.q.put(("ok",) + ai.ask(cfg, system, msgs, web=web))
-            except Exception as e:  # noqa: BLE001
+            except ai.AIError as e:
+                self.q.put(("err", str(e), []))
+            except Exception as e:  # noqa: BLE001 - un error de programación no debe dejar la pregunta colgada
+                logger.exception("Error inesperado al preguntar al asistente")
                 self.q.put(("err", str(e), []))
         threading.Thread(target=work, daemon=True).start()
 
