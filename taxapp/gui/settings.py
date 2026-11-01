@@ -494,7 +494,11 @@ class SettingsView(tk.Frame):
 
     def _save_matrix(self):
         m = {r: {k: self.mvars[(r, k)].get() for k, _t in PERMS} for r in ROLES}
-        accounts.set_matrix(m, self._by())
+        try:
+            accounts.set_matrix(m, self._by())
+        except accounts.AccountError as e:
+            messagebox.showerror(APP_NAME, str(e), parent=self)
+            return
         messagebox.showinfo(APP_NAME, _("Permisos guardados. Se aplican la próxima vez que cada usuario inicie sesión."),
                             parent=self)
 

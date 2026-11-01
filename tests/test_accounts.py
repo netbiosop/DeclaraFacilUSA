@@ -238,6 +238,11 @@ class AdminOnlyTests(AccountsBase):
         with self.assertRaises(A.AccountError):
             A.delete_user("admin", "super")
 
+    def test_non_admin_cannot_change_permission_matrix(self):
+        with self.assertRaises(A.AccountError):
+            A.set_matrix({"supervisor": {"ai_settings": True, "tax_tables": True}}, "super")
+        self.assertFalse(A.load()["matrix"]["supervisor"]["ai_settings"])
+
     def test_non_admin_can_still_rename_self(self):
         self.assertEqual(A.update_user("super", "super", name="Nuevo", role="supervisor")["name"], "Nuevo")
 

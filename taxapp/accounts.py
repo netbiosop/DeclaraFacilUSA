@@ -218,7 +218,7 @@ def _require_admin(db: dict, by: str):
     "Crear usuarios y asignar roles" no alcanza para hacerse Administrador)."""
     u = find(db, by) if by else None
     if not (u and u["role"] == "admin"):
-        raise AccountError(_("Solo un Administrador puede crear o cambiar cuentas de Administrador."))
+        raise AccountError(_("Solo un Administrador puede cambiar cuentas de Administrador o los permisos de los roles."))
 
 
 def create_user(username: str, name: str, role: str, password: str, by: str = "", db: dict = None) -> dict:
@@ -379,6 +379,7 @@ def can(user: Optional[dict], perm: str, db: dict = None) -> bool:
 
 def set_matrix(matrix: Dict[str, Dict[str, bool]], by: str):
     db = load()
+    _require_admin(db, by)  # si no, quien tiene "Crear usuarios" se daría a sí mismo los demás permisos
     for r in ROLES:
         if r == "admin":
             continue
