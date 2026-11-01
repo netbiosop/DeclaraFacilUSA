@@ -21,6 +21,10 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
 - El número de versión (`taxapp/__init__.py`) lo sube el dueño al publicar; las correcciones no lo tocan.
 - `publicar_actualizacion.bat` publica la carpeta local del dueño encima de `main`: los cambios fusionados en GitHub
   deben llevarse a esa carpeta antes de publicar.
+- `except Exception` con `logger.exception` en `gui/app.py` (abrir, calcular, exportar…) y `forms_view.py`: registran y
+  evitan que la app se cierre; se dejan. `HomeA`/`HomeB`/`HomeC` (`home.py`) se eligen por tema: no son código muerto.
+- Edades: `Dependent.age` cuenta al 31-dic por aniversario (Rev. Rul. 2003-72, CTC/EITC/cuidado y el crédito AZ);
+  `age_at_year_end` (contribuyente y cónyuge) sigue con la regla del día anterior (65 años, HSA 55).
 - `usuarios.json` que no se puede leer (bloqueo, no daño) se carga vacío con la marca `_unreadable` y `save()` se niega
   a escribirlo; un `AccountError` que llega a un callback de Tk queda en `errores.log` (no se perdió nada).
 
@@ -52,10 +56,34 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
   `gui/tools.py:175`, `assistant.py:243-244`, `review.py:131` (IRA 7500), edades en `models.py`; textos de ayuda con montos
   de 2025 en `screens.py:637-731`; años 2025/2026 fijos en la interfaz en vez de `SUPPORTED_YEARS`. Montos estatales
   además de `_ss_subtraction` en todo `state.py` (MO, OR, AL, CT, IL, OH, MD, NM, AZ, CA, VT, UT).
+- Cálculos que cambian montos y hay que verificar con la ley antes de tocar (revisión 2026-11-01):
+  MFS que vivió separado los últimos 6 meses no recibe EITC (`federal.py:~478`, ARPA §32(d)(2)(B)); beneficios de
+  cuidado del empleador: se resta el bruto y no lo excluido, y el 2441 no descuenta L30 (`federal.py:~376`,
+  `build.py:~624`); interés de inversión sin el límite del 4952 (`federal.py:~277`); WA ganancias >$1M al 9 % (¿9,9 %
+  por SB 5813?) en `states_2025/2026.json`; mínimo QBI 2026 de $400 sin exigir participación material y antes del
+  tope (`federal.py:~319`); edad <13 del 2441 por aniversario (verificar Pub. 503).
+- Anexo B: el límite de $1,500 está 5 veces (`questions.py:142-151`, `build.py:146`) y `build.py` también lo genera por
+  `foreign_trust`, pero entonces la pregunta desaparece. Decidir la condición y una sola `needs_schedule_b()`.
+- `earned_tp` (2441) se calcula igual en `federal.py:~378` y `build.py:~613`: devolverlo en el resultado.
 - Propuestas de estructura: una sola función para tareas en segundo plano en `ui.py` (hoy 8 copias), `ListEditor` para
   dependientes/W-2/locales en `screens.py`, unificar estado civil→clave, `ask_ai_action` por clave y no por posición.
 
 ## Historial
+### 2026-11-01 — revisión nocturna (PR #2, rama `revision-nocturna`)
+- `models.py` `Dependent.age`: un niño nacido el 1-ene salía un año mayor (regla del día anterior) y perdía CTC/EITC/
+  cuidado → edad al 31-dic por aniversario.
+- `federal.py:~480`: EITC conjunto sin SSN válido del cónyuge → se exigen los dos (§32(c)(1)(E), §32(m)).
+- `federal.py:248,377` y `build.py:613`: la pérdida del Anexo C no restaba del ingreso del trabajo (EITC, ACTC, 2441,
+  deducción estándar del dependiente) → `max(0, salario + ganancia − mitad SE)` (Pub. 596).
+  Las tres comparadas en 2.000 declaraciones: solo cambian las que cumplen alguna condición.
+- `build.py:605`: el 2441 contaba personas cuidadas distinto que el cálculo → usa `credits.n_care`.
+- `accounts.py`: con `manage_users` un Supervisor podía hacerse Administrador, crear admins, restablecer su contraseña,
+  borrarlo o cambiar la tabla de permisos → `_require_admin()` (pruebas nuevas).
+- `review.py`: todo ITIN salía como "formato inválido" → se aceptan los grupos de ITIN y se avisa si un ITIN está marcado
+  como SSN (contribuyente, cónyuge, dependiente).
+- `gui/assistant.py`, `gui/updates.py`: `except Exception` sin registro → errores esperados + `logger.exception`.
+  Clave `'Usted'` duplicada en `lang_en.py`; `self.state_cb` sin uso.
+- Pendiente: MFS separado y EITC, beneficios de cuidado, interés de inversión, WA 9,9 %, QBI mínimo, Anexo B (ver arriba).
 ### 2026-10-28 — revisión nocturna (rama `revision-nocturna`, sobre `antislop`)
 - `accounts.load()`: un `usuarios.json` bloqueado (OSError) se tomaba como vacío y el inicio de sesión lo guardaba encima
   en cada intento → marca `_unreadable`, `save()` lo rechaza, `authenticate` avisa; `update_settings` ya no escribe si
