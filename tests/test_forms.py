@@ -156,6 +156,15 @@ class BuilderTests(unittest.TestCase):
         self.assertEqual(num(f8863["L8"]), whole(L["29"]))
         self.assertEqual(f8863["L21_a"], "333")
 
+    def test_2441_uses_same_care_persons_as_calculation(self):
+        # Con "personas cuidadas" indicado a mano, el formulario usaba el número de niños y no coincidía con el cálculo
+        ret = family()
+        ret.credits.care_expenses, ret.credits.care_persons, ret.credits.dependent_care_benefits = 6000, 1, 0
+        res, p = self.plan(ret)
+        f2441 = self.vals(p, "2441")
+        self.assertEqual(num(f2441["L3"]), 3000)
+        self.assertEqual(num(f2441["L11"]), whole(res["federal"]["credits"]["cdcc"]))
+
     def test_business_forms_consistent(self):
         ret = business()
         res, p = self.plan(ret)

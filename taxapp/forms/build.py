@@ -602,7 +602,7 @@ class Builder:
                                       "Formulario 2441 - Parte I Proveedores de cuidado (continuacion)"),
                            [f"{upper(p.name)}  {upper(p.address)}  TIN {p.tin}  {m(p.amount, True)}" for p in provs[3:]])
         qual = [dep for dep in r.dependents if dep.qualifies_care(self.year)]
-        n = len(qual) or cr.care_persons
+        n = f["credits"]["n_care"]
         limit = self.data["cdcc"]["expense_limit_one"] if n <= 1 else self.data["cdcc"]["expense_limit_two"]
         share = cr.care_expenses / len(qual) if qual else 0.0
         for i, dep in enumerate(qual[:3]):
