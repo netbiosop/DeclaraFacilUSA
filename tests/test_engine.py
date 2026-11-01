@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from taxapp.engine import compute_all  # noqa: E402
 from taxapp.models import TaxReturn, W2, Dependent, Person, clean_money_text  # noqa: E402
-from taxapp.review import review  # noqa: E402
+from taxapp.review import review, valid_ssn  # noqa: E402
 from taxapp import storage  # noqa: E402
 
 
@@ -208,6 +208,17 @@ class EarnedIncomeAndAgeTests(unittest.TestCase):
 
     def test_taxpayer_born_january_first_turns_65_a_day_early(self):
         self.assertEqual(make(2025, dob="1961-01-01").taxpayer_age(), 65)
+
+
+class TaxIdFormatTests(unittest.TestCase):
+    def test_itin_is_a_valid_tax_id(self):
+        # Los ITIN empiezan con 9 y su grupo central es 50-65, 70-88, 90-92 o 94-99
+        self.assertTrue(valid_ssn("912-70-1234"))
+        self.assertTrue(valid_ssn("999-94-1234"))
+
+    def test_invalid_numbers_still_rejected(self):
+        for bad in ("912-89-1234", "912-93-1234", "000-12-3456", "666-12-3456", "123-00-4567", "123-45-0000"):
+            self.assertFalse(valid_ssn(bad), bad)
 
 
 class StorageAndReview(unittest.TestCase):

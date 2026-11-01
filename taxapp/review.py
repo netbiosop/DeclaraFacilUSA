@@ -26,7 +26,10 @@ def valid_ssn(s: str) -> bool:
     if not s or not SSN_RE.match(s.strip()):
         return False
     d = re.sub(r"\D", "", s)
-    return not (d[:3] in ("000", "666") or d[0] == "9" or d[3:5] == "00" or d[5:] == "0000")
+    if d[0] == "9":  # ITIN: grupo central 50-65, 70-88, 90-92 o 94-99
+        g = int(d[3:5])
+        return 50 <= g <= 65 or 70 <= g <= 88 or 90 <= g <= 92 or 94 <= g <= 99
+    return not (d[:3] in ("000", "666") or d[3:5] == "00" or d[5:] == "0000")
 
 
 def money0(v) -> str:
