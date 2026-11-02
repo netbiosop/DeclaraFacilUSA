@@ -25,6 +25,8 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
   evitan que la app se cierre; se dejan. `HomeA`/`HomeB`/`HomeC` (`home.py`) se eligen por tema: no son código muerto.
 - Edades: `Dependent.age` cuenta al 31-dic por aniversario (Rev. Rul. 2003-72, CTC/EITC/cuidado y el crédito AZ);
   `age_at_year_end` (contribuyente y cónyuge) sigue con la regla del día anterior (65 años, HSA 55).
+- Parentesco del dependiente: se guarda la clave en español de `RELATIONSHIPS`; `_CHILD_RELATION_RE` (`models.py`) usa
+  palabras completas en inglés para archivos con texto libre ("son" por subcadena aceptaba "Otra persona del hogar").
 - `usuarios.json` que no se puede leer (bloqueo, no daño) se carga vacío con la marca `_unreadable` y `save()` se niega
   a escribirlo; un `AccountError` que llega a un callback de Tk queda en `errores.log` (no se perdió nada).
 
@@ -65,10 +67,44 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
 - Anexo B: el límite de $1,500 está 5 veces (`questions.py:142-151`, `build.py:146`) y `build.py` también lo genera por
   `foreign_trust`, pero entonces la pregunta desaparece. Decidir la condición y una sola `needs_schedule_b()`.
 - `earned_tp` (2441) se calcula igual en `federal.py:~378` y `build.py:~613`: devolverlo en el resultado.
+- Cálculos que cambian montos, encontrados el 2026-11-02 (verificar con la ley/Pub. antes de tocar):
+  recién nacido/fallecido en el año con `months_lived` ≤ 6 pierde CTC/EITC (Pub. 501: cuenta todo el año; ¿regla en
+  código o texto de ayuda?, `models.py:~128`); `qualifies_care` sin `months_lived` ni parentesco (§21(b)(1), padre no
+  custodio, `models.py:~140`); quien `can_be_claimed` recibe CTC/ODC/ACTC (§152(b)(1); el AOTC usa "otro lo reclama",
+  `federal.py:~440`); MFS que vivió separado todo el año usa base $0 del Seguro Social (`federal.py:~180`, falta el
+  campo); Maine sin `hoh` en `states_2025/2026.json` (usa la de soltero) y AZ 2026 `hoh` = soltero.
+- `clean_money_text`: "1.500,50" → 1.5005 y "45.000" → 45 (formato con punto de miles). Decidir cómo leer "12.345".
+- Cierre por inactividad (`gui/app.py:~454`): con una declaración nueva sin guardar la sesión nunca se cierra y los datos
+  quedan a la vista. ¿Autoguardar en `recuperado_<fecha>.dfusa` o pantalla de bloqueo?
+- Asistente de IA: `include_data=True` por defecto envía montos de la declaración al proveedor sin consentimiento del
+  cliente (IRC §7216 para preparadores). Decidir aviso/consentimiento.
+- Actualizador: las tablas `data/*.json` que el admin edita (la pantalla lo invita) se reemplazan sin aviso en cada
+  actualización de código (`updater.py:~397`). "Actualización cancelada" (`gui/updates.py:~135`) se muestra cuando
+  `apply_code()` ya dejó la versión nueva activa para el próximo arranque.
+- Formularios: al volver a generar quedan en la carpeta PDF de la vez anterior (Anexo C, 1040-V con otro saldo)
+  (`forms/__init__.py:~111`). Borrar archivos del usuario es decisión del dueño.
+- `gui/theme.py:~150` `except Exception` silencioso al leer fuentes (y guarda un conjunto vacío para siempre); Tk no
+  se puede probar en la nube.
+- Duplicación que conviene unir (resultados iguales): aritmética del 1-A/8812/2441 recalculada en `build.py`; gastos
+  del Anexo C escritos dos veces (`build.py:~442`, `models.py:~310`); `_get_json`/`_fetch` del actualizador con
+  encabezados distintos; edad 65 y 55 sin constante en 9 sitios (`SENIOR_AGE`, `HSA_CATCHUP_AGE`); `compute_federal`
+  (~485 líneas) por secciones.
 - Propuestas de estructura: una sola función para tareas en segundo plano en `ui.py` (hoy 8 copias), `ListEditor` para
   dependientes/W-2/locales en `screens.py`, unificar estado civil→clave, `ask_ai_action` por clave y no por posición.
 
 ## Historial
+### 2026-11-02 — revisión nocturna (PR #2, rama `revision-nocturna`)
+- `models.py:~117` `is_child_relation`: "son" por subcadena → "Otra persona del hogar" recibía CTC y EITC (HOH $30k:
+  $2,200 + $3,265) → regex de palabras completas (acepta Stepchild/Grandchild, rechaza Godson).
+- `models.py` `qualifies_eitc`: ignoraba `lived_in_us` (§32(c)(3)(C)). Dependiente nacido después del año calificaba
+  para CTC/EITC/cuidado y ODC → `born_by()`; `review.py` marca fechas imposibles ("2015-02-30") y futuras.
+- `federal.py:~404` y `build.py` 8863: AOTC sin medio tiempo o con 4 años completados → `Student.aotc_eligible()`;
+  sin líneas 26-30 tras el "Stop". 3.000 declaraciones contra la versión anterior: solo cambian las que tienen estos casos.
+- `accounts.delete_user`: no dejaba borrar un admin ya desactivado.
+- `assistant._dedupe`: enlaces de "Fuentes" de la IA abiertos con `webbrowser.open` sin revisar esquema (en Windows
+  ejecuta rutas locales/UNC) → solo http/https.
+- Pendiente: recién nacido, cuidado, `can_be_claimed`, MFS SS, Maine HOH, coma decimal, inactividad, consentimiento IA,
+  tablas editadas, PDF viejos (ver arriba).
 ### 2026-11-01 — revisión nocturna (PR #2, rama `revision-nocturna`)
 - `models.py` `Dependent.age`: un niño nacido el 1-ene salía un año mayor (regla del día anterior) y perdía CTC/EITC/
   cuidado → edad al 31-dic por aniversario.
