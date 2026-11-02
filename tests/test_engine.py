@@ -249,5 +249,52 @@ class StorageAndReview(unittest.TestCase):
         self.assertTrue(any("ITIN" in m and "X" in m for m in msgs), msgs)
 
 
+class DependentQualificationTests(unittest.TestCase):
+    """Quién cuenta como hijo calificado y quién recibe el AOTC (revisión 2026-11-02)."""
+
+    def test_other_household_member_is_not_a_qualifying_child(self):
+        # "Otra persona del hogar" contiene "son" (per-son-a) y se tomaba como hijo: CTC y EITC indebidos
+        r = make(2025, "hoh", wages=30000)
+        r.dependents = [Dependent(first_name="A", dob="2015-03-01", ssn="123-45-6787",
+                                  relationship="Otra persona del hogar", months_lived=12)]
+        f = compute_all(r)["federal"]
+        self.assertEqual(f["credits"]["n_ctc"], 0)
+        self.assertEqual(f["credits"]["eitc"], 0)
+
+    def test_english_relationships_still_count(self):
+        for rel in ("son", "Stepson", "grandson", "daughter", "nephew"):
+            self.assertTrue(Dependent(relationship=rel).is_child_relation(), rel)
+        for rel in ("person", "Otra persona del hogar", "Otro pariente", "Padre / Madre"):
+            self.assertFalse(Dependent(relationship=rel).is_child_relation(), rel)
+
+    def test_eitc_child_must_live_in_us(self):
+        # IRC §32(c)(3)(C): el hijo calificado del EITC debe vivir con usted en EE. UU. más de medio año
+        r = make(2025, "hoh", wages=20000)
+        r.dependents = [Dependent(first_name="A", dob="2015-03-01", ssn="123-45-6787", relationship="Hijo(a)",
+                                  months_lived=12, lived_in_us=False)]
+        self.assertEqual(compute_all(r)["federal"]["credits"]["n_eitc"], 0)
+
+    def test_child_born_after_tax_year_does_not_qualify(self):
+        r = make(2025, "hoh", wages=30000)
+        r.dependents = [Dependent(first_name="A", dob="2026-03-01", ssn="123-45-6787", relationship="Hijo(a)")]
+        f = compute_all(r)["federal"]
+        self.assertEqual(f["credits"]["n_ctc"], 0)
+        self.assertEqual(f["credits"]["eitc"], 0)
+
+    def test_aotc_requires_half_time_and_first_four_years(self):
+        # Formulario 8863 líneas 24 y 25: sin medio tiempo o con 4 años ya completados no hay AOTC
+        from taxapp.models import Student
+        for flags in ({"half_time": False}, {"first_four_years": False}):
+            r = make(2025, wages=40000)
+            r.credits.students = [Student(name="Ana", credit="AOTC", expenses=4000, **flags)]
+            self.assertEqual(compute_all(r)["federal"]["detail"]["aotc_gross"], 0, flags)
+
+    def test_review_flags_impossible_birth_date(self):
+        r = make(2025, wages=30000)
+        r.dependents.append(Dependent(first_name="X", dob="2015-02-30", ssn="123-45-6787", relationship="Hijo(a)"))
+        errs = [x["message"] for x in review(r, compute_all(r)) if x["severity"] == "error"]
+        self.assertTrue(any("X" in m for m in errs), errs)
+
+
 if __name__ == "__main__":
     unittest.main()

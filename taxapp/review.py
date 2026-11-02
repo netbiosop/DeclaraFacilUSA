@@ -54,7 +54,7 @@ def review(ret: TaxReturn, res: dict) -> List[dict]:
     elif is_itin(tp.ssn) and tp.valid_ssn_for_work:
         out.append(_f("aviso", "personal", _("El número del contribuyente es un ITIN: desmarque 'Tengo un SSN válido para "
                                              "trabajar' (con ITIN no hay EITC ni crédito por hijos).")))
-    if tp.dob and not DATE_RE.match(tp.dob):
+    if tp.dob and (not DATE_RE.match(tp.dob) or ret.taxpayer_age() is None):
         out.append(_f("error", "personal", _("Fecha de nacimiento del contribuyente: use el formato AAAA-MM-DD.")))
     if not tp.dob:
         out.append(_f("aviso", "personal", _("Ingrese la fecha de nacimiento: se usa para la deduccion de mayores de 65 y el EITC.")))
@@ -93,7 +93,8 @@ def review(ret: TaxReturn, res: dict) -> List[dict]:
     # ---- Dependientes
     for d in ret.dependents:
         n = d.full_name() or _("(sin nombre)")
-        if not d.dob or not DATE_RE.match(d.dob):
+        age = d.age(y)
+        if not DATE_RE.match(d.dob or "") or age is None or age < 0:
             out.append(_f("error", "dependents", tr("Dependiente {n}: fecha de nacimiento faltante o invalida.", n=n)))
         if d.has_ssn and not valid_ssn(d.ssn):
             out.append(_f("aviso", "dependents", tr("Dependiente {n}: SSN faltante o con formato invalido.", n=n)))

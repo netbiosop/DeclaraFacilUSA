@@ -730,7 +730,7 @@ class Builder:
         lo, top = ed["phaseout"]["mfj" if self.status == "mfj" else "other"]
         rng = top - lo
         l4 = max(0.0, top - agi)
-        aotc = [s for s in students if s.credit.upper() == "AOTC"]
+        aotc = [s for s in students if s.credit.upper() == "AOTC" and s.half_time and s.first_four_years]
         llc = [s for s in students if s.credit.upper() == "LLC"]
 
         def l30(s):
@@ -775,11 +775,13 @@ class Builder:
                 for k, ch in enumerate(ein):
                     sv[f"L22a_ein{k}"] = ch
             if s.credit.upper() == "AOTC":
-                l27, l28, l29, l30v = l30(s)
                 sv.update({"L23_no": True, "L24_yes" if s.half_time else "L24_no": True,
-                           "L25_no" if s.first_four_years else "L25_yes": True, "L26_no": True,
-                           "L27": m(l27, True), "L28": m(l28, True), "L29": m(l29, True), "L30": m(l30v, True)})
-                if not s.half_time or not s.first_four_years:
+                           "L25_no" if s.first_four_years else "L25_yes": True})
+                if s in aotc:
+                    l27, l28, l29, l30v = l30(s)
+                    sv.update({"L26_no": True, "L27": m(l27, True), "L28": m(l28, True), "L29": m(l29, True),
+                               "L30": m(l30v, True)})
+                else:  # el 8863 dice "Stop" en la línea 24 o 25: sin líneas 26-30
                     self.warn(tr("Formulario 8863: {n} no cumple los requisitos del AOTC (medio tiempo / primeros 4 años); "
                                  "considere el crédito LLC.", n=s.name or _("estudiante")))
             else:

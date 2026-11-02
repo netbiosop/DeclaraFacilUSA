@@ -93,6 +93,11 @@ class Person:
         return f"{self.first_name} {self.last_name}".strip()
 
 
+_CHILD_RELATION_RE = re.compile(
+    r"hij[oa]|hijastr|niet[oa]|herman|sobrin|crianza|acogid"
+    r"|\b(child|daughter|foster|brother|sister|sibling|niece|nephew|(step|grand|god)?sons?\b)", re.IGNORECASE)
+
+
 @dataclass
 class Dependent:
     first_name: str = ""
@@ -115,23 +120,24 @@ class Dependent:
         return _age_on(self.dob, date(year, 12, 31))
 
     def is_child_relation(self) -> bool:
-        r = (self.relationship or "").lower()
-        return any(k in r for k in ("hijo", "hija", "hijastr", "nieto", "nieta", "herman", "sobrin", "crianza", "acogid",
-                                    "child", "son", "daughter", "foster", "brother", "sister", "sibling", "niece", "nephew"))
+        # Palabras completas: "son" por subcadena aceptaba "Otra persona del hogar" como hijo
+        return bool(_CHILD_RELATION_RE.search(self.relationship or ""))
 
     def qualifies_ctc(self, year: int) -> bool:
         a = self.age(year)
-        return self.has_ssn and a is not None and a < 17 and self.months_lived > 6 and self.is_child_relation()
+        return self.has_ssn and a is not None and 0 <= a < 17 and self.months_lived > 6 and self.is_child_relation()
 
     def qualifies_eitc(self, year: int) -> bool:
         a = self.age(year)
-        if a is None or self.months_lived <= 6 or not self.is_child_relation() or not self.has_ssn:
+        # §32(c)(3)(C): el hijo del EITC tiene que haber vivido con usted en EE. UU.
+        if a is None or a < 0 or self.months_lived <= 6 or not self.is_child_relation() or not self.has_ssn \
+                or not self.lived_in_us:
             return False
         return a < 19 or (a < 24 and self.full_time_student) or self.disabled
 
     def qualifies_care(self, year: int) -> bool:
         a = self.age(year)
-        return (a is not None and a < 13) or self.disabled
+        return (a is not None and 0 <= a < 13) or self.disabled
 
 
 @dataclass
