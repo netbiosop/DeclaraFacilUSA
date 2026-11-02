@@ -141,6 +141,14 @@ class UserTests(AccountsBase):
         A.delete_user("ana", "admin")
         self.assertIsNone(A.find(A.load(), "ana"))
 
+    def test_delete_disabled_admin_with_one_active_admin(self):
+        # Borrar un admin ya desactivado no deja a nadie sin acceso: no debe exigir otro admin activo
+        self.admin()
+        A.create_user("viejo", "Viejo", "admin", "Clave2025!", by="admin")
+        A.update_user("viejo", "admin", active=False)
+        A.delete_user("viejo", "admin")
+        self.assertIsNone(A.find(A.load(), "viejo"))
+
     def test_password_change(self):
         self.admin()
         with self.assertRaises(A.AccountError):

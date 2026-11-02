@@ -280,7 +280,7 @@ def delete_user(username: str, by: str, transfer_to: str = None):
         raise AccountError(_("No puede eliminar su propia cuenta."))
     if u["role"] == "admin":
         _require_admin(db, by)
-    if u["role"] == "admin" and active_admins(db) <= 1:
+    if u["role"] == "admin" and u.get("active", True) and active_admins(db) <= 1:
         raise AccountError(_("Debe quedar al menos un Administrador activo."))
     if transfer_to:
         transfer_returns(username, transfer_to, by)
