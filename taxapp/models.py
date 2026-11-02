@@ -94,8 +94,9 @@ class Person:
 
 
 _CHILD_RELATION_RE = re.compile(
-    r"hij[oa]|hijastr|niet[oa]|herman|sobrin|crianza|acogid"
-    r"|\b(child|daughter|foster|brother|sister|sibling|niece|nephew|(step|grand|god)?sons?\b)", re.IGNORECASE)
+    r"hij[oa]|niet[oa]|herman|sobrin|crianza|acogid"
+    r"|\b(?:step|grand|half[- ]?)?(?:child(?:ren)?|sons?|daughters?|brothers?|sisters?|siblings?)\b|\b(?:foster|niece|nephew)",
+    re.IGNORECASE)
 
 
 @dataclass
@@ -118,6 +119,11 @@ class Dependent:
         # Para el CTC, el EITC y el cuidado de dependientes la edad se cumple el día del cumpleaños (Rev. Rul. 2003-72):
         # nacido el 1-ene-2009 tiene 16 años al cierre de 2025.
         return _age_on(self.dob, date(year, 12, 31))
+
+    def born_by(self, year: int) -> bool:
+        """False si la fecha de nacimiento es posterior al año (review.py lo marca como error)."""
+        a = self.age(year)
+        return a is None or a >= 0
 
     def is_child_relation(self) -> bool:
         # Palabras completas: "son" por subcadena aceptaba "Otra persona del hogar" como hijo
@@ -373,6 +379,10 @@ class Student:
     got_1098t: bool = True
     half_time: bool = True    # matriculado al menos medio tiempo (requisito del AOTC)
     first_four_years: bool = True  # no había completado 4 años de estudios superiores antes del año
+
+    def aotc_eligible(self) -> bool:
+        """8863 líneas 24-25: sin medio tiempo o con 4 años ya completados no hay AOTC."""
+        return self.credit.upper() == "AOTC" and self.half_time and self.first_four_years
 
     def __post_init__(self):
         self.expenses = _num(self.expenses)

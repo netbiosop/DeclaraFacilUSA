@@ -262,9 +262,9 @@ class DependentQualificationTests(unittest.TestCase):
         self.assertEqual(f["credits"]["eitc"], 0)
 
     def test_english_relationships_still_count(self):
-        for rel in ("son", "Stepson", "grandson", "daughter", "nephew"):
+        for rel in ("son", "Stepson", "grandson", "daughter", "nephew", "Stepchild", "Grandchild", "half brother"):
             self.assertTrue(Dependent(relationship=rel).is_child_relation(), rel)
-        for rel in ("person", "Otra persona del hogar", "Otro pariente", "Padre / Madre"):
+        for rel in ("person", "Godson", "Otra persona del hogar", "Otro pariente", "Padre / Madre"):
             self.assertFalse(Dependent(relationship=rel).is_child_relation(), rel)
 
     def test_eitc_child_must_live_in_us(self):
@@ -279,6 +279,7 @@ class DependentQualificationTests(unittest.TestCase):
         r.dependents = [Dependent(first_name="A", dob="2026-03-01", ssn="123-45-6787", relationship="Hijo(a)")]
         f = compute_all(r)["federal"]
         self.assertEqual(f["credits"]["n_ctc"], 0)
+        self.assertEqual(f["credits"]["n_odc"], 0)
         self.assertEqual(f["credits"]["eitc"], 0)
 
     def test_aotc_requires_half_time_and_first_four_years(self):

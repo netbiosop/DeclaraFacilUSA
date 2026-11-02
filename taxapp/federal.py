@@ -400,8 +400,7 @@ def compute_federal(ret: TaxReturn) -> dict:
         factor = round(phase_factor(magi, pick(ao["phaseout"], st)), 3)
         aotc_factor = factor
         for stu in cr.students:
-            # 8863 líneas 24-25: sin medio tiempo o con 4 años ya completados no hay AOTC (build.py avisa y sugiere LLC)
-            if stu.credit.upper() == "AOTC" and stu.half_time and stu.first_four_years:
+            if stu.aotc_eligible():  # si no, build.py avisa y sugiere LLC
                 e = stu.expenses
                 aotc_total += min(e, ao["full_expenses"]) + ao["excess_rate"] * max(0.0, min(e, ao["max_expenses"]) - ao["full_expenses"])
         aotc_gross = aotc_total
@@ -440,7 +439,7 @@ def compute_federal(ret: TaxReturn) -> dict:
     # Credito tributario por hijos y otros dependientes
     ctc_data = fed["ctc"]
     n_ctc = sum(1 for d in deps if d.qualifies_ctc(year))
-    n_odc = len(deps) - n_ctc
+    n_odc = sum(1 for d in deps if d.born_by(year)) - n_ctc
     ctc_allowed = ret.taxpayer.valid_ssn_for_work or (ret.is_joint() and ret.spouse.valid_ssn_for_work)
     if n_ctc and not ctc_allowed:
         notes.append(_("CTC requiere que al menos un contribuyente tenga SSN valido (OBBBA); se aplica solo ODC."))

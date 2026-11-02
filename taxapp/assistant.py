@@ -15,7 +15,6 @@ import os
 import ssl
 import sys
 import urllib.error
-import urllib.parse
 import urllib.request
 from dataclasses import dataclass, field, asdict
 from typing import Dict, List, Optional, Tuple
@@ -411,7 +410,7 @@ def _dedupe(sources):
     # Solo enlaces web: la interfaz abre estas URL con webbrowser.open, que en Windows ejecuta rutas locales o UNC
     seen, out = set(), []
     for t, u in sources:
-        if u and u not in seen and urllib.parse.urlparse(u).scheme in ("http", "https"):
+        if u and u not in seen and u.lower().startswith(("http://", "https://")):
             seen.add(u)
             out.append((t, u))
     return out[:8]

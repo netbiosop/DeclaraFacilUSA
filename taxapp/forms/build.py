@@ -210,7 +210,7 @@ class Builder:
                       f"dep{i}_ssn": digits(d.ssn), f"dep{i}_rel": upper(self.rel(d.relationship, self.main)),
                       f"dep{i}_lived": d.months_lived > 6, f"dep{i}_us": d.months_lived > 6 and d.lived_in_us,
                       f"dep{i}_student": d.full_time_student, f"dep{i}_disabled": d.disabled,
-                      f"dep{i}_ctc": ctc, f"dep{i}_odc": not ctc})
+                      f"dep{i}_ctc": ctc, f"dep{i}_odc": not ctc and d.born_by(self.year)})
         if len(deps) > 4:
             v["dep_more"] = True
             lines = []
@@ -730,7 +730,7 @@ class Builder:
         lo, top = ed["phaseout"]["mfj" if self.status == "mfj" else "other"]
         rng = top - lo
         l4 = max(0.0, top - agi)
-        aotc = [s for s in students if s.credit.upper() == "AOTC" and s.half_time and s.first_four_years]
+        aotc = [s for s in students if s.aotc_eligible()]
         llc = [s for s in students if s.credit.upper() == "LLC"]
 
         def l30(s):

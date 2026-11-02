@@ -232,8 +232,8 @@ class SourceLinkTests(unittest.TestCase):
     def test_only_web_links_are_kept(self):
         # La respuesta del proveedor no es confiable: webbrowser.open en Windows ejecuta rutas locales o UNC
         src = [("ok", "https://irs.gov/x"), ("unc", "\\\\servidor\\x.exe"), ("file", "file:///C:/x.lnk"),
-               ("local", "C:\\x.bat"), ("http", "http://a.com")]
-        self.assertEqual([u for _, u in ai._dedupe(src)], ["https://irs.gov/x", "http://a.com"])
+               ("local", "C:\\x.bat"), ("http", "http://a.com"), ("rota", "http://[abc")]
+        self.assertEqual([u for _, u in ai._dedupe(src)], ["https://irs.gov/x", "http://a.com", "http://[abc"])
 
 
 if __name__ == "__main__":
