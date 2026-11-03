@@ -220,6 +220,17 @@ class FolderTests(AccountsBase):
         self.assertFalse(any(n.startswith("Respaldos") for n in names))
 
 
+class UserDirTests(AccountsBase):
+    def test_folder_does_not_move_when_documents_appears(self):
+        """Sin Documentos los datos van a USERPROFILE\\DeclaraFacilUSA; si después aparece Documentos
+        (OneDrive, otro programa), la app no puede cambiarse a una carpeta vacía y pedir un admin nuevo."""
+        self.admin()
+        first = A.data_loader.user_dir()
+        (pathlib.Path(self.tmp.name) / "Documents").mkdir()
+        self.assertEqual(A.data_loader.user_dir(), first)
+        self.assertTrue(A.has_users())
+
+
 class AdminOnlyTests(AccountsBase):
     """Con "Crear usuarios y asignar roles" un Supervisor no puede llegar a Administrador."""
 

@@ -44,6 +44,11 @@ def data_dir() -> Path:
 def user_dir() -> Path:
     base = Path(os.environ.get("USERPROFILE") or Path.home())
     docs = base / "Documents"
+    # la carpeta que ya tiene datos gana: si Documentos aparece después, cambiarse dejaría
+    # las cuentas atrás y la app pediría crear un Administrador nuevo
+    for d in (docs / "DeclaraFacilUSA", base / "DeclaraFacilUSA"):
+        if d.is_dir():
+            return d
     d = (docs if docs.exists() else base) / "DeclaraFacilUSA"
     try:
         d.mkdir(parents=True, exist_ok=True)
