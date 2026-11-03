@@ -241,6 +241,12 @@ class UserDirTests(AccountsBase):
         self.assertEqual(A.data_loader.user_dir(), first)
         self.assertTrue(A.has_users())
 
+    def test_folder_with_accounts_wins_over_empty_one(self):
+        self.admin()
+        first = A.data_loader.user_dir()
+        (pathlib.Path(self.tmp.name) / "Documents" / "DeclaraFacilUSA").mkdir(parents=True)  # la creó otra versión u otro programa
+        self.assertEqual(A.data_loader.user_dir(), first)
+
 
 class AdminOnlyTests(AccountsBase):
     """Con "Crear usuarios y asignar roles" un Supervisor no puede llegar a Administrador."""

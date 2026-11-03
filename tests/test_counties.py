@@ -26,8 +26,7 @@ class CensusDownloadTests(unittest.TestCase):
             with self.assertRaises(RuntimeError) as cm:
                 counties.download_from_census()
         save.assert_not_called()
-        self.assertNotIn("None", str(cm.exception))
-        self.assertIn("1", str(cm.exception))
+        self.assertIn("trajo solo 1 estados", str(cm.exception))
 
 
 if __name__ == "__main__":

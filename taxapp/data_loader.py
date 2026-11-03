@@ -46,9 +46,9 @@ def user_dir() -> Path:
     docs = base / "Documents"
     # la carpeta que ya tiene datos gana: si Documentos aparece después, cambiarse dejaría
     # las cuentas atrás y la app pediría crear un Administrador nuevo
-    for d in (docs / "DeclaraFacilUSA", base / "DeclaraFacilUSA"):
-        if d.is_dir():
-            return d
+    candidates = (docs / "DeclaraFacilUSA", base / "DeclaraFacilUSA")
+    for d in [c for c in candidates if (c / "usuarios.json").is_file()] + [c for c in candidates if c.is_dir()]:
+        return d
     d = (docs if docs.exists() else base) / "DeclaraFacilUSA"
     try:
         d.mkdir(parents=True, exist_ok=True)
