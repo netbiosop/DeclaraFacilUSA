@@ -4,6 +4,7 @@ estilos ttk; luego la App reconstruye la interfaz.
 """
 from __future__ import annotations
 
+import logging
 import re
 import sys
 import tkinter as tk
@@ -15,6 +16,8 @@ from .. import data_loader
 from ..i18n import N_
 from . import widgets
 from . import layout
+
+logger = logging.getLogger(__name__)
 
 THEMES = {
     "A": {"name": N_("A · Verde moderno"), "desc": N_("Claro, con tarjetas"), "dark": False, "accent": "#0F7B5C",
@@ -183,8 +186,8 @@ def register_fonts():
         for f in fonts_dir().glob("*.ttf"):
             if ctypes.windll.gdi32.AddFontResourceExW(str(f), 0x10, 0):
                 n += 1
-    except Exception:  # noqa: BLE001
-        pass
+    except (OSError, AttributeError) as e:
+        logger.warning("No se pudieron registrar las fuentes incluidas: %s", e)
     reset_font_cache()
     return n
 

@@ -1,6 +1,7 @@
 """Ventana del asistente de IA (chat) y dialogo de configuracion / AI assistant window and settings dialog."""
 from __future__ import annotations
 
+import logging
 import os
 import queue
 import re
@@ -15,6 +16,8 @@ from . import widgets
 from .theme import icon, icon_font
 from .widgets import COLORS, font, Tooltip
 from . import layout
+
+logger = logging.getLogger(__name__)
 
 MAX_HISTORY = 16   # mensajes que se reenvian como contexto de la conversacion
 
@@ -320,8 +323,9 @@ class AssistantPanel(tk.Frame):
         self.cfg.web_search = bool(self.web.get())
         try:
             ai.save_config(self.cfg)
-        except OSError:
-            pass
+        except OSError as e:
+            logger.warning("No se pudo guardar la configuración del asistente: %s", e)
+            messagebox.showwarning(APP_NAME, _("No se pudo guardar la configuración del asistente."), parent=self)
 
     def open_settings(self):
         if not self.app.can("ai_settings"):

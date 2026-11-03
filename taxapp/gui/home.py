@@ -8,7 +8,7 @@ from pathlib import Path
 from tkinter import ttk
 
 from .. import APP_NAME, __version__, accounts, storage
-from ..i18n import _, N_, tr
+from ..i18n import _, tr
 from . import theme
 from .theme import icon, icon_font, mix
 from .ui import (C, Tile, Progress, IconButton, flat_button, user_chip, lang_toggle, label, card, fmt_date,

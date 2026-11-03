@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import base64
 import json
+import logging
 import os
 import ssl
 import sys
@@ -21,6 +22,8 @@ from typing import Dict, List, Optional, Tuple
 from . import data_loader
 from .i18n import _, N_, tr, get_language
 from .models import TaxReturn
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------- proveedores
 PROVIDERS: Dict[str, dict] = {
@@ -72,7 +75,8 @@ class AIConfig:
         if enc:
             try:
                 return unprotect(enc)
-            except Exception:  # noqa: BLE001
+            except (OSError, ValueError, AttributeError) as e:  # DPAPI de otro usuario/PC o dato dañado
+                logger.warning("No se pudo descifrar la clave guardada de %s: %s", p, e)
                 return ""
         env = PROVIDERS.get(p, {}).get("env")
         return os.environ.get(env, "") if env else ""
@@ -100,14 +104,11 @@ def _config_path():
 
 
 def load_config() -> AIConfig:
-    try:
-        d = json.loads(_config_path().read_text(encoding="utf-8"))
-        cfg = AIConfig(**{k: v for k, v in d.items() if k in AIConfig.__dataclass_fields__})
-        if cfg.provider not in PROVIDERS:
-            cfg.provider = "anthropic"
-        return cfg
-    except (OSError, ValueError, TypeError):
-        return AIConfig()
+    d = data_loader.read_json(_config_path(), {})
+    cfg = AIConfig(**{k: v for k, v in d.items() if k in AIConfig.__dataclass_fields__})
+    if not isinstance(cfg.provider, str) or cfg.provider not in PROVIDERS:
+        cfg.provider = "anthropic"
+    return cfg
 
 
 def save_config(cfg: AIConfig):
@@ -138,8 +139,8 @@ def protect(secret: str) -> str:
     if sys.platform.startswith("win"):
         try:
             return "dpapi:" + base64.b64encode(_dpapi(secret.encode("utf-8"), True)).decode()
-        except Exception:  # noqa: BLE001
-            pass
+        except (OSError, AttributeError) as e:
+            logger.warning("DPAPI no disponible; la clave se guarda solo codificada en base64: %s", e)
     return "b64:" + base64.b64encode(secret.encode("utf-8")).decode()
 
 

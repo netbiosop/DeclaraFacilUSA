@@ -5,6 +5,7 @@ kind = "installer": cambio el programa base; se descarga e instala el instalador
 """
 from __future__ import annotations
 
+import logging
 import threading
 import tkinter as tk
 import webbrowser
@@ -16,6 +17,8 @@ from .theme import icon, icon_font
 from .ui import C, label
 from .widgets import COLORS, font
 from . import layout
+
+logger = logging.getLogger(__name__)
 
 
 class UpdateDialog(tk.Toplevel):
@@ -81,8 +84,8 @@ class UpdateDialog(tk.Toplevel):
         cfg.skipped = self.upd.version
         try:
             updater.save_config(cfg)
-        except OSError:
-            pass
+        except OSError as e:
+            logger.warning("No se pudo guardar la versión omitida: %s", e)
         self.destroy()
 
     def start(self):

@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import ssl
 import urllib.request
 from functools import lru_cache
@@ -14,6 +15,8 @@ from pathlib import Path
 from typing import Dict, List
 
 from . import data_loader
+
+logger = logging.getLogger(__name__)
 
 CENSUS_URLS = [
     "https://www2.census.gov/geo/docs/reference/codes2020/national_county2020.txt",
@@ -31,15 +34,12 @@ def _all() -> Dict[str, List[str]]:
     try:
         with open(data_loader.data_dir() / "counties_builtin.json", encoding="utf-8") as f:
             out.update(json.load(f)["states"])
-    except (OSError, ValueError, KeyError):
-        pass
-    try:
-        cached = json.loads(_cache_file().read_text(encoding="utf-8"))
-        for k, v in cached.items():
-            if k not in out or len(v) > len(out[k]):
-                out[k] = v
-    except (OSError, ValueError):
-        pass
+    except (OSError, ValueError, KeyError) as e:
+        logger.warning("No se pudo leer counties_builtin.json: %s", e)
+    # lista completa del Census, si ya se descargó
+    for k, v in data_loader.read_json(_cache_file(), {}).items():
+        if k not in out or len(v) > len(out[k]):
+            out[k] = v
     return out
 
 

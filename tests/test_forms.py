@@ -1,8 +1,5 @@
 """Pruebas de los formularios oficiales / Official forms tests: mapa de campos, valores de cada formulario, preguntas
 guiadas, direcciones del IRS y generación de los PDF."""
-import io
-import json
-import os
 import pathlib
 import sys
 import tempfile
@@ -14,7 +11,7 @@ sys.path.insert(0, str(ROOT))
 from taxapp import forms  # noqa: E402
 from taxapp.engine import compute_all  # noqa: E402
 from taxapp.forms import catalog, mailing, questions  # noqa: E402
-from taxapp.forms.build import Builder, m, whole  # noqa: E402
+from taxapp.forms.build import m, whole  # noqa: E402
 from taxapp.models import (Address, CareProvider, Credits, Dependent, FilingInfo, OtherExpense, Payer,  # noqa: E402
                            Person, Sale, Student, TaxReturn, W2)
 

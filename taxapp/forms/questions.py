@@ -10,7 +10,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Callable, List, Optional, Tuple
 
-from ..i18n import N_, tr
+from ..i18n import N_
 from ..models import TaxReturn
 
 SSN_RE = re.compile(r"^\d{3}-?\d{2}-?\d{4}$")
@@ -266,9 +266,3 @@ def questions(ret: TaxReturn, res: dict) -> List[Question]:
 
 def missing(ret: TaxReturn, res: dict, required_only: bool = False) -> List[Question]:
     return [q for q in questions(ret, res) if q.is_missing(ret) and (q.required or not required_only)]
-
-
-def blocking(ret: TaxReturn, res: dict) -> List[str]:
-    """Datos obligatorios que faltan para generar los formularios finales (textos ya traducidos)."""
-    from ..i18n import _
-    return [tr(q.text, **q.params) if q.params else _(q.text) for q in missing(ret, res, required_only=True)]

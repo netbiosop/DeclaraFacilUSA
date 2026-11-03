@@ -2,35 +2,36 @@
 herramientas y cambio de idioma ES/EN. Cada usuario tiene rol, permisos, carpeta y preferencias de apariencia."""
 from __future__ import annotations
 
-import os
+import logging
 import sys
 import threading
 import time
 import tkinter as tk
 import webbrowser
 from pathlib import Path
-from tkinter import ttk, messagebox, filedialog
+from tkinter import messagebox, filedialog
 
 from .. import APP_NAME, __version__, accounts, data_loader, storage, counties, reports, i18n
 from ..engine import compute_all
-from ..i18n import _, N_, tr
+from ..i18n import _, tr
 from ..models import TaxReturn
 from ..review import review
 from . import theme
+from .ui import open_path
 from .widgets import Form
 from .workspace import Workspace, SECTIONS
 from . import layout
 
+logger = logging.getLogger(__name__)
+
 __all__ = ["App", "SECTIONS", "main"]
-
-
-def other_language() -> str:
-    return "en" if i18n.get_language() == "es" else "es"
 
 
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
+        # Sin consola (programa instalado) Tk no muestra los errores de los botones: que queden en errores.log
+        self.report_callback_exception = lambda *exc: logger.error("Error no controlado en la interfaz", exc_info=exc)
         i18n.load_saved_language()
         self.title(APP_NAME)
         ico = data_loader.app_dir() / "assets" / "DeclaraFacilUSA.ico"
@@ -228,9 +229,6 @@ class App(tk.Tk):
             self.prefs["language"] = lang
         self._rebuild(section=self.settings_section)
 
-    def toggle_language(self):
-        self.set_language(other_language())
-
     # ================================================================ menus
     def _build_menu(self):
         m = tk.Menu(self)
@@ -341,6 +339,7 @@ class App(tk.Tk):
         try:
             self.ret = storage.load(path)
         except Exception as e:  # noqa: BLE001
+            logger.exception("No se pudo abrir %s", path)
             messagebox.showerror(APP_NAME, tr("No se pudo abrir el archivo:\n{e}", e=e))
             return
         if self.ret.tax_year not in data_loader.SUPPORTED_YEARS:
@@ -411,6 +410,7 @@ class App(tk.Tk):
         try:
             self.result = compute_all(self.ret)
         except Exception as e:  # noqa: BLE001 - mostrar sin cerrar la app
+            logger.exception("Error de cálculo")
             if self.workspace:
                 self.workspace.status.configure(text=tr("Error de cálculo: {e}", e=e))
             return
@@ -489,6 +489,7 @@ class App(tk.Tk):
             else:
                 Path(p).write_text(reports.to_html(self.ret, self.result, fnd), encoding="utf-8")
         except Exception as e:  # noqa: BLE001
+            logger.exception("No se pudo exportar %s", p)
             messagebox.showerror(APP_NAME, tr("No se pudo exportar:\n{e}", e=e))
             return
         accounts.log("return_exported", self.user["username"], Path(p).name)
@@ -503,13 +504,8 @@ class App(tk.Tk):
 
     # ================================================================ utilidades
     def _open_path(self, p):
-        try:
-            if sys.platform.startswith("win"):
-                os.startfile(p)  # type: ignore[attr-defined]
-            else:
-                webbrowser.open(Path(p).resolve().as_uri())
-        except Exception:  # noqa: BLE001
-            pass
+        if not open_path(p):
+            messagebox.showerror(APP_NAME, tr("No se pudo abrir el archivo:\n{e}", e=p), parent=self)
 
     def _open_folder(self, p):
         self._open_path(str(p))
@@ -527,6 +523,7 @@ class App(tk.Tk):
                 n = counties.download_from_census()
                 msg = (True, tr("Lista de condados actualizada: {n} estados y territorios.", n=n))
             except Exception as e:  # noqa: BLE001
+                logger.warning("No se pudo descargar la lista de condados: %s", e)
                 msg = (False, tr("{e}\n\nPuede escribir el condado manualmente o importar el archivo "
                                  "national_county2020.txt desde Herramientas.", e=e))
             self.after(0, lambda: self._download_done(*msg))
@@ -548,6 +545,7 @@ class App(tk.Tk):
                 n = counties.import_file(p)
                 messagebox.showinfo(APP_NAME, tr("Importados condados de {n} estados.", n=n))
             except Exception as e:  # noqa: BLE001
+                logger.exception("No se pudo importar %s", p)
                 messagebox.showerror(APP_NAME, str(e))
 
     def about(self):
@@ -579,7 +577,8 @@ class App(tk.Tk):
         def work():
             try:
                 found = updater.check_any(cfg)
-            except Exception:  # noqa: BLE001 - sin conexion: no molestar al usuario
+            except Exception as e:  # noqa: BLE001 - sin conexion: no molestar al usuario
+                logger.info("Búsqueda automática de actualizaciones sin resultado: %s", e)
                 return
             if found and found[1].version != cfg.skipped:
                 self.after(0, lambda: self._offer_update(*found))
@@ -598,6 +597,7 @@ class App(tk.Tk):
                 else:
                     msg = (tr("Ya tiene la versión más reciente ({v}).", v=__version__), False)
             except Exception as e:  # noqa: BLE001
+                logger.warning("Búsqueda de actualizaciones: %s", e)
                 msg = (str(e), False)
             if on_done:
                 self.after(0, lambda: on_done(*msg))
@@ -674,6 +674,26 @@ class App(tk.Tk):
         self.ask_ai(ai.field_question(label.rstrip(" :"), help_text, sec))
 
 
+LOG_MAX_BYTES = 1_000_000
+
+
+def _setup_logging():
+    """Avisos y errores internos en Documentos\\DeclaraFacilUSA\\errores.log.
+
+    Solo usa el módulo logging (no logging.handlers): el programa base 1.5.1 no lo incluye y las actualizaciones
+    de código corren sobre esa base. Al abrir, si el archivo pasa de 1 MB, se guarda como errores.log.1.
+    """
+    path = data_loader.user_dir() / "errores.log"
+    try:
+        if path.exists() and path.stat().st_size > LOG_MAX_BYTES:
+            path.replace(path.with_suffix(".log.1"))
+        handler = logging.FileHandler(path, encoding="utf-8")
+    except OSError:
+        handler = logging.NullHandler()   # sin acceso a Documentos la app igual abre; solo no hay registro
+    logging.basicConfig(handlers=[handler], level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+
+
 def main():
+    _setup_logging()
     app = App()
     app.mainloop()

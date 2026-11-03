@@ -112,6 +112,7 @@ EN = {
     "Federal: reembolso(+)/a pagar(-)": "Federal: refund(+)/owed(-)",
     "Abrir declaración": "Open return",
     "No se pudo abrir el archivo:\n{e}": "Could not open the file:\n{e}",
+    "No se pudo guardar la configuración del asistente.": "Could not save the assistant settings.",
     "La revisión encontró {n} error(es). ¿Exportar de todos modos?": "The review found {n} error(s). Export anyway?",
     "No se pudo exportar:\n{e}": "Could not export:\n{e}",
     "Lista de condados actualizada: {n} estados y territorios.": "County list updated: {n} states and territories.",

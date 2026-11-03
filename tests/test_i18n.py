@@ -2,7 +2,6 @@
 every user-facing note in data/*.json is translated, and the engine produces English output."""
 import ast
 import json
-import os
 import pathlib
 import string
 import sys
