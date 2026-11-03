@@ -468,7 +468,10 @@ class SettingsView(tk.Frame):
     def _unlock_user(self):
         u = self._selected()
         if u:
-            accounts.unlock(u, self._by())
+            try:
+                accounts.unlock(u, self._by())
+            except accounts.AccountError as e:
+                messagebox.showerror(APP_NAME, str(e), parent=self)
             self._fill_users()
 
     def _transfer(self):
@@ -843,7 +846,11 @@ class TransferDialog(_Modal):
     def ok(self):
         if not self.dest.get():
             return
-        n = accounts.transfer_returns(self.username, self.dest.get(), self.view.app.user["username"])
+        try:
+            n = accounts.transfer_returns(self.username, self.dest.get(), self.view.app.user["username"])
+        except accounts.AccountError as e:
+            messagebox.showerror(APP_NAME, str(e), parent=self)
+            return
         self.destroy()
         messagebox.showinfo(APP_NAME, tr("{n} declaraciones transferidas.", n=n))
         self.on_done()

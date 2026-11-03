@@ -214,7 +214,7 @@ def active_admins(db: dict) -> int:
 
 
 def _require_admin(db: dict, by: str):
-    """Solo un Administrador crea, cambia, restablece o borra cuentas de Administrador (el permiso
+    """Solo un Administrador crea, cambia, restablece, desbloquea o borra cuentas de Administrador (el permiso
     "Crear usuarios y asignar roles" no alcanza para hacerse Administrador)."""
     u = find(db, by) if by else None
     if not (u and u["role"] == "admin"):
@@ -354,6 +354,8 @@ def authenticate(username: str, password: str) -> Tuple[Optional[dict], str]:
 def unlock(username: str, by: str):
     db = load()
     u = find(db, username)
+    if u and u["role"] == "admin":
+        _require_admin(db, by)
     if u:
         u["failed"], u["locked_until"] = 0, ""
         save(db)
@@ -490,6 +492,10 @@ def list_returns(user: dict) -> List[dict]:
 
 
 def transfer_returns(src: str, dst: str, by: str) -> int:
+    db = load()
+    u = find(db, src)
+    if u and u["role"] == "admin":
+        _require_admin(db, by)  # si no, quien tiene "Crear usuarios" se llevaría las declaraciones de un Administrador
     a, b = returns_dir(src), returns_dir(dst)
     n = 0
     for f in list(a.glob("*.dfusa")):

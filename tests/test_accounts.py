@@ -251,6 +251,21 @@ class AdminOnlyTests(AccountsBase):
             A.set_matrix({"supervisor": {"ai_settings": True, "tax_tables": True}}, "super")
         self.assertFalse(A.load()["matrix"]["supervisor"]["ai_settings"])
 
+    def test_non_admin_cannot_take_admin_returns(self):
+        (A.returns_dir("admin") / "cliente_2025.dfusa").write_text("{}", encoding="utf-8")
+        with self.assertRaises(A.AccountError):
+            A.transfer_returns("admin", "super", "super")
+        self.assertEqual(len(list(A.returns_dir("admin").glob("*.dfusa"))), 1)
+        self.assertEqual(A.transfer_returns("admin", "super", "admin"), 1)
+
+    def test_non_admin_cannot_unlock_admin(self):
+        db = A.load()
+        A.find(db, "admin")["failed"] = 5
+        A.save(db)
+        with self.assertRaises(A.AccountError):
+            A.unlock("admin", "super")
+        self.assertEqual(A.find(A.load(), "admin")["failed"], 5)
+
     def test_non_admin_can_still_rename_self(self):
         self.assertEqual(A.update_user("super", "super", name="Nuevo", role="supervisor")["name"], "Nuevo")
 
