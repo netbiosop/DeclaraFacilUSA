@@ -220,6 +220,17 @@ class FolderTests(AccountsBase):
         self.assertFalse(any(n.startswith("Respaldos") for n in names))
 
 
+class UsernameTests(unittest.TestCase):
+    def test_windows_folder_names_rejected(self):
+        # Windows quita el punto final ("ana." usaría la carpeta de "ana") y reserva CON, NUL, COM1…
+        for bad in ("ana.", "ana..", "con", "nul", "aux", "prn", "com1", "lpt9", "con.ana"):
+            self.assertIsNotNone(A.validate_username(bad), bad)
+
+    def test_valid_usernames(self):
+        for ok in ("ana", "ana.maria", "j_perez", "ana-2", "a1", "console", "nulo"):
+            self.assertIsNone(A.validate_username(ok), ok)
+
+
 class UserDirTests(AccountsBase):
     def test_folder_does_not_move_when_documents_appears(self):
         """Sin Documentos los datos van a USERPROFILE\\DeclaraFacilUSA; si después aparece Documentos

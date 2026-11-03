@@ -71,7 +71,8 @@ DEFAULT_SETTINGS = {"max_attempts": 5, "lock_minutes": 15, "min_password": 8, "i
 PREPARER_FIELDS = ("name", "ptin", "firm", "firm_address", "firm_phone", "firm_ein", "self_employed")
 DEFAULT_PREFS = {"theme": "A", "accent": "", "font": "", "size": "normal", "language": "",
                  "meter": "", "ai_docked": None, "autosave": 5}
-USERNAME_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{1,31}$")
+USERNAME_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{0,30}[a-z0-9_-]$")  # sin punto final: Windows lo quita de la carpeta
+WINDOWS_RESERVED = {"con", "prn", "aux", "nul", *(f"com{i}" for i in range(1, 10)), *(f"lpt{i}" for i in range(1, 10))}
 
 
 class AccountError(Exception):
@@ -188,6 +189,8 @@ def normalize_username(name: str) -> str:
 def validate_username(name: str) -> Optional[str]:
     if not USERNAME_RE.match(name):
         return _("Usuario inválido: use 2 a 32 letras minúsculas, números, punto, guion o guion bajo.")
+    if name.split(".")[0] in WINDOWS_RESERVED:
+        return _("Ese nombre de usuario lo reserva Windows. Elija otro.")
     return None
 
 

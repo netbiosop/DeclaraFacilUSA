@@ -1064,6 +1064,7 @@ EN = {
     'Usuario desbloqueado': 'User unlocked',
     'Usuario eliminado': 'User deleted',
     'Usuario inválido: use 2 a 32 letras minúsculas, números, punto, guion o guion bajo.': 'Invalid username: use 2 to 32 lowercase letters, numbers, period, hyphen or underscore.',
+    'Ese nombre de usuario lo reserva Windows. Elija otro.': 'Windows reserves that username. Choose another one.',
     'Usuario modificado': 'User changed',
     'Usuario no encontrado.': 'User not found.',
     'Usuario o contraseña incorrectos.': 'Incorrect username or password.',
