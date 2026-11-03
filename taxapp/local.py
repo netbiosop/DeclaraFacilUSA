@@ -30,8 +30,6 @@ def find_county(counties: dict, name: str) -> Optional[str]:
     for c in counties:
         if normalize_county(c) == target:
             return c
-    if target in ("baltimore", "baltimore county"):
-        return "Baltimore County" if "Baltimore County" in counties else None
     return None
 
 
@@ -43,16 +41,12 @@ def _status_brackets(d: dict, status: str, hoh_uses: str = "single"):
     return d["single"]
 
 
-def earned_income(ret: TaxReturn, fedres: dict) -> float:
-    return fedres["wages"] + max(0.0, fedres["profit"])
-
-
 def _apply(j: dict, name: str, ret: TaxReturn, fedres: dict, stres: dict, override_rate: float = 0.0) -> dict:
     status = ret.filing_status
     method = j.get("method", "flat")
     base_key = j.get("base", "state_taxable")
     bases = {
-        "earned": earned_income(ret, fedres),
+        "earned": fedres["wages"] + max(0.0, fedres["profit"]),
         "agi": fedres["agi"],
         "state_taxable": stres.get("taxable_income", 0.0),
         "state_tax": stres.get("tax", 0.0),
@@ -62,7 +56,7 @@ def _apply(j: dict, name: str, ret: TaxReturn, fedres: dict, stres: dict, overri
     base = bases.get(base_key, bases["state_taxable"])
     if method == "flat":
         rate = (override_rate / 100.0) if (override_rate and j.get("editable")) else j["rate"]
-        if base_key == "earned_less_exemptions" or j.get("base") == "earned_less_exemptions":
+        if base_key == "earned_less_exemptions":
             people = (2 if ret.is_joint() else 1) + len(ret.dependents)
             base = max(0.0, bases["earned"] + ret.income.taxable_interest + ret.income.ordinary_dividends
                        - j.get("exemption", 0) * people)
@@ -86,12 +80,7 @@ def _apply(j: dict, name: str, ret: TaxReturn, fedres: dict, stres: dict, overri
         tax = base * rate
         rate_desc = tr("{r}% del impuesto estatal", r=f"{rate * 100:.4g}")
     elif method == "threshold":
-        tiers = _status_brackets(j["tiers"], status, "mfj")
-        tax = 0.0
-        for i, (floor, rate) in enumerate(tiers):
-            top = tiers[i + 1][0] if i + 1 < len(tiers) else float("inf")
-            if base > floor:
-                tax += (min(base, top) - floor) * rate
+        tax = bracket_tax(base, _status_brackets(j["tiers"], status, "mfj"))
         rate_desc = _("sobre umbral")
     elif method == "monthly":
         months = 12 if fedres["wages"] > 0 else 0
