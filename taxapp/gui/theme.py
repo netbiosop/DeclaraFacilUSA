@@ -134,9 +134,7 @@ def palette(theme: str = "A", accent: str = "") -> dict:
         "disabled": mix(t["card"], t["muted"], 0.35),
         "dark": "1" if dark else "",
     })
-    # nombres antiguos usados por pantallas existentes
-    p["primary_dark"] = p["accent_dark"]
-    p["accent_light"] = tint
+    p["accent_light"] = tint  # nombre antiguo que usan varias pantallas
     return p
 
 

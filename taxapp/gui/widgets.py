@@ -10,7 +10,7 @@ from ..models import clean_money_text
 
 # ----------------------------------------------------------------------------- paleta y fuentes
 COLORS = {
-    "primary": "#0B5D3B", "primary_dark": "#08442B", "accent": "#1F8A5B", "accent_light": "#E7F4EC",
+    "primary": "#0B5D3B", "accent": "#1F8A5B", "accent_light": "#E7F4EC",
     "sidebar": "#12302A", "sidebar_fg": "#CFE3DA", "sidebar_sel": "#1F8A5B",
     "bg": "#F4F7F5", "card": "#FFFFFF", "text": "#1D2733", "muted": "#5B6775", "border": "#D9E0E7",
     "refund": "#1E9E5A", "owe": "#C0392B", "warn": "#B9770E", "info": "#2471A3",
