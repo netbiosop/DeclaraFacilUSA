@@ -29,6 +29,11 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
   palabras completas en inglés para archivos con texto libre ("son" por subcadena aceptaba "Otra persona del hogar").
 - `usuarios.json` que no se puede leer (bloqueo, no daño) se carga vacío con la marca `_unreadable` y `save()` se niega
   a escribirlo; un `AccountError` que llega a un callback de Tk queda en `errores.log` (no se perdió nada).
+- `data_loader.user_dir()`: gana la carpeta (Documentos o USERPROFILE) que ya tiene `usuarios.json`, después la que
+  exista; solo se crea si no hay ninguna. No volver a elegir por "existe Documentos" en cada llamada.
+- `updater.save_config` guarda solo lo que difiere de `data/actualizaciones.json`. Un cambio de repositorio en `data/`
+  debe publicarse en una versión posterior a la 2026-11-03 (las PC que ya guardaron `repo` lo conservan hasta que
+  coincida con el publicado).
 
 ## Pendientes
 - `taxapp/state.py` `_ss_subtraction`: umbrales estatales de Seguro Social (CT, MN, NM, RI, VT, WV) escritos en código e
@@ -89,10 +94,36 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
   del Anexo C escritos dos veces (`build.py:~442`, `models.py:~310`); `_get_json`/`_fetch` del actualizador con
   encabezados distintos; edad 65 y 55 sin constante en 9 sitios (`SENIOR_AGE`, `HSA_CATCHUP_AGE`); `compute_federal`
   (~485 líneas) por secciones.
+- Impuesto local del lugar de trabajo (`local.py:~120`) con la tasa de residente y sin crédito: Columbus/Cleveland
+  $50k → $2,500 (real ~$1,250, Columbus acredita hasta 2,5 %); no residente en Detroit 2,4 % en vez de 1,2 % y suma
+  intereses/dividendos. Falta `nonresident_rate` en `local_<año>.json` y el crédito de OH. Cambia montos: verificar tasas.
+- ODC $500 para un dependiente que no vive en EE. UU. (`federal.py:~442`): §24(h)(4) exige ciudadano/nacional/residente;
+  la casilla `lived_in_us` no es eso. ¿Campo de ciudadanía/residencia? Cambia montos.
+- Cerrar la app en los 5 s tras actualizar (`gui/app.py:73`, `after(5000, confirm_code_ok)`) marca la versión como mala
+  para siempre. Llamar también `confirm_code_ok()` en `quit_app()` (interfaz: no se prueba en la nube).
+- Inicio de sesión: un usuario inexistente responde distinto y más rápido (sin PBKDF2) que uno existente ("Intentos
+  restantes: N") → revela qué usuarios existen. ¿Mismo mensaje y mismo cálculo?
+- "Ajustes generales y seguridad" (intentos, minutos de bloqueo, largo de contraseña) los cambia quien tenga
+  `manage_users` (`gui/settings.py:29`, `accounts.update_settings`). ¿Solo Administrador?
+- Duplicación menor: `storage.returns_dir()` arma a mano `accounts.returns_dir()`; `gui/app.py` `_activity` =
+  `reset_idle_timer` y `_open_folder` solo llama a `_open_path`; User-Agent `DeclaraFacilUSA/...` en `counties.py` y 3
+  veces en `updater.py`; números sueltos `0.94/0.88` (`layout.py`), `[:8]` recientes (`storage.py`), `30_000` (`app.py`).
 - Propuestas de estructura: una sola función para tareas en segundo plano en `ui.py` (hoy 8 copias), `ListEditor` para
   dependientes/W-2/locales en `screens.py`, unificar estado civil→clave, `ask_ai_action` por clave y no por posición.
 
 ## Historial
+### 2026-11-03 — revisión nocturna (PR #2, rama `revision-nocturna`)
+- `accounts.transfer_returns`/`unlock`: un Supervisor con "Crear usuarios" se llevaba las declaraciones del Administrador
+  y lo desbloqueaba → `_require_admin` si la cuenta afectada es admin; la pantalla muestra el error.
+- `data_loader.user_dir()`: si aparecía Documentos la app cambiaba a una carpeta vacía y pedía un admin nuevo → gana la
+  carpeta con `usuarios.json` (ver Decisiones).
+- `accounts.USERNAME_RE`: "ana." (Windows quita el punto: misma carpeta que "ana") y CON/NUL/COM1 → rechazados al crear.
+- `updater.save_config`: `repo` quedaba congelado en la PC → solo se guarda lo distinto de `data/`.
+- `local.py`: rama de Baltimore muerta, "threshold" copiaba `bracket_tax`, condición repetida, `earned_income` sin uso
+  de `ret` (94.200 casos contra la versión anterior: 0 diferencias). `counties`: "…del Censo: None" → dice cuántos
+  estados llegaron; `MIN_STATES`. Color `primary_dark` sin uso.
+- Pendiente: local de trabajo (OH/MI), ODC fuera de EE. UU., cierre en 5 s tras actualizar, enumeración de usuarios,
+  ajustes de seguridad (ver arriba).
 ### 2026-11-02 — revisión nocturna (PR #2, rama `revision-nocturna`)
 - `models.py:~117` `is_child_relation`: "son" por subcadena → "Otra persona del hogar" recibía CTC y EITC (HOH $30k:
   $2,200 + $3,265) → regex de palabras completas (acepta Stepchild/Grandchild, rechaza Godson).
