@@ -69,17 +69,23 @@ def _user_file() -> Path:
     return data_loader.user_dir() / "actualizaciones.json"
 
 
-def load_config() -> UpdateConfig:
-    cfg = UpdateConfig()
-    for p in (data_loader.data_dir() / "actualizaciones.json", _user_file()):
-        for k, v in data_loader.read_json(p, {}).items():
-            if k in UpdateConfig.__dataclass_fields__:
-                setattr(cfg, k, v)
+def _apply(cfg: UpdateConfig, path: Path) -> UpdateConfig:
+    for k, v in data_loader.read_json(path, {}).items():
+        if k in UpdateConfig.__dataclass_fields__:
+            setattr(cfg, k, v)
     return cfg
 
 
+def load_config() -> UpdateConfig:
+    return _apply(_apply(UpdateConfig(), data_loader.data_dir() / "actualizaciones.json"), _user_file())
+
+
 def save_config(cfg: UpdateConfig):
-    _user_file().write_text(json.dumps(asdict(cfg), indent=1), encoding="utf-8")
+    """Guarda en la PC solo lo que difiere de data/actualizaciones.json: así un repositorio nuevo
+    publicado en data/ llega a todas las PC que no eligieron otro."""
+    published = asdict(_apply(UpdateConfig(), data_loader.data_dir() / "actualizaciones.json"))
+    own = {k: v for k, v in asdict(cfg).items() if v != published[k]}
+    _user_file().write_text(json.dumps(own, indent=1), encoding="utf-8")
 
 
 # ---------------------------------------------------------------------------- versiones
