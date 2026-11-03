@@ -18,6 +18,8 @@ from . import data_loader
 
 logger = logging.getLogger(__name__)
 
+MIN_STATES = 50  # menos que esto no es la lista nacional completa
+
 CENSUS_URLS = [
     "https://www2.census.gov/geo/docs/reference/codes2020/national_county2020.txt",
     "https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt",
@@ -48,7 +50,7 @@ def counties_for(code: str) -> List[str]:
 
 
 def has_full_list() -> bool:
-    return len(_all()) >= 50
+    return len(_all()) >= MIN_STATES
 
 
 def parse_census(text: str) -> Dict[str, List[str]]:
@@ -85,9 +87,10 @@ def download_from_census(timeout: int = 30) -> int:
                 raw = r.read()
             text = raw.decode("utf-8", errors="replace")
             lists = parse_census(text)
-            if len(lists) >= 50:
+            if len(lists) >= MIN_STATES:
                 save_lists(lists)
                 return len(lists)
+            last_err = ValueError(f"{url} trajo solo {len(lists)} estados")
         except Exception as e:  # noqa: BLE001 - se informa al usuario
             last_err = e
     raise RuntimeError(f"No se pudo descargar la lista del Censo: {last_err}")
