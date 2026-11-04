@@ -14,7 +14,7 @@ from typing import Dict, List, Optional
 from .. import data_loader
 from ..federal import pick
 from ..i18n import _, tr
-from ..models import TaxReturn, age_at_year_end
+from ..models import TaxReturn
 
 
 # ------------------------------------------------------------------------------------------------- utilidades
@@ -83,9 +83,8 @@ class Builder:
         self.year = ret.tax_year
         st = ret.filing_status
         self.status = st
-        self.other = "mfj" if st in ("mfj", "qss") else "other"
         tp_age = ret.taxpayer_age()
-        sp_age = age_at_year_end(ret.spouse.dob, self.year) if ret.has_spouse() else None
+        sp_age = ret.spouse_age()
         self.tp65 = tp_age is not None and tp_age >= 65
         self.sp65 = ret.is_joint() and sp_age is not None and sp_age >= 65
         sr_ok = self.tp65 or self.sp65

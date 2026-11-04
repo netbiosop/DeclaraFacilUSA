@@ -440,8 +440,7 @@ def compute_federal(ret: TaxReturn) -> dict:
     ctc_data = fed["ctc"]
     n_ctc = sum(1 for d in deps if d.qualifies_ctc(year))
     n_odc = sum(1 for d in deps if d.born_by(year)) - n_ctc
-    ctc_allowed = ret.taxpayer.valid_ssn_for_work or (ret.is_joint() and ret.spouse.valid_ssn_for_work)
-    if n_ctc and not ctc_allowed:
+    if n_ctc and not has_ssn:
         notes.append(_("CTC requiere que al menos un contribuyente tenga SSN valido (OBBBA); se aplica solo ODC."))
         n_odc += n_ctc
         n_ctc = 0
@@ -495,12 +494,13 @@ def compute_federal(ret: TaxReturn) -> dict:
         income_for_phase = max(agi, earned_income)
         eitc = max(0.0, min(credit, p["max"] - p["phaseout_rate"] * max(0.0, income_for_phase - start)))
 
+    excess_ss = _excess_ss(ret, se)
     # Anexo 8812 Parte II-B (3 o más hijos): el ACTC puede basarse en los impuestos de Seguro Social y Medicare pagados
     actc_part2b = None
     if n_ctc >= 3 and actc_l20 < actc_l17:
         l21 = sum(w.box4_ss_withheld + w.box6_medicare_withheld for w in ret.w2s)
         l22 = half_se  # Anexo 1 línea 15 (+ Anexo 2 líneas 5, 6 y 13, no modeladas)
-        l24 = eitc + _excess_ss(ret, se)
+        l24 = eitc + excess_ss
         l25 = max(0.0, l21 + l22 - l24)
         actc_part2b = {"21": l21, "22": l22, "23": l21 + l22, "24": l24, "25": l25, "26": max(actc_l20, l25)}
         actc = min(actc_l17, max(actc_l20, l25))
@@ -510,7 +510,6 @@ def compute_federal(ret: TaxReturn) -> dict:
     other_withheld = (inc.investment_withheld + inc.pension_withheld + inc.ira_withheld + inc.ss_withheld
                       + inc.unemployment_withheld + inc.business_withheld)
     withholding = w2_withheld + other_withheld
-    excess_ss = _excess_ss(ret, se)
     # el empleado paga la mitad de la tasa de Medicare; lo retenido de más es Medicare adicional (Form 8959)
     addl_med_withheld = max(0.0, medicare_withheld - se["medicare_rate"] / 2 * medicare_wages)
     estimated = ret.payments.federal_estimated + ret.payments.federal_prior_overpayment
