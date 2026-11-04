@@ -313,7 +313,7 @@ def _post(url: str, payload: dict, headers: dict, timeout=TIMEOUT) -> dict:
             body = e.read().decode("utf-8", "replace")
             msg = json.loads(body).get("error", {})
             msg = msg.get("message", msg) if isinstance(msg, dict) else msg
-        except Exception:  # noqa: BLE001
+        except (OSError, ValueError, AttributeError):  # cuerpo ilegible, no es JSON o no trae {"error": ...}
             msg = body[:300]
         if e.code in (401, 403):
             raise AIError(tr("Clave API inválida o sin permiso ({c}). Revise la configuración de IA.", c=e.code)) from e

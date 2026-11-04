@@ -46,7 +46,9 @@ def published_version(root: Path):
     try:
         with urllib.request.urlopen(req, timeout=20) as r:
             return json.loads(r.read().decode("utf-8")).get("version")
-    except Exception:  # noqa: BLE001 - sin conexion: no se bloquea la publicacion
+    except (OSError, ValueError, AttributeError) as e:  # sin conexion: no se bloquea la publicacion, pero se avisa
+        print(f"AVISO: no se pudo consultar la version publicada en GitHub ({e}); no se comprobo si ya existe.",
+              file=sys.stderr)
         return None
 
 
