@@ -141,6 +141,21 @@ class UserTests(AccountsBase):
         A.delete_user("ana", "admin")
         self.assertIsNone(A.find(A.load(), "ana"))
 
+    def test_new_user_with_same_name_does_not_inherit_pdfs(self):
+        # los PDF exportados (SSN, cuenta bancaria) quedaban en la carpeta y un usuario nuevo con el mismo nombre los veía
+        self.admin()
+        A.create_user("maria", "Maria", "preparer", "Clave2025!", by="admin")
+        pdfs = A.returns_dir("maria") / "PEREZ_JUAN_2025_formularios"
+        pdfs.mkdir()
+        (pdfs / "01_Form_1040_2025.pdf").write_bytes(b"%PDF")
+        storage.save(TaxReturn(tax_year=2025), A.returns_dir("maria") / "juan")
+        A.delete_user("maria", "admin", transfer_to="admin")
+        A.create_user("maria", "Maria", "preparer", "Clave2025!", by="admin")
+        self.assertEqual(list(A.returns_dir("maria").iterdir()), [])
+        kept = list(A.returns_dir("admin").rglob("01_Form_1040_2025.pdf"))
+        self.assertEqual(len(kept), 1)
+        self.assertTrue((A.returns_dir("admin") / "juan.dfusa").exists())
+
     def test_delete_disabled_admin_with_one_active_admin(self):
         # Borrar un admin ya desactivado no deja a nadie sin acceso: no debe exigir otro admin activo
         self.admin()

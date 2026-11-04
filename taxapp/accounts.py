@@ -289,7 +289,24 @@ def delete_user(username: str, by: str, transfer_to: str = None):
         transfer_returns(username, transfer_to, by)
     db["users"].remove(u)
     save(db)
+    _archive_leftovers(username, transfer_to or by)
     log("user_deleted", by, username)
+
+
+def _archive_leftovers(username: str, keeper: str):
+    """Lo que quedó en la carpeta (PDF exportados con SSN y cuenta bancaria) pasa a una subcarpeta de quien se queda
+    con sus declaraciones: si no, un usuario nuevo con el mismo nombre lo heredaría."""
+    src = returns_root() / normalize_username(username)
+    if not src.is_dir():
+        return
+    try:
+        if any(src.iterdir()):
+            dest = returns_dir(keeper) / f"{normalize_username(username)}_eliminado_{datetime.now():%Y%m%d_%H%M%S}"
+            shutil.move(str(src), str(dest))
+        else:
+            src.rmdir()
+    except OSError as e:  # un PDF abierto en Windows bloquea la carpeta: el usuario ya se borró, se avisa en el log
+        logger.warning("No se pudo archivar la carpeta del usuario eliminado %s: %s", username, e)
 
 
 def set_password(username: str, new_password: str, by: str, current: str = None, must_change: bool = False):
