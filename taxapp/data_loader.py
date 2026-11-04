@@ -47,13 +47,15 @@ def user_dir() -> Path:
     # la carpeta que ya tiene datos gana: si Documentos aparece después, cambiarse dejaría
     # las cuentas atrás y la app pediría crear un Administrador nuevo
     candidates = (docs / "DeclaraFacilUSA", base / "DeclaraFacilUSA")
-    for d in [c for c in candidates if (c / "usuarios.json").is_file()] + [c for c in candidates if c.is_dir()]:
+    fallback = Path.home() / ".declarafacilusa"  # si Documentos estaba bloqueado (acceso controlado a carpetas)
+    with_accounts = [c for c in candidates + (fallback,) if (c / "usuarios.json").is_file()]
+    for d in with_accounts + [c for c in candidates if c.is_dir()]:
         return d
     d = (docs if docs.exists() else base) / "DeclaraFacilUSA"
     try:
         d.mkdir(parents=True, exist_ok=True)
     except OSError:
-        d = Path.home() / ".declarafacilusa"
+        d = fallback
         d.mkdir(parents=True, exist_ok=True)
     return d
 

@@ -213,6 +213,12 @@ class FolderTests(AccountsBase):
         events = [e["event"] for e in A.read_log()]
         self.assertIn("user_created", events)
         self.assertEqual(events[0], "login_failed")
+
+    def test_unknown_user_text_not_logged(self):
+        # quien escribe la contraseña en el campo de usuario no debe dejarla en actividad.log
+        self.admin()
+        A.authenticate("MiClaveSecreta9", "x")
+        self.assertNotIn("miclavesecreta9", str(A.read_log()[0]).lower())
         dest = A.create_backup(A.backups_dir() / "respaldo", "admin")
         names = zipfile.ZipFile(dest).namelist()
         self.assertIn("usuarios.json", names)
@@ -246,6 +252,17 @@ class UserDirTests(AccountsBase):
         first = A.data_loader.user_dir()
         (pathlib.Path(self.tmp.name) / "Documents" / "DeclaraFacilUSA").mkdir(parents=True)  # la creó otra versión u otro programa
         self.assertEqual(A.data_loader.user_dir(), first)
+
+    def test_fallback_folder_with_accounts_wins(self):
+        """Si Documentos estuvo bloqueado, las cuentas quedaron en ~/.declarafacilusa: al desbloquearse
+        Documentos la app no puede pedir un Administrador nuevo."""
+        fallback = pathlib.Path(self.tmp.name) / ".declarafacilusa"
+        fallback.mkdir()
+        with mock.patch.object(A.data_loader, "user_dir", return_value=fallback):
+            self.admin()
+        with mock.patch.dict(os.environ, {"HOME": self.tmp.name}):
+            self.assertEqual(A.data_loader.user_dir(), fallback)
+            self.assertTrue(A.has_users())
 
 
 class AdminOnlyTests(AccountsBase):

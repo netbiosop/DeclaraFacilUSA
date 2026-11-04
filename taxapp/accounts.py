@@ -319,7 +319,7 @@ def authenticate(username: str, password: str) -> Tuple[Optional[dict], str]:
     u = find(db, username)
     generic = _("Usuario o contraseña incorrectos.")
     if not u:
-        log("login_failed", normalize_username(username), "unknown user")
+        log("login_failed", "", "unknown user")  # lo escrito puede ser la contraseña puesta en el campo equivocado
         return None, generic
     if not u.get("active", True):
         log("login_failed", u["username"], "disabled")
