@@ -31,7 +31,9 @@ def loads(text: str) -> TaxReturn:
 
 def save(ret: TaxReturn, path) -> Path:
     p = Path(path)
-    if p.suffix.lower() != EXT:
+    if p.suffix.lower() == ".json":  # declaraciones antiguas abiertas como .json
+        p = p.with_suffix(EXT)
+    elif p.suffix.lower() != EXT:
         p = p.with_name(p.name + EXT)  # with_suffix cambiaría "Garcia.Maria" por "Garcia.dfusa"
     tmp = p.with_suffix(p.suffix + ".tmp")
     tmp.write_text(dumps(ret), encoding="utf-8")

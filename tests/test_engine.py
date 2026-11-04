@@ -270,6 +270,7 @@ class StorageAndReview(unittest.TestCase):
             self.assertEqual(p.name, "Garcia.Maria.dfusa")
             self.assertEqual(storage.load(other).w2s[0].box1_wages, 1)
             self.assertEqual(storage.save(make(2025), pathlib.Path(d) / "x.DFUSA").name, "x.DFUSA")
+            self.assertEqual(storage.save(make(2025), pathlib.Path(d) / "vieja.json").name, "vieja.dfusa")
 
 
 class DependentQualificationTests(unittest.TestCase):

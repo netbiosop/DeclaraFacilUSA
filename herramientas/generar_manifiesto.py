@@ -34,6 +34,7 @@ def build(root: Path = ROOT) -> dict:
 
 def published_version(root: Path):
     """Version publicada en GitHub (actualizacion.json de la rama main), o None si no se puede consultar."""
+    import http.client
     import urllib.request
     try:
         repo = json.loads((root / "data" / "actualizaciones.json").read_text(encoding="utf-8")).get("repo", "")
@@ -46,7 +47,7 @@ def published_version(root: Path):
     try:
         with urllib.request.urlopen(req, timeout=20) as r:
             return json.loads(r.read().decode("utf-8")).get("version")
-    except (OSError, ValueError, AttributeError) as e:  # sin conexion: no se bloquea la publicacion, pero se avisa
+    except (OSError, ValueError, AttributeError, http.client.HTTPException) as e:  # sin conexion: no se bloquea la publicacion, pero se avisa
         print(f"AVISO: no se pudo consultar la version publicada en GitHub ({e}); no se comprobo si ya existe.",
               file=sys.stderr)
         return None

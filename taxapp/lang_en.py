@@ -1201,7 +1201,8 @@ EN = {
     'Anexo D: la ganancia neta a corto plazo se ingresó sin detalle; agregue las ventas (precio y costo) en Ingresos → Inversiones para completar las columnas (d) y (e).': 'Schedule D: the net short-term gain was entered without detail; add the sales (proceeds and cost) in Income → Investments to complete columns (d) and (e).',
     'Anexo D: la ganancia neta a largo plazo se ingresó sin detalle; agregue las ventas (precio y costo) en Ingresos → Inversiones para completar las columnas (d) y (e).': 'Schedule D: the net long-term gain was entered without detail; add the sales (proceeds and cost) in Income → Investments to complete columns (d) and (e).',
     'Antes de enviar': 'Before mailing',
-    'Aparece en la parte inferior izquierda de sus cheques.': 'It appears at the bottom left of your checks.',
+    'Aparece en la parte inferior izquierda de sus cheques. Si no se acepta, revise los 9 dígitos: uno está mal.':
+        'It appears at the bottom left of your checks. If it is not accepted, check the 9 digits: one is wrong.',
     'Apellido(s) de su cónyuge': "Spouse's last name",
     'Aportes de su empleador a la HSA (W-2 casilla 12, código W)': "Your employer's HSA contributions (W-2 box 12, code W)",
     'Aportes del empleador a la HSA (W-2 casilla 12, código W)': 'Employer HSA contributions (W-2 box 12, code W)',

@@ -302,7 +302,7 @@ def _archive_leftovers(username: str, keeper: str):
     try:
         if any(src.iterdir()):
             dest = returns_dir(keeper) / f"{normalize_username(username)}_eliminado_{datetime.now():%Y%m%d_%H%M%S}"
-            shutil.move(str(src), str(dest))
+            src.rename(dest)  # mismo disco: todo o nada (shutil.move copiaba y dejaba restos si un PDF estaba abierto)
         else:
             src.rmdir()
     except OSError as e:  # un PDF abierto en Windows bloquea la carpeta: el usuario ya se borró, se avisa en el log

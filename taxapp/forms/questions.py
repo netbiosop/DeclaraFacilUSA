@@ -56,7 +56,7 @@ def _ssn_ok(v) -> bool:
 
 
 def _digits(v, n) -> bool:
-    d = "".join(ch for ch in (v or "") if ch.isdigit())
+    d = "".join(ch for ch in (v or "") if ch.isdecimal())
     return len(d) == n
 
 
@@ -64,7 +64,7 @@ def _routing_ok(v) -> bool:
     """9 dígitos con el dígito de control ABA (pesos 3-7-1): atrapa un dígito mal tipeado."""
     if not _digits(v, 9):
         return False
-    d = [int(ch) for ch in v if ch.isdigit()]
+    d = [int(ch) for ch in v if ch.isdecimal()]
     return sum(x * w for x, w in zip(d, (3, 7, 1) * 3)) % 10 == 0
 
 
@@ -131,7 +131,8 @@ def questions(ret: TaxReturn, res: dict) -> List[Question]:
         if fi.direct_deposit:
             Q.append(Question("routing", G4, N_("Número de ruta bancaria (9 dígitos)"), "text", f, "routing",
                               required=True, width=14, check=_routing_ok,
-                              help=N_("Aparece en la parte inferior izquierda de sus cheques.")))
+                              help=N_("Aparece en la parte inferior izquierda de sus cheques. Si no se acepta, "
+                                      "revise los 9 dígitos: uno está mal.")))
             Q.append(Question("account", G4, N_("Número de cuenta"), "text", f, "account", required=True, width=22,
                               check=lambda v: 4 <= len("".join(ch for ch in (v or "") if ch.isalnum())) <= 17))
             Q.append(Question("acct_type", G4, N_("Tipo de cuenta"), "choice", f, "account_type",

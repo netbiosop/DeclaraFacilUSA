@@ -17,7 +17,7 @@ from taxapp.models import TaxReturn  # noqa: E402
 class AccountsBase(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.env = mock.patch.dict(os.environ, {"USERPROFILE": self.tmp.name})
+        self.env = mock.patch.dict(os.environ, {"USERPROFILE": self.tmp.name, "HOME": self.tmp.name})
         self.env.start()
         self.it = mock.patch.object(A, "ITERATIONS", 1000)
         self.it.start()
@@ -228,17 +228,17 @@ class FolderTests(AccountsBase):
         events = [e["event"] for e in A.read_log()]
         self.assertIn("user_created", events)
         self.assertEqual(events[0], "login_failed")
+        dest = A.create_backup(A.backups_dir() / "respaldo", "admin")
+        names = zipfile.ZipFile(dest).namelist()
+        self.assertIn("usuarios.json", names)
+        self.assertTrue(any(n.startswith("Declaraciones") for n in names) or True)
+        self.assertFalse(any(n.startswith("Respaldos") for n in names))
 
     def test_unknown_user_text_not_logged(self):
         # quien escribe la contraseña en el campo de usuario no debe dejarla en actividad.log
         self.admin()
         A.authenticate("MiClaveSecreta9", "x")
         self.assertNotIn("miclavesecreta9", str(A.read_log()[0]).lower())
-        dest = A.create_backup(A.backups_dir() / "respaldo", "admin")
-        names = zipfile.ZipFile(dest).namelist()
-        self.assertIn("usuarios.json", names)
-        self.assertTrue(any(n.startswith("Declaraciones") for n in names) or True)
-        self.assertFalse(any(n.startswith("Respaldos") for n in names))
 
 
 class UsernameTests(unittest.TestCase):
