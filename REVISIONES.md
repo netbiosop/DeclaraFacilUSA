@@ -34,6 +34,12 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
 - `updater.save_config` guarda solo lo que difiere de `data/actualizaciones.json`. Un cambio de repositorio en `data/`
   debe publicarse en una versión posterior a la 2026-11-03 (las PC que ya guardaron `repo` lo conservan hasta que
   coincida con el publicado).
+- `user_dir()` también reconoce `~/.declarafacilusa` (la carpeta de respaldo si Documentos está bloqueado) cuando tiene
+  `usuarios.json`.
+- `login_failed` de un usuario que no existe se anota con usuario vacío a propósito: lo escrito puede ser la contraseña
+  puesta en el campo equivocado (`actividad.log` lo ven Supervisores y va en los respaldos).
+- Al eliminar un usuario, lo que queda en su carpeta (PDF exportados) pasa a `<quien recibe>/<usuario>_eliminado_<fecha>/`
+  con `rename` (todo o nada); `list_returns` no lo muestra como declaración, `can_access_path` sí lo permite a quien lo recibe.
 
 ## Pendientes
 - `taxapp/state.py` `_ss_subtraction`: umbrales estatales de Seguro Social (CT, MN, NM, RI, VT, WV) escritos en código e
@@ -110,8 +116,41 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
   veces en `updater.py`; números sueltos `0.94/0.88` (`layout.py`), `[:8]` recientes (`storage.py`), `30_000` (`app.py`).
 - Propuestas de estructura: una sola función para tareas en segundo plano en `ui.py` (hoy 8 copias), `ListEditor` para
   dependientes/W-2/locales en `screens.py`, unificar estado civil→clave, `ask_ai_action` por clave y no por posición.
+- Encontrados el 2026-11-04 (cambian montos o necesitan la interfaz):
+  - Pérdida de capital arrastrada: un solo campo y siempre se resta del corto plazo (`federal.py:136`, `build.py:541`,
+    `screens.py:431`). Con arrastre de largo plazo grava de más (ej. 2025: $350). ¿Campo aparte para la línea 14 del Anexo D?
+  - Pensilvania (y el EIT local de `local.py:49`) usa la casilla 1 del W-2; PA grava los aportes al 401(k) (casilla 16,
+    `box16_state_wages`, se pide pero no se usa). Verificar la regla de PA y del EIT.
+  - W-2 del cónyuge en MFS/soltero: la revisión ya lo marca como error, pero el cálculo lo sigue sumando
+    (`federal.py:121`, `state.py:101`, `local.py:49,132`). ¿Filtrarlo también en el cálculo?
+  - Carpetas de usuarios eliminados antes del 2026-11-04 siguen en `Declaraciones/<usuario>/` y un usuario nuevo con ese
+    nombre las ve. ¿Archivarlas al crear el usuario?
+  - "Guardar como" `Garcia.Maria` dos veces pisa `Garcia.Maria.dfusa` sin preguntar: el diálogo comprueba el nombre sin
+    extensión (`gui/app.py:~370`). Pedir confirmación si `p + ".dfusa"` existe.
+  - `gui/settings.py:237` descarga de fuentes con `except Exception` sin `logger.exception` (interfaz).
+  - Limpieza con resultados iguales: `models.py` conversión a número repetida en 10 `__post_init__` (dos con listas a
+    mano); `build.py:517,934` vuelve a leer como texto un monto ya formateado (`_num`; puede cambiar $1 por redondeo);
+    regla "el 1040-SR no lleva su última página" en `forms/__init__.py:105` y `build.py:272`; caso especial `"s3"` en
+    el bucle de `build.py:162`; números sin nombre en `build.py` (2210 1000, 1116 300/600, 8283 500, 8949 11 filas,
+    Anexo B 14/15, Anexo C 9/8).
 
 ## Historial
+### 2026-11-04 — revisión nocturna (PR #2, rama `revision-nocturna`)
+- `storage.py:34` "Guardar como" con punto (`Garcia.Maria`) usaba `with_suffix` y pisaba `Garcia.dfusa` sin aviso → se
+  agrega la extensión (y `.json` antiguo pasa a `.dfusa`). Prueba en `test_engine.py`.
+- `review.py`: W-2 del cónyuge en una declaración no conjunta se sumaba como salario propio → error en la revisión.
+- `data_loader.py:49` las cuentas en `~/.declarafacilusa` (Documentos bloqueado) se ignoraban al desbloquearse → cuenta
+  como carpeta con `usuarios.json`. `accounts.py:322` el texto de un usuario inexistente iba tal cual a `actividad.log`.
+- `accounts.py:277` al eliminar un usuario sus PDF (SSN, cuenta) quedaban para un usuario nuevo con el mismo nombre →
+  `_archive_leftovers`. Prueba con la carpeta `*_formularios`.
+- `questions.py:124` número de ruta solo por largo → dígito de control ABA (`_routing_ok`).
+- Limpieza sin cambio de montos (3.000 declaraciones aleatorias iguales al centavo): `state.py` 4 copias de
+  `phase_factor`; `federal.py` `ctc_allowed` = `has_ssn` y `_excess_ss` dos veces; `build.py` `self.other` muerto y
+  edad del cónyuge repetida. `except Exception` acotados en `assistant.py:316` y `generar_manifiesto.py:49` (ahora avisa).
+- Revisión del propio cambio (ponytail-review + Thermos): `rename` en vez de `shutil.move`, `isdecimal`, prueba de
+  respaldo que había quedado partida, `HOME` fijo en las pruebas de cuentas, `http.client.HTTPException`.
+- Pruebas: 135 → 141 pasan (7 de interfaz omitidas). Pendientes nuevos arriba.
+
 ### 2026-11-03 — revisión nocturna (PR #2, rama `revision-nocturna`)
 - `accounts.transfer_returns`/`unlock`: un Supervisor con "Crear usuarios" se llevaba las declaraciones del Administrador
   y lo desbloqueaba → `_require_admin` si la cuenta afectada es admin; la pantalla muestra el error.
