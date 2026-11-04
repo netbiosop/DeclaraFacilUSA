@@ -60,6 +60,14 @@ def _digits(v, n) -> bool:
     return len(d) == n
 
 
+def _routing_ok(v) -> bool:
+    """9 dígitos con el dígito de control ABA (pesos 3-7-1): atrapa un dígito mal tipeado."""
+    if not _digits(v, 9):
+        return False
+    d = [int(ch) for ch in v if ch.isdigit()]
+    return sum(x * w for x, w in zip(d, (3, 7, 1) * 3)) % 10 == 0
+
+
 def questions(ret: TaxReturn, res: dict) -> List[Question]:
     """Lista de preguntas que aplican a esta declaración (en orden)."""
     fed = res["federal"]
@@ -122,7 +130,7 @@ def questions(ret: TaxReturn, res: dict) -> List[Question]:
                           help=N_("Es la forma más rápida. Si responde No, el IRS envía un cheque por correo.")))
         if fi.direct_deposit:
             Q.append(Question("routing", G4, N_("Número de ruta bancaria (9 dígitos)"), "text", f, "routing",
-                              required=True, width=14, check=lambda v: _digits(v, 9),
+                              required=True, width=14, check=_routing_ok,
                               help=N_("Aparece en la parte inferior izquierda de sus cheques.")))
             Q.append(Question("account", G4, N_("Número de cuenta"), "text", f, "account", required=True, width=22,
                               check=lambda v: 4 <= len("".join(ch for ch in (v or "") if ch.isalnum())) <= 17))

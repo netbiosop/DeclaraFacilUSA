@@ -223,6 +223,12 @@ class QuestionTests(unittest.TestCase):
         ret.filing.routing = "111000025"
         self.assertEqual(questions.missing(ret, compute_all(ret), required_only=True), [])
 
+    def test_routing_number_checksum(self):
+        # 9 dígitos con un dígito mal tipeado: el IRS rechaza el depósito y el reembolso llega por cheque
+        ret = family()
+        ret.filing.routing = "111000026"
+        self.assertIn("routing", {q.key for q in questions.missing(ret, compute_all(ret), required_only=True)})
+
     def test_conditional_questions(self):
         ret = business()
         ret.income.exp_car = 1000
