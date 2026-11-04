@@ -702,6 +702,8 @@ EN = {
     "Dependiente {n}: vivio 6 meses o menos con usted; puede no calificar.": "Dependent {n}: lived with you 6 months or less; may not qualify.",
     "W-2 {e}: la retencion federal (casilla 2) supera el salario (casilla 1).": "W-2 {e}: federal withholding (box 2) exceeds wages (box 1).",
     "W-2 {e}: sin retencion federal. Verifique la casilla 2.": "W-2 {e}: no federal withholding. Check box 2.",
+    "W-2 {e} es del cónyuge: solo se incluye en una declaración conjunta. Quítelo o cambie el estado civil.":
+        "W-2 {e} belongs to the spouse: it only goes on a joint return. Remove it or change the filing status.",
     "W-2 {e} tiene retencion de {s}: puede necesitar una declaracion de no residente en {s} y el credito por impuestos pagados a otro estado.": "W-2 {e} has {s} withholding: you may need a nonresident return in {s} and the credit for taxes paid to another state.",
     "Hay un W-2 sin nombre de empleador.": "There is a W-2 without an employer name.",
 

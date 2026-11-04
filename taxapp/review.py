@@ -117,6 +117,9 @@ def review(ret: TaxReturn, res: dict) -> List[dict]:
                                                "en {s} y el credito por impuestos pagados a otro estado.", e=w.employer, s=w.state)))
         if not w.employer:
             out.append(_f("aviso", "income", _("Hay un W-2 sin nombre de empleador.")))
+        if w.owner == "conyuge" and not ret.is_joint():
+            out.append(_f("error", "income", tr("W-2 {e} es del cónyuge: solo se incluye en una declaración conjunta. "
+                                                "Quítelo o cambie el estado civil.", e=w.employer)))
     inc = ret.income
     if inc.qualified_dividends > inc.ordinary_dividends:
         out.append(_f("error", "income", _("Los dividendos calificados no pueden superar los dividendos ordinarios.")))

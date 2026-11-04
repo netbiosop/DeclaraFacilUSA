@@ -3,8 +3,11 @@
 Ejecutar:  python -m unittest discover -s tests -v
 """
 import os
+import pathlib
+import tempfile
 import sys
 import unittest
+from unittest import mock
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -247,6 +250,26 @@ class StorageAndReview(unittest.TestCase):
         msgs = [x["message"] for x in review(r, compute_all(r)) if x["severity"] == "aviso"]
         self.assertTrue(any("ITIN" in m and "contribuyente" in m for m in msgs), msgs)
         self.assertTrue(any("ITIN" in m and "X" in m for m in msgs), msgs)
+
+
+    def test_review_flags_spouse_w2_on_non_joint_return(self):
+        # el W-2 del cónyuge solo va en una declaración conjunta; en MFS o soltero se sumaría como salario propio
+        r = make(2025, "mfs", wages=50000)
+        r.w2s.append(W2(employer="Esposa SA", box1_wages=50000, owner="conyuge"))
+        errors = [x["message"] for x in review(r, compute_all(r)) if x["severity"] == "error"]
+        self.assertTrue(any("Esposa SA" in m for m in errors), errors)
+        r.filing_status = "mfj"
+        errors = [x["message"] for x in review(r, compute_all(r)) if x["severity"] == "error"]
+        self.assertFalse(any("Esposa SA" in m for m in errors), errors)
+
+    def test_save_as_name_with_dot_keeps_it(self):
+        # "Garcia.Maria" se guardaba como "Garcia.dfusa" y pisaba otra declaración sin preguntar
+        with tempfile.TemporaryDirectory() as d, mock.patch.object(storage, "add_recent"):
+            other = storage.save(make(2025, wages=1), pathlib.Path(d) / "Garcia")
+            p = storage.save(make(2025, wages=2), pathlib.Path(d) / "Garcia.Maria")
+            self.assertEqual(p.name, "Garcia.Maria.dfusa")
+            self.assertEqual(storage.load(other).w2s[0].box1_wages, 1)
+            self.assertEqual(storage.save(make(2025), pathlib.Path(d) / "x.DFUSA").name, "x.DFUSA")
 
 
 class DependentQualificationTests(unittest.TestCase):
