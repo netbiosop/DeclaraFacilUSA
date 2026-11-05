@@ -133,8 +133,37 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
     regla "el 1040-SR no lleva su última página" en `forms/__init__.py:105` y `build.py:272`; caso especial `"s3"` en
     el bucle de `build.py:162`; números sin nombre en `build.py` (2210 1000, 1116 300/600, 8283 500, 8949 11 filas,
     Anexo B 14/15, Anexo C 9/8).
+- Encontrados el 2026-11-05 (cambian montos o necesitan la interfaz; verificar con la ley antes de tocar):
+  - Estados que parten de la deducción federal (CO, ID, MT, ND, IA, NM vía `uses_federal_deduction`; DC y MO vía
+    `std_from_federal`, `state.py:177-184`): si se itemiza, la deducción incluye el propio impuesto estatal (SALT) y no
+    se suma de vuelta. Ej. 2025 MFJ $200k, casilla 17 $9,000: CO −$396, ID −$477, MO −$423, NM −$441, DC −$765. CO/ID/
+    MO/NM/DC exigen el ajuste; confirmar MT, ND, IA. Propuesta: `addback_state_income_tax` por estado en `states_<año>.json`.
+  - Utah, crédito del contribuyente (`state.py:287`): resta todo el SALT (también propiedad o ventas), no solo el impuesto
+    estatal sobre la renta (TC-40 línea 10). Ej. MFJ $45k con $6,000 de propiedad: crédito igual que con $0.
+  - Cabeza de familia como soltero en reducciones de CA (`state.py:257`, sin HOH ni MFS), UT (`ut_phase_base`, `:289`) y
+    WI (`wi_std_phase`, `:203`). Ej. CA 2025 HOH $300k: crédito por exención $370 en vez de ~$610.
+  - Calculadora rápida (`gui/tools.py:177`): "Ingreso neto estimado" no suma créditos reembolsables (EITC/ACTC). Ej. 2026
+    HOH $25k con 2 hijos: neto $23,087, real ~$33,545. Corrección de una línea, pero es interfaz Tk.
+  - Umbral de "sin pago": la línea 37 se imprime desde $0.50 pero `forms/__init__.py:180` y `mailing.py:50` usan ≥ 1.
+  - Borrador (`reports.py`): faltan filas de `other_adjustments` (Anexo 1) y `other_nonref`/`other_refundable`; la fila
+    "Desempleo, reembolsos estatales, juegos y otros" (`L["8"] - profit`) puede mostrar $0.01 por redondeo.
+  - Sin verificar: direcciones del IRS por estado en `forms/mailing.py` (AL/GA/NC/SC/TN con Austin) y la codificación del
+    archivo del Censo en `counties.py` (sin acceso a irs.gov/census.gov desde la nube).
+  - Limpieza con resultados iguales: lista de estados para combos 3 veces (`gui/tools.py:32,132`, `screens.py:209`);
+    `max_tokens` 1500 repetido y límites 200–16000 en código vs 300–8000 en pantalla (`gui/assistant.py:83,158`);
+    autoguardado 5/60 a mano (`gui/settings.py:289,299`); 2210 `1000`/`0.9` sin nombre en `review.py:~150`;
+    `counties._all` con lector JSON propio; margen `0.6 * inch` 6 veces en `reports.py`.
 
 ## Historial
+### 2026-11-05 — revisión nocturna (PR #2, rama `revision-nocturna`)
+- `local.py:56` impuesto local personalizado sobre el AGI con AGI negativo (pérdida de negocio) daba impuesto negativo y
+  "Reembolso local" → base acotada a 0 (prueba nueva; 3.000 declaraciones: solo cambian las 31 con base negativa).
+- `forms/build.py:243` líneas 34/35a/36 redondeadas por separado (100,49 y 20,50 → 100 = 80 + 21) y monto negativo al año
+  próximo impreso como (500) → dólares enteros y 0 ≤ L36 ≤ L34 (prueba nueva; cálculos iguales, 73 descuadres → 0).
+- `reports.py:31` el borrador no tenía la línea 25c (Medicare adicional retenido): 25d no era la suma (prueba nueva).
+- Limpieza: `elif` siempre verdadero y `section_name()` que solo reenviaba (`gui/assistant.py`), imports a mitad de
+  `updater.py`, `any()` en `review.py`, `SECTIONS` en `__all__` de `gui/app.py`, comentario repetido en `i18n.py`.
+- Pruebas: 141 → 144 pasan (7 de interfaz omitidas). Pendientes nuevos arriba (estados con SALT, UT, HOH, calculadora).
 ### 2026-11-04 — revisión nocturna (PR #2, rama `revision-nocturna`)
 - `storage.py:34` "Guardar como" con punto (`Garcia.Maria`) usaba `with_suffix` y pisaba `Garcia.dfusa` sin aviso → se
   agrega la extensión (y `.json` antiguo pasa a `.dfusa`). Prueba en `test_engine.py`.
