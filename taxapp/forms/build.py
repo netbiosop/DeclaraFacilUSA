@@ -242,9 +242,11 @@ class Builder:
             v["L27c_noeic"] = True
         refund = L["34"]
         if refund >= 0.5:
-            next_year = min(fi.apply_to_next_year, refund)
-            v.update({"L34": m(refund), "L35a": m(refund - next_year, True), "L36": m(next_year)})
-            if fi.direct_deposit and refund - next_year >= 0.5:
+            # En dólares enteros para que L35a + L36 = L34; lo aplicado al año próximo va de 0 al reembolso.
+            refund_whole = whole(refund)
+            next_year = min(max(0, whole(fi.apply_to_next_year)), refund_whole)
+            v.update({"L34": m(refund_whole), "L35a": m(refund_whole - next_year, True), "L36": m(next_year)})
+            if fi.direct_deposit and refund_whole > next_year:
                 v.update({"routing": digits(fi.routing), "account": fi.account.replace(" ", "").replace("-", ""),
                           "acct_checking": fi.account_type != "savings", "acct_savings": fi.account_type == "savings"})
         if L["37"] >= 0.5:

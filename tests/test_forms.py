@@ -129,6 +129,17 @@ class BuilderTests(unittest.TestCase):
     def vals(self, plan, fid, n=0):
         return [i for i in plan.instances if i.form == fid][n].values
 
+    def test_refund_lines_34_35a_36_add_up(self):
+        def lines(next_year):
+            r = TaxReturn(tax_year=2025, filing_status="single")
+            r.taxpayer = Person(first_name="Ana", last_name="Perez", ssn="123-45-6789", dob="1985-06-01")
+            r.w2s.append(W2(employer="ACME", box1_wages=60000, box2_fed_withheld=5171.99))
+            r.filing.apply_to_next_year = next_year
+            v = self.vals(self.plan(r)[1], "1040")
+            return v.get("L34"), v.get("L35a"), v.get("L36")
+        self.assertEqual(lines(20.50), ("100", "79", "21"))   # reembolso 100.49
+        self.assertEqual(lines(-500), ("100", "100", None))
+
     def test_family_forms_and_lines(self):
         ret = family()
         res, p = self.plan(ret)
