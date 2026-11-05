@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import ssl
 import urllib.request
 from functools import lru_cache
@@ -14,6 +15,10 @@ from pathlib import Path
 from typing import Dict, List
 
 from . import data_loader
+
+logger = logging.getLogger(__name__)
+
+MIN_STATES = 50  # menos que esto no es la lista nacional completa
 
 CENSUS_URLS = [
     "https://www2.census.gov/geo/docs/reference/codes2020/national_county2020.txt",
@@ -31,15 +36,12 @@ def _all() -> Dict[str, List[str]]:
     try:
         with open(data_loader.data_dir() / "counties_builtin.json", encoding="utf-8") as f:
             out.update(json.load(f)["states"])
-    except (OSError, ValueError, KeyError):
-        pass
-    try:
-        cached = json.loads(_cache_file().read_text(encoding="utf-8"))
-        for k, v in cached.items():
-            if k not in out or len(v) > len(out[k]):
-                out[k] = v
-    except (OSError, ValueError):
-        pass
+    except (OSError, ValueError, KeyError) as e:
+        logger.warning("No se pudo leer counties_builtin.json: %s", e)
+    # lista completa del Census, si ya se descargó
+    for k, v in data_loader.read_json(_cache_file(), {}).items():
+        if k not in out or len(v) > len(out[k]):
+            out[k] = v
     return out
 
 
@@ -48,7 +50,7 @@ def counties_for(code: str) -> List[str]:
 
 
 def has_full_list() -> bool:
-    return len(_all()) >= 50
+    return len(_all()) >= MIN_STATES
 
 
 def parse_census(text: str) -> Dict[str, List[str]]:
@@ -85,9 +87,10 @@ def download_from_census(timeout: int = 30) -> int:
                 raw = r.read()
             text = raw.decode("utf-8", errors="replace")
             lists = parse_census(text)
-            if len(lists) >= 50:
+            if len(lists) >= MIN_STATES:
                 save_lists(lists)
                 return len(lists)
+            last_err = ValueError(f"{url} trajo solo {len(lists)} estados")
         except Exception as e:  # noqa: BLE001 - se informa al usuario
             last_err = e
     raise RuntimeError(f"No se pudo descargar la lista del Censo: {last_err}")

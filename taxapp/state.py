@@ -7,16 +7,11 @@ jubilacion), deduccion estandar, exenciones o creditos personales, tramos por es
 from __future__ import annotations
 
 import math
-from typing import List
 
 from . import data_loader
-from .federal import bracket_tax, marginal_rate, r2
+from .federal import bracket_tax, marginal_rate, phase_factor, r2
 from .i18n import _, tr
 from .models import TaxReturn
-
-
-def _status_key(status: str) -> str:
-    return {"qss": "mfj", "mfs": "single"}.get(status, status)
 
 
 def _select_brackets(sd: dict, status: str):
@@ -68,12 +63,7 @@ def _ss_subtraction(rule: str, taxable_ss: float, agi: float, status: str, tp_ag
     if rule == "RI":
         return taxable_ss if agi <= (130000 if joint else 104000) else 0.0
     if rule == "VT":
-        lo, hi = (65000, 75000) if joint else (50000, 60000)
-        if agi <= lo:
-            return taxable_ss
-        if agi >= hi:
-            return 0.0
-        return taxable_ss * (hi - agi) / (hi - lo)
+        return taxable_ss * phase_factor(agi, (65000, 75000) if joint else (50000, 60000))
     if rule == "WV2025":
         return taxable_ss if agi <= (100000 if joint else 50000) else 0.65 * taxable_ss
     return taxable_ss
@@ -175,11 +165,7 @@ def compute_state(ret: TaxReturn, fedres: dict, code: str = None) -> dict:
             lines.append((tr("Resta: {p}% del impuesto federal (MO)", p=int(pct * 100)), -mo))
     if "OR_fed_tax_subtraction" in special and fed_tax:
         cap = sd.get("fed_tax_cap", 8500)
-        lo, hi = (250000, 290000) if joint else (125000, 145000)
-        if agi >= hi:
-            cap = 0.0
-        elif agi > lo:
-            cap = cap * (hi - agi) / (hi - lo)
+        cap *= phase_factor(agi, (250000, 290000) if joint else (125000, 145000))
         orsub = min(fed_tax, cap)
         if orsub:
             state_agi -= orsub
@@ -214,11 +200,7 @@ def compute_state(ret: TaxReturn, fedres: dict, code: str = None) -> dict:
             red = 0.03 * max(0.0, min(agi, s2) - s1) + 0.10 * max(0.0, agi - s2)
             deduction = max(deduction * 0.2, deduction - red)
         if "WI_std_sliding" in special and deduction:
-            lo, hi = sd["wi_std_phase"]["mfj" if joint else "single"]
-            if agi >= hi:
-                deduction = 0.0
-            elif agi > lo:
-                deduction = deduction * (hi - agi) / (hi - lo)
+            deduction *= phase_factor(agi, sd["wi_std_phase"]["mfj" if joint else "single"])
         if sd.get("extra_std_65_blind"):
             deduction += sd["extra_std_65_blind"] * fedres["std_boxes"]
         if ex.itemized_override > deduction:
@@ -259,13 +241,7 @@ def compute_state(ret: TaxReturn, fedres: dict, code: str = None) -> dict:
     if "AZ_dependent_credit" in special:
         dep_amount = sum(100 if (d.age(year) or 0) < 17 else 25 for d in ret.dependents)
     if "RI_phaseout" in special:
-        lo, hi = sd["phaseout_range"]
-        if agi >= hi:
-            factor = 0.0
-        elif agi > lo:
-            factor = (hi - agi) / (hi - lo)
-        else:
-            factor = 1.0
+        factor = phase_factor(agi, sd["phaseout_range"])
         if factor < 1.0:
             deduction *= factor
             persons_amount *= factor

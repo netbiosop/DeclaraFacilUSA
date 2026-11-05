@@ -2,12 +2,15 @@
 from __future__ import annotations
 
 import json
+import logging
 from datetime import datetime
 from pathlib import Path
 from typing import List
 
 from . import data_loader
 from .models import TaxReturn
+
+logger = logging.getLogger(__name__)
 
 EXT = ".dfusa"
 MAGIC = "DeclaraFacilUSA"
@@ -28,8 +31,10 @@ def loads(text: str) -> TaxReturn:
 
 def save(ret: TaxReturn, path) -> Path:
     p = Path(path)
-    if p.suffix.lower() != EXT:
+    if p.suffix.lower() == ".json":  # declaraciones antiguas abiertas como .json
         p = p.with_suffix(EXT)
+    elif p.suffix.lower() != EXT:
+        p = p.with_name(p.name + EXT)  # with_suffix cambiaría "Garcia.Maria" por "Garcia.dfusa"
     tmp = p.with_suffix(p.suffix + ".tmp")
     tmp.write_text(dumps(ret), encoding="utf-8")
     tmp.replace(p)
@@ -62,19 +67,15 @@ def _recent_file() -> Path:
 
 
 def recent() -> List[str]:
-    try:
-        items = json.loads(_recent_file().read_text(encoding="utf-8"))
-        return [x for x in items if Path(x).exists()][:8]
-    except (OSError, ValueError):
-        return []
+    return [x for x in data_loader.read_json(_recent_file(), []) if Path(x).exists()][:8]
 
 
 def add_recent(p: Path):
     items = [str(Path(p).resolve())] + [x for x in recent() if x != str(Path(p).resolve())]
     try:
         _recent_file().write_text(json.dumps(items[:8], indent=1), encoding="utf-8")
-    except OSError:
-        pass
+    except OSError as e:
+        logger.warning("No se pudo actualizar la lista de archivos recientes: %s", e)
 
 
 def default_filename(ret: TaxReturn) -> str:

@@ -92,6 +92,22 @@ class ConfigTests(Base):
         U.save_config(cfg)
         self.assertEqual(U.load_config().get_token(), "ghp_secreto")
 
+    def test_repo_from_data_is_not_frozen_in_user_file(self):
+        """check() guarda la configuración: el repositorio de data/ no puede quedar copiado en la PC,
+        si no, al publicar otro repositorio en data/actualizaciones.json las PC seguirían en el viejo."""
+        U.save_config(U.load_config())
+        data = pathlib.Path(self.tmp.name) / "data"
+        data.mkdir()
+        (data / "actualizaciones.json").write_text('{"repo": "otro/Repo"}', encoding="utf-8")
+        with mock.patch.object(U.data_loader, "data_dir", return_value=data):
+            self.assertEqual(U.load_config().repo, "otro/Repo")
+
+    def test_repo_chosen_by_admin_is_kept(self):
+        cfg = U.load_config()
+        cfg.repo = "mi/Fork"
+        U.save_config(cfg)
+        self.assertEqual(U.load_config().repo, "mi/Fork")
+
     def test_bad_repo(self):
         with self.assertRaises(U.UpdateError):
             U.latest_release(U.UpdateConfig(repo="sin-barra"))

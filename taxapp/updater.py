@@ -14,7 +14,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
+import os
 import re
+import shutil
 import ssl
 import subprocess
 import sys
@@ -28,6 +31,8 @@ from typing import Callable, Optional
 
 from . import __version__, data_loader
 from .i18n import _, tr
+
+logger = logging.getLogger(__name__)
 
 ASSET_RE = re.compile(r"^Instalar_DeclaraFacilUSA_.*\.exe$", re.I)
 API = "https://api.github.com"
@@ -53,7 +58,8 @@ class UpdateConfig:
         from .assistant import unprotect
         try:
             return unprotect(self.token)
-        except Exception:  # noqa: BLE001
+        except (OSError, ValueError, AttributeError) as e:
+            logger.warning("No se pudo descifrar el token de GitHub guardado: %s", e)
             return ""
 
     def set_token(self, tok: str):
@@ -65,21 +71,27 @@ def _user_file() -> Path:
     return data_loader.user_dir() / "actualizaciones.json"
 
 
-def load_config() -> UpdateConfig:
-    cfg = UpdateConfig()
-    for p in (data_loader.data_dir() / "actualizaciones.json", _user_file()):
-        try:
-            d = json.loads(p.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            continue
-        for k, v in d.items():
-            if k in UpdateConfig.__dataclass_fields__:
-                setattr(cfg, k, v)
+def _published_file() -> Path:
+    return data_loader.data_dir() / "actualizaciones.json"
+
+
+def _overlay(cfg: UpdateConfig, path: Path) -> UpdateConfig:
+    for k, v in data_loader.read_json(path, {}).items():
+        if k in UpdateConfig.__dataclass_fields__:
+            setattr(cfg, k, v)
     return cfg
 
 
+def load_config() -> UpdateConfig:
+    return _overlay(_overlay(UpdateConfig(), _published_file()), _user_file())
+
+
 def save_config(cfg: UpdateConfig):
-    _user_file().write_text(json.dumps(asdict(cfg), indent=1), encoding="utf-8")
+    """Guarda en la PC solo lo que difiere de data/actualizaciones.json: así un repositorio nuevo
+    publicado en data/ llega a todas las PC que no eligieron otro."""
+    published = asdict(_overlay(UpdateConfig(), _published_file()))
+    own = {k: v for k, v in asdict(cfg).items() if v != published[k]}
+    _user_file().write_text(json.dumps(own, indent=1), encoding="utf-8")
 
 
 # ---------------------------------------------------------------------------- versiones
@@ -200,7 +212,9 @@ def latest_release(cfg: UpdateConfig) -> Release:
             txt = _get_text(sha_asset["url"] if tok else sha_asset["browser_download_url"], tok)
             m = re.search(r"\b[0-9a-fA-F]{64}\b", txt)
             rel.sha256 = m.group(0).lower() if m else ""
-        except (UpdateError, urllib.error.URLError, OSError):
+        except (UpdateError, urllib.error.URLError, OSError) as e:
+            logger.warning("No se pudo leer la huella SHA-256 de %s; la descarga no se verificará: %s",
+                           rel.asset_name, e)
             rel.sha256 = ""
     return rel
 
@@ -213,8 +227,8 @@ def check(cfg: UpdateConfig = None, save=True) -> Optional[Release]:
     if save:
         try:
             save_config(cfg)
-        except OSError:
-            pass
+        except OSError as e:
+            logger.warning("No se pudo guardar la configuración de actualizaciones: %s", e)
     return rel if is_newer(rel.version) else None
 
 
@@ -277,8 +291,6 @@ def notes_text(rel: Release, limit=4000) -> str:
 # El repositorio de GitHub contiene el codigo y un manifiesto (actualizacion.json) con la huella SHA-256 de cada
 # archivo de taxapp/, data/, docs/ y assets/. La app compara y descarga solo lo que cambio, en una carpeta nueva
 # (%LOCALAPPDATA%\DeclaraFacilUSA\codigo\<version>); main.py la usa al reiniciar y vuelve a la anterior si falla.
-import os  # noqa: E402
-import shutil  # noqa: E402
 
 BRANCH = "main"
 MANIFEST = "actualizacion.json"
@@ -309,10 +321,7 @@ def _state_path() -> Path:
 
 
 def load_state() -> dict:
-    try:
-        return json.loads(_state_path().read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return {}
+    return data_loader.read_json(_state_path(), {})
 
 
 def save_state(st: dict):
@@ -453,8 +462,8 @@ def confirm_code_ok():
         if st.get("trial"):
             st.update(trial=False, attempts=0)
             save_state(st)
-    except OSError:
-        pass
+    except OSError as e:
+        logger.warning("No se pudo confirmar que la versión actual arrancó bien: %s", e)
 
 
 def restart():
@@ -475,7 +484,8 @@ def check_any(cfg: UpdateConfig = None):
         return "code", cu
     try:
         rel = check(cfg)
-    except UpdateError:
+    except UpdateError as e:
+        logger.warning("No se pudo buscar el instalador nuevo: %s", e)
         rel = None
     if rel:
         return "installer", rel

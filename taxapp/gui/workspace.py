@@ -5,14 +5,15 @@ from __future__ import annotations
 import tkinter as tk
 from tkinter import ttk
 
-from ..engine import fmt_money, balance_text
+from ..engine import fmt_money
 from ..i18n import _, N_, tr
+from ..models import nonzero_amounts
 from . import theme
 from .forms_view import FormsScreen
 from .screens import SCREENS
 from .theme import icon, icon_font
 from .ui import C, Pill, Progress, IconButton, flat_button, user_chip, label
-from .widgets import COLORS, font, Tooltip
+from .widgets import COLORS, font
 from . import layout
 
 SECTIONS = [("personal", N_("Información personal")), ("address", N_("Dirección, estado y condado")),
@@ -36,7 +37,7 @@ def section_done(key, ret, visited) -> bool:
         "personal": bool(ret.taxpayer.dob or ret.taxpayer.first_name),
         "address": bool(a.state),
         "dependents": bool(ret.dependents),
-        "income": bool(ret.w2s) or any(isinstance(v, (int, float)) and v for v in vars(inc).values()),
+        "income": bool(ret.w2s) or bool(nonzero_amounts(inc)),
     }.get(key, False)
 
 

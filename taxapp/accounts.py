@@ -15,6 +15,7 @@ import copy
 import hashlib
 import hmac
 import json
+import logging
 import os
 import re
 import shutil
@@ -25,6 +26,8 @@ from typing import Dict, List, Optional, Tuple
 
 from . import data_loader
 from .i18n import N_, _, tr
+
+logger = logging.getLogger(__name__)
 
 ITERATIONS = 240_000
 ROLES = ["admin", "supervisor", "preparer", "viewer"]
@@ -68,7 +71,8 @@ DEFAULT_SETTINGS = {"max_attempts": 5, "lock_minutes": 15, "min_password": 8, "i
 PREPARER_FIELDS = ("name", "ptin", "firm", "firm_address", "firm_phone", "firm_ein", "self_employed")
 DEFAULT_PREFS = {"theme": "A", "accent": "", "font": "", "size": "normal", "language": "",
                  "meter": "", "ai_docked": None, "autosave": 5}
-USERNAME_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{1,31}$")
+USERNAME_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{0,30}[a-z0-9_-]$")  # sin punto final: Windows lo quita de la carpeta
+WINDOWS_RESERVED = {"con", "prn", "aux", "nul", *(f"com{i}" for i in range(1, 10)), *(f"lpt{i}" for i in range(1, 10))}
 
 
 class AccountError(Exception):
@@ -84,15 +88,41 @@ def _log_file() -> Path:
     return data_loader.user_dir() / "actividad.log"
 
 
+# Marca de una lista cargada vacía porque el archivo no se pudo leer (bloqueado por el antivirus o la
+# sincronización): guardarla borraría todas las cuentas, así que save() la rechaza.
+_UNREADABLE = "_unreadable"
+_UNREADABLE_MSG = N_("No se pudo leer la lista de usuarios. Cierre otros programas que la usen e intente de nuevo.")
+
+
 def _empty() -> dict:
     return {"version": 1, "users": [], "matrix": copy.deepcopy(DEFAULT_MATRIX), "settings": dict(DEFAULT_SETTINGS)}
 
 
-def load() -> dict:
+def _keep_damaged(p: Path, err: Exception):
+    """Copia un usuarios.json ilegible antes de que el asistente de inicio lo reemplace por uno nuevo."""
+    backup = p.with_name(f"usuarios.danado-{datetime.now():%Y%m%d-%H%M%S}.json")
     try:
-        d = json.loads(_file().read_text(encoding="utf-8"))
-    except (OSError, ValueError):
+        content = p.read_bytes()
+        if any(prev.read_bytes() == content for prev in p.parent.glob("usuarios.danado-*.json")):
+            return  # esta versión dañada ya tiene su copia
+        shutil.copy2(p, backup)
+        logger.error("usuarios.json ilegible (%s); se guardó una copia en %s", err, backup)
+    except OSError as e:
+        logger.error("usuarios.json ilegible (%s) y no se pudo copiar: %s", err, e)
+
+
+def load() -> dict:
+    p = _file()
+    try:
+        d = json.loads(p.read_text(encoding="utf-8"))
+    except FileNotFoundError:
         return _empty()
+    except ValueError as e:
+        _keep_damaged(p, e)
+        return _empty()
+    except OSError as e:
+        logger.error("No se pudo leer usuarios.json: %s", e)
+        return {**_empty(), _UNREADABLE: True}
     d.setdefault("users", [])
     m = d.setdefault("matrix", {})
     for r in ROLES:
@@ -112,6 +142,8 @@ def load() -> dict:
 
 
 def save(db: dict):
+    if db.get(_UNREADABLE):
+        raise AccountError(_(_UNREADABLE_MSG))
     p = _file()
     tmp = p.with_suffix(".tmp")
     tmp.write_text(json.dumps(db, indent=1, ensure_ascii=False), encoding="utf-8")
@@ -157,6 +189,8 @@ def normalize_username(name: str) -> str:
 def validate_username(name: str) -> Optional[str]:
     if not USERNAME_RE.match(name):
         return _("Usuario inválido: use 2 a 32 letras minúsculas, números, punto, guion o guion bajo.")
+    if name.split(".")[0] in WINDOWS_RESERVED:
+        return _("Ese nombre de usuario lo reserva Windows. Elija otro.")
     return None
 
 
@@ -182,6 +216,14 @@ def active_admins(db: dict) -> int:
     return sum(1 for u in db["users"] if u["role"] == "admin" and u.get("active", True))
 
 
+def _require_admin(db: dict, by: str):
+    """Solo un Administrador crea, cambia, restablece, desbloquea o borra cuentas de Administrador (el permiso
+    "Crear usuarios y asignar roles" no alcanza para hacerse Administrador)."""
+    u = find(db, by) if by else None
+    if not (u and u["role"] == "admin"):
+        raise AccountError(_("Solo un Administrador puede cambiar cuentas de Administrador o los permisos de los roles."))
+
+
 def create_user(username: str, name: str, role: str, password: str, by: str = "", db: dict = None) -> dict:
     db = db or load()
     username = normalize_username(username)
@@ -193,6 +235,8 @@ def create_user(username: str, name: str, role: str, password: str, by: str = ""
     if find(db, username):
         raise AccountError(tr("Ya existe el usuario '{u}'.", u=username))
     first = not db["users"]
+    if role == "admin" and not first:
+        _require_admin(db, by)
     u = {"username": username, "name": (name or username).strip(), "role": role, "password": hash_password(password),
          "active": True, "failed": 0, "locked_until": "", "created": _now(), "last_login": "", "prefs": {},
          "must_change": False}
@@ -210,6 +254,8 @@ def update_user(username: str, by: str, name: str = None, role: str = None, acti
     u = find(db, username)
     if not u:
         raise AccountError(_("Usuario no encontrado."))
+    if u["role"] == "admin" or role == "admin":
+        _require_admin(db, by)
     demoting = (role is not None and role != "admin") or active is False
     if u["role"] == "admin" and u.get("active", True) and demoting and active_admins(db) <= 1:
         raise AccountError(_("Debe quedar al menos un Administrador activo."))
@@ -235,13 +281,32 @@ def delete_user(username: str, by: str, transfer_to: str = None):
         raise AccountError(_("Usuario no encontrado."))
     if normalize_username(username) == normalize_username(by):
         raise AccountError(_("No puede eliminar su propia cuenta."))
-    if u["role"] == "admin" and active_admins(db) <= 1:
+    if u["role"] == "admin":
+        _require_admin(db, by)
+    if u["role"] == "admin" and u.get("active", True) and active_admins(db) <= 1:
         raise AccountError(_("Debe quedar al menos un Administrador activo."))
     if transfer_to:
         transfer_returns(username, transfer_to, by)
     db["users"].remove(u)
     save(db)
+    _archive_leftovers(username, transfer_to or by)
     log("user_deleted", by, username)
+
+
+def _archive_leftovers(username: str, keeper: str):
+    """Lo que quedó en la carpeta (PDF exportados con SSN y cuenta bancaria) pasa a una subcarpeta de quien se queda
+    con sus declaraciones: si no, un usuario nuevo con el mismo nombre lo heredaría."""
+    src = returns_root() / normalize_username(username)
+    if not src.is_dir():
+        return
+    try:
+        if any(src.iterdir()):
+            dest = returns_dir(keeper) / f"{normalize_username(username)}_eliminado_{datetime.now():%Y%m%d_%H%M%S}"
+            src.rename(dest)  # mismo disco: todo o nada (shutil.move copiaba y dejaba restos si un PDF estaba abierto)
+        else:
+            src.rmdir()
+    except OSError as e:  # un PDF abierto en Windows bloquea la carpeta: el usuario ya se borró, se avisa en el log
+        logger.warning("No se pudo archivar la carpeta del usuario eliminado %s: %s", username, e)
 
 
 def set_password(username: str, new_password: str, by: str, current: str = None, must_change: bool = False):
@@ -249,6 +314,8 @@ def set_password(username: str, new_password: str, by: str, current: str = None,
     u = find(db, username)
     if not u:
         raise AccountError(_("Usuario no encontrado."))
+    if u["role"] == "admin":
+        _require_admin(db, by)
     if current is not None and not verify_password(current, u["password"]):
         raise AccountError(_("La contraseña actual no es correcta."))
     err = check_password_rules(new_password, db)
@@ -264,10 +331,12 @@ def set_password(username: str, new_password: str, by: str, current: str = None,
 def authenticate(username: str, password: str) -> Tuple[Optional[dict], str]:
     """Devuelve (usuario, "") o (None, mensaje)."""
     db = load()
+    if db.get(_UNREADABLE):
+        return None, _(_UNREADABLE_MSG)
     u = find(db, username)
     generic = _("Usuario o contraseña incorrectos.")
     if not u:
-        log("login_failed", normalize_username(username), "unknown user")
+        log("login_failed", "", "unknown user")  # lo escrito puede ser la contraseña puesta en el campo equivocado
         return None, generic
     if not u.get("active", True):
         log("login_failed", u["username"], "disabled")
@@ -305,6 +374,8 @@ def authenticate(username: str, password: str) -> Tuple[Optional[dict], str]:
 def unlock(username: str, by: str):
     db = load()
     u = find(db, username)
+    if u and u["role"] == "admin":
+        _require_admin(db, by)
     if u:
         u["failed"], u["locked_until"] = 0, ""
         save(db)
@@ -330,6 +401,7 @@ def can(user: Optional[dict], perm: str, db: dict = None) -> bool:
 
 def set_matrix(matrix: Dict[str, Dict[str, bool]], by: str):
     db = load()
+    _require_admin(db, by)  # si no, quien tiene "Crear usuarios" se daría a sí mismo los demás permisos
     for r in ROLES:
         if r == "admin":
             continue
@@ -347,12 +419,13 @@ def settings() -> dict:
 
 def update_settings(by: str, **kw):
     db = load()
-    for k, v in kw.items():
-        if k in DEFAULT_SETTINGS:
-            db["settings"][k] = v
+    changed = {k: v for k, v in kw.items() if k in DEFAULT_SETTINGS and db["settings"].get(k) != v}
+    if not changed:
+        return
+    db["settings"].update(changed)
     save(db)
-    if set(kw) - {"last_user"}:
-        log("settings_changed", by, ", ".join(sorted(kw)))
+    if set(changed) - {"last_user"}:
+        log("settings_changed", by, ", ".join(sorted(changed)))
 
 
 def prefs_for(username: str) -> dict:
@@ -420,17 +493,8 @@ def can_access_path(user: dict, path) -> bool:
     return own == p.parent or own in p.parents
 
 
-def owner_of(path) -> str:
-    try:
-        rel = Path(path).resolve().relative_to(returns_root().resolve())
-        return rel.parts[0] if len(rel.parts) > 1 else ""
-    except (ValueError, OSError):
-        return ""
-
-
 def list_returns(user: dict) -> List[dict]:
     """Declaraciones visibles para el usuario: [{path, owner, name, modified}]."""
-    dirs = []
     if can(user, "view_all"):
         dirs = [d for d in returns_root().iterdir() if d.is_dir()]
     else:
@@ -448,6 +512,10 @@ def list_returns(user: dict) -> List[dict]:
 
 
 def transfer_returns(src: str, dst: str, by: str) -> int:
+    db = load()
+    u = find(db, src)
+    if u and u["role"] == "admin":
+        _require_admin(db, by)  # si no, quien tiene "Crear usuarios" se llevaría las declaraciones de un Administrador
     a, b = returns_dir(src), returns_dir(dst)
     n = 0
     for f in list(a.glob("*.dfusa")):
@@ -467,8 +535,8 @@ def log(event: str, user: str, detail: str = ""):
     try:
         with open(_log_file(), "a", encoding="utf-8") as fh:
             fh.write(json.dumps({"time": _now(), "user": user, "event": event, "detail": detail}, ensure_ascii=False) + "\n")
-    except OSError:
-        pass
+    except OSError as e:
+        logger.warning("No se pudo anotar en el registro de actividad (%s): %s", event, e)
 
 
 EVENT_LABELS = {
