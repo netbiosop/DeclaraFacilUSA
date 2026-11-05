@@ -53,7 +53,7 @@ def _apply(j: dict, name: str, ret: TaxReturn, fedres: dict, stres: dict, overri
     }
     rate_desc = ""
     tax = 0.0
-    base = bases.get(base_key, bases["state_taxable"])
+    base = max(0.0, bases.get(base_key, bases["state_taxable"]))  # el AGI puede ser negativo
     if method == "flat":
         rate = (override_rate / 100.0) if (override_rate and j.get("editable")) else j["rate"]
         if base_key == "earned_less_exemptions":

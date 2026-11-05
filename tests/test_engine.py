@@ -12,7 +12,7 @@ from unittest import mock
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from taxapp.engine import compute_all  # noqa: E402
-from taxapp.models import TaxReturn, W2, Dependent, Person, clean_money_text  # noqa: E402
+from taxapp.models import TaxReturn, W2, Dependent, Person, CustomLocalTax, clean_money_text  # noqa: E402
 from taxapp.review import review, valid_ssn  # noqa: E402
 from taxapp import storage  # noqa: E402
 
@@ -138,6 +138,13 @@ class StateLocalTests(unittest.TestCase):
         self.assertAlmostEqual(res["state"]["taxable_income"], 53450)
         self.assertAlmostEqual(res["state"]["tax"], 2486.38, places=1)
         self.assertAlmostEqual(res["local"]["total"], 1710.40, places=1)
+
+    def test_custom_local_on_negative_agi_is_zero_not_refund(self):
+        r = make(2025, state="OH", business_gross=10000, exp_rent=40000)
+        r.state_extras.custom_local = [CustomLocalTax(name="Villa X", base="agi", rate=2)]
+        loc = compute_all(r)["local"]
+        self.assertEqual(loc["total"], 0)
+        self.assertEqual(loc["refund"], 0)
 
     def test_maryland_anne_arundel_graduated(self):
         res = compute_all(make(2025, wages=80000, state="MD", county="Anne Arundel"))
