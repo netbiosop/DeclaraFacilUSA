@@ -55,7 +55,7 @@ def load_saved_language() -> str:
     global _lang
     from .data_loader import read_json
     saved = read_json(_config_file(), {}).get("language")
-    _lang = saved if saved in LANGS else system_language()   # la primera vez, el idioma del sistema
+    _lang = saved if saved in LANGS else system_language()
     return _lang
 
 

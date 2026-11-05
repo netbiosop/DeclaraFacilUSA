@@ -15,7 +15,9 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import os
 import re
+import shutil
 import ssl
 import subprocess
 import sys
@@ -289,8 +291,6 @@ def notes_text(rel: Release, limit=4000) -> str:
 # El repositorio de GitHub contiene el codigo y un manifiesto (actualizacion.json) con la huella SHA-256 de cada
 # archivo de taxapp/, data/, docs/ y assets/. La app compara y descarga solo lo que cambio, en una carpeta nueva
 # (%LOCALAPPDATA%\DeclaraFacilUSA\codigo\<version>); main.py la usa al reiniciar y vuelve a la anterior si falla.
-import os  # noqa: E402
-import shutil  # noqa: E402
 
 BRANCH = "main"
 MANIFEST = "actualizacion.json"

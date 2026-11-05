@@ -24,7 +24,7 @@ from . import layout
 
 logger = logging.getLogger(__name__)
 
-__all__ = ["App", "SECTIONS", "main"]
+__all__ = ["App", "main"]
 
 
 class App(tk.Tk):

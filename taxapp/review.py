@@ -164,6 +164,6 @@ def review(ret: TaxReturn, res: dict) -> List[dict]:
     for n in loc.get("notes", []):
         out.append(_f("info", "local", n))
 
-    if not [x for x in out if x["severity"] == "error"]:
+    if not any(x["severity"] == "error" for x in out):
         out.insert(0, _f("ok", "review", _("No se encontraron errores que impidan generar la declaracion.")))
     return out

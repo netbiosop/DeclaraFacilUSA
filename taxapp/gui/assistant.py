@@ -161,7 +161,7 @@ class AISettingsDialog(tk.Toplevel):
         for c, k in self.keys.items():
             if k:
                 cfg.set_key(k, c)
-            elif c in self.keys and c in cfg.keys and not k:
+            else:
                 cfg.keys.pop(c, None)
         return cfg
 
@@ -403,12 +403,9 @@ class AssistantPanel(tk.Frame):
         self.txt.configure(state="disabled")
 
     # ---------------------------------------------------------------- contexto
-    def section_name(self) -> str:
-        return self.app.section_name()
-
     def _system(self):
         res = self.app.result if self.app.ret else None
-        return ai.system_prompt(self.app.ret, res, self.section_name(), include_data=bool(self.use_data.get()),
+        return ai.system_prompt(self.app.ret, res, self.app.section_name(), include_data=bool(self.use_data.get()),
                                 web=bool(self.web.get()) and self.cfg.supports_web())
 
     def show_payload(self):
@@ -430,7 +427,7 @@ class AssistantPanel(tk.Frame):
 
     def quick(self, n):
         label, prompt = ai.QUICK_ACTIONS[n]
-        self.ask(tr(prompt, section=self.section_name()))
+        self.ask(tr(prompt, section=self.app.section_name()))
 
     def ask(self, question: str):
         if self.busy:
