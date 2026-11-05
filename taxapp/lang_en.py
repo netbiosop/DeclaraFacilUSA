@@ -567,6 +567,7 @@ EN = {
     "IMPUESTO TOTAL": "TOTAL TAX",
     "Retencion federal - W-2": "Federal withholding - W-2",
     "Retencion federal - 1099 y otros": "Federal withholding - 1099 and other",
+    "Retencion de Medicare adicional (Form 8959)": "Additional Medicare tax withheld (Form 8959)",
     "Total retenido": "Total withheld",
     "Pagos estimados y con la prorroga": "Estimated and extension payments",
     "Credito por ingreso del trabajo (EIC)": "Earned income credit (EIC)",

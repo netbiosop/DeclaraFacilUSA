@@ -180,6 +180,16 @@ class StateLocalTests(unittest.TestCase):
                     self.assertLess(s["tax"], 85000 * 0.12, (year, code, status))
 
 
+class ReportTests(unittest.TestCase):
+    def test_draft_lists_line_25c_so_totals_add_up(self):
+        from taxapp import reports
+        r = make(2025, wages=300000)
+        r.w2s[0].box6_medicare_withheld = 5250   # 900 de Medicare adicional retenido
+        html = reports.to_html(r, compute_all(r), [])
+        self.assertIn("Linea 25c:", html)
+        self.assertIn("$900.00", html)
+
+
 class MoneyTextTests(unittest.TestCase):
     def test_decimal_comma_and_thousands(self):
         cases = {"1500,50": "1500.50", "12,5": "12.5", "-3,25": "-3.25", "1,500": "1500",
