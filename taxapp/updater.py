@@ -165,14 +165,14 @@ class _NoRedirect(urllib.request.HTTPRedirectHandler):
         return None
 
 
-def _resolve(url: str, token: str, accept: str):
-    """Para repositorios privados: pide el archivo con la clave sin seguir la redireccion; la descarga real
+def _resolve(url: str, headers: dict):
+    """Con clave (encabezado Authorization): pide el archivo sin seguir la redireccion; la descarga real
     (servidor de GitHub) se hace sin la clave."""
-    if not token:
-        return urllib.request.Request(url, headers=_headers("", accept))
+    if "Authorization" not in headers:
+        return urllib.request.Request(url, headers=headers)
     opener = urllib.request.build_opener(_NoRedirect, urllib.request.HTTPSHandler(context=ssl.create_default_context()))
     try:
-        r = opener.open(urllib.request.Request(url, headers=_headers(token, accept)), timeout=TIMEOUT)
+        r = opener.open(urllib.request.Request(url, headers=headers), timeout=TIMEOUT)
         return r          # sin redireccion: el contenido viene directo
     except urllib.error.HTTPError as e:
         if e.code in (301, 302, 303, 307, 308) and e.headers.get("Location"):
@@ -181,10 +181,12 @@ def _resolve(url: str, token: str, accept: str):
 
 
 def _download_bytes(url, token="", accept="application/octet-stream") -> bytes:
-    target = _resolve(url, token, accept)
+    return _read(_resolve(url, _headers(token, accept)))
+
+
+def _read(target) -> bytes:
     if isinstance(target, urllib.request.Request):
-        with _open(target) as r:
-            return r.read()
+        target = _open(target)
     with target as r:
         return r.read()
 
@@ -242,7 +244,7 @@ def download(rel: Release, cfg: UpdateConfig = None, progress: Callable[[int, in
     dest = dest_dir / rel.asset_name
     url = rel.asset_api_url if tok else rel.asset_download_url
     try:
-        target = _resolve(url, tok, "application/octet-stream")
+        target = _resolve(url, _headers(tok, "application/octet-stream"))
         resp = _open(target, timeout=60) if isinstance(target, urllib.request.Request) else target
         total = int(resp.headers.get("Content-Length") or rel.size or 0)
         h = hashlib.sha256()
@@ -359,8 +361,7 @@ def _fetch(url: str, token: str = "", accept: str = "*/*") -> bytes:
     if token:
         h["Authorization"] = f"token {token}"
     try:
-        with _open(urllib.request.Request(url, headers=h), timeout=30) as r:
-            return r.read()
+        return _read(_resolve(url, h))
     except urllib.error.HTTPError as e:
         if e.code == 404:
             raise UpdateError(_("No se encontró el repositorio o todavía no tiene versiones publicadas. "
