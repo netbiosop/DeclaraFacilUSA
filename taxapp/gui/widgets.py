@@ -1,6 +1,7 @@
 """Widgets y utilidades de la interfaz (tkinter/ttk)."""
 from __future__ import annotations
 
+import math
 import tkinter as tk
 from tkinter import ttk
 from typing import Callable, List, Optional
@@ -31,6 +32,8 @@ def parse_money(text: str) -> Optional[float]:
     try:
         v = float(t)
     except ValueError:
+        return None
+    if not math.isfinite(v):
         return None
     return -v if neg else v
 

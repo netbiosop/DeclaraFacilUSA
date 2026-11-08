@@ -4,6 +4,7 @@ Todas las clases son dataclasses serializables a JSON con to_dict()/from_dict().
 """
 from __future__ import annotations
 
+import math
 import re
 from dataclasses import dataclass, field, asdict, fields
 from datetime import date
@@ -35,7 +36,8 @@ def _num(v) -> float:
     try:
         if v in (None, ""):
             return 0.0
-        return float(clean_money_text(v) or 0)
+        n = float(clean_money_text(v) or 0)
+        return n if math.isfinite(n) else 0.0
     except (TypeError, ValueError):
         return 0.0
 

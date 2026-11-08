@@ -191,6 +191,10 @@ class ReportTests(unittest.TestCase):
 
 
 class MoneyTextTests(unittest.TestCase):
+    def test_nan_and_inf_are_not_amounts(self):
+        for text in ("nan", "inf", "-inf", "Infinity"):
+            self.assertEqual(W2(box1_wages=text).box1_wages, 0.0, text)
+
     def test_decimal_comma_and_thousands(self):
         cases = {"1500,50": "1500.50", "12,5": "12.5", "-3,25": "-3.25", "1,500": "1500",
                  "$1,500.25": "1500.25", "1,234,567": "1234567", " $ 2 000 ": "2000"}
@@ -268,6 +272,15 @@ class StorageAndReview(unittest.TestCase):
         self.assertTrue(any("ITIN" in m and "contribuyente" in m for m in msgs), msgs)
         self.assertTrue(any("ITIN" in m and "X" in m for m in msgs), msgs)
 
+
+    def test_review_warns_retirement_gross_without_taxable(self):
+        r = make(wages=50000)
+        r.income.pension_gross = 30000
+        msgs = [x["message"] for x in review(r, compute_all(r)) if x["severity"] == "aviso"]
+        self.assertTrue(any("1099-R" in m for m in msgs), msgs)
+        r.income.pension_taxable = 30000
+        msgs = [x["message"] for x in review(r, compute_all(r)) if x["severity"] == "aviso"]
+        self.assertFalse(any("1099-R" in m for m in msgs), msgs)
 
     def test_review_flags_spouse_w2_on_non_joint_return(self):
         # el W-2 del cónyuge solo va en una declaración conjunta; en MFS o soltero se sumaría como salario propio
