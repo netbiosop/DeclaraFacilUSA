@@ -48,6 +48,34 @@ class TokenRedirectTests(unittest.TestCase):
         self.assertIn("ghp_SECRETO", seen["/a"])
         self.assertIsNone(seen["/b"])
 
+    def test_fetch_keeps_token_on_same_host_redirect(self):
+        import http.server
+        import threading
+        seen = {}
+
+        class H(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                seen[self.path] = (self.headers.get("Authorization"), self.headers.get("Accept"))
+                if self.path == "/viejo":
+                    self.send_response(301)
+                    self.send_header("Location", "/nuevo")
+                    self.end_headers()
+                else:
+                    self.send_response(200)
+                    self.send_header("Content-Length", "3")
+                    self.end_headers()
+                    self.wfile.write(b"sha")
+
+            def log_message(self, *a):
+                pass
+        srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), H)
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+        self.addCleanup(srv.shutdown)
+        with mock.patch.dict(os.environ, {"no_proxy": "*", "NO_PROXY": "*"}):
+            data = U._fetch(f"http://127.0.0.1:{srv.server_port}/viejo", "ghp_SECRETO", "application/vnd.github.sha")
+        self.assertEqual(data, b"sha")
+        self.assertEqual(seen["/nuevo"], ("token ghp_SECRETO", "application/vnd.github.sha"))
+
 
 class Resp:
     def __init__(self, data: bytes, headers=None):

@@ -319,9 +319,9 @@ class App(tk.Tk):
         """La conversación de un cliente no debe llegar al proveedor junto con los datos de otro."""
         dock = self.workspace.dock if self.workspace else None
         if dock:
-            dock.clear()
+            dock.forget_client()
         if self.assistant_win and self.assistant_win.winfo_exists():
-            self.assistant_win.panel.clear()
+            self.assistant_win.panel.forget_client()
 
     def continue_return(self):
         if self.ret:

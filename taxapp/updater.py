@@ -23,6 +23,7 @@ import subprocess
 import sys
 import tempfile
 import urllib.error
+import urllib.parse
 import urllib.request
 from dataclasses import dataclass, asdict
 from datetime import datetime
@@ -164,7 +165,7 @@ class _NoRedirect(urllib.request.HTTPRedirectHandler):
         return None
 
 
-def _resolve(url: str, headers: dict, timeout=TIMEOUT):
+def _resolve(url: str, headers: dict, timeout=TIMEOUT, hops: int = 5):
     """Con clave (encabezado Authorization): pide el archivo sin seguir la redireccion; la descarga real
     (servidor de GitHub) se hace sin la clave."""
     if "Authorization" not in headers:
@@ -175,7 +176,10 @@ def _resolve(url: str, headers: dict, timeout=TIMEOUT):
         return r          # sin redireccion: el contenido viene directo
     except urllib.error.HTTPError as e:
         if e.code in (301, 302, 303, 307, 308) and e.headers.get("Location"):
-            return urllib.request.Request(e.headers["Location"], headers={"User-Agent": f"DeclaraFacilUSA/{__version__}"})
+            target = urllib.parse.urljoin(url, e.headers["Location"])
+            if hops and urllib.parse.urlsplit(target).netloc == urllib.parse.urlsplit(url).netloc:
+                return _resolve(target, headers, timeout, hops - 1)  # p. ej. repositorio renombrado: sigue en la API
+            return urllib.request.Request(target, headers={"User-Agent": f"DeclaraFacilUSA/{__version__}"})
         raise
 
 

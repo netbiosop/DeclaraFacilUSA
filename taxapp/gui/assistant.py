@@ -216,6 +216,7 @@ class AssistantPanel(tk.Frame):
         self.cfg = ai.load_config()
         self.history = []          # [{"role","content"}]
         self.busy = False
+        self.discard_reply = False
         self.q = queue.Queue()
         self.link_n = 0
         c = COLORS
@@ -355,6 +356,14 @@ class AssistantPanel(tk.Frame):
     def clear(self):
         if self.busy:
             return
+        self._wipe()
+
+    def forget_client(self):
+        """Otra declaración: la conversación y la respuesta en camino eran del cliente anterior."""
+        self.discard_reply = self.busy
+        self._wipe()
+
+    def _wipe(self):
         self.history = []
         self.txt.configure(state="normal")
         self.txt.delete("1.0", "end")
@@ -490,6 +499,9 @@ class AssistantPanel(tk.Frame):
         self.busy = False
         self.send_btn.state(["!disabled"])
         self.status.configure(text="")
+        if self.discard_reply:
+            self.discard_reply = False
+            return
         self._write("\n" + _("Asistente") + f" ({provider_label(self.cfg.provider)})\n", "ai")
         if kind == "ok":
             text = text or _("(respuesta vacía)")

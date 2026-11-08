@@ -54,6 +54,15 @@ class LogoutTests(unittest.TestCase):
             win.new_return(2025)
             self.assertEqual(win.assistant_win.panel.history, [])
 
+            panel = win.assistant_win.panel
+            panel.history = [{"role": "user", "content": "cliente A"}]
+            panel.busy = True
+            win.dirty = False
+            win.new_return(2025)
+            panel._done("ok", "respuesta para A", [])
+            self.assertEqual(panel.history, [])
+            self.assertFalse(panel.busy)
+
 
 if __name__ == "__main__":
     unittest.main()
