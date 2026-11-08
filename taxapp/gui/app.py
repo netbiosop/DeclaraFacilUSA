@@ -312,7 +312,16 @@ class App(tk.Tk):
         self.readonly = False
         if self.workspace:
             self.workspace.reset()
+        self._clear_ai_chat()
         self.show_workspace("personal")
+
+    def _clear_ai_chat(self):
+        """La conversación de un cliente no debe llegar al proveedor junto con los datos de otro."""
+        dock = self.workspace.dock if self.workspace else None
+        if dock:
+            dock.clear()
+        if self.assistant_win and self.assistant_win.winfo_exists():
+            self.assistant_win.panel.clear()
 
     def continue_return(self):
         if self.ret:
@@ -347,6 +356,7 @@ class App(tk.Tk):
         self.path = Path(path)
         self.dirty = False
         self.readonly = not self.can("edit")
+        self._clear_ai_chat()
         accounts.log("return_opened", self.user["username"], self.path.name)
         if self.workspace:
             self.workspace.destroy()

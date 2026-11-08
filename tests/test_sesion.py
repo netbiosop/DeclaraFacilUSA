@@ -37,6 +37,23 @@ class LogoutTests(unittest.TestCase):
             win.update()
             self.assertFalse(workspace.winfo_exists())
 
+    def test_new_return_clears_ai_chat_of_previous_client(self):
+        with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home, "USERPROFILE": home}):
+            from taxapp import accounts
+            from taxapp.gui import app as A
+            from taxapp.gui.assistant import AssistantWindow
+            accounts.create_user("admin", "Admin", "admin", "Secreta123")
+            win = A.App()
+            self.addCleanup(win.destroy)
+            user, _err = accounts.authenticate("admin", "Secreta123")
+            win.login_ok(user)
+            win.new_return(2025)
+            win.assistant_win = AssistantWindow(win)
+            win.assistant_win.panel.history = [{"role": "user", "content": "cliente A"}]
+            win.dirty = False
+            win.new_return(2025)
+            self.assertEqual(win.assistant_win.panel.history, [])
+
 
 if __name__ == "__main__":
     unittest.main()
