@@ -114,7 +114,6 @@ class App(tk.Tk):
         self.user = None
         storage.current_user = ""
         self.ret, self.path, self.result, self.dirty = None, None, None, False
-        self.workspace = None
         self._apply_login_style()
         self._rebuild("login")
 
