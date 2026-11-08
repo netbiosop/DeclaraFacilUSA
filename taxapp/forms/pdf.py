@@ -246,7 +246,7 @@ def _wrap(text: str, width: int) -> List[str]:
 
 def text_document(blocks: List[tuple], footer: str = "") -> bytes:
     """PDF tamaño carta con texto simple (Helvetica). blocks: lista de (estilo, texto); estilos: 'h1', 'h2', 'p',
-    'mono', 'box' (recuadro destacado), 'sp' (espacio). Sin dependencias externas."""
+    'mono', 'box' (recuadro destacado), 'sp' (espacio)."""
     require()
     W, H, M = 612, 792, 54
     writer = pypdf.PdfWriter()

@@ -158,8 +158,8 @@ def has_users() -> bool:
 
 
 # ---------------------------------------------------------------------------- contrasenas
-def hash_password(password: str, iterations: int = None) -> str:
-    it = iterations or ITERATIONS
+def hash_password(password: str) -> str:
+    it = ITERATIONS
     salt = os.urandom(16)
     dk = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, it)
     return f"pbkdf2_sha256${it}${base64.b64encode(salt).decode()}${base64.b64encode(dk).decode()}"
@@ -579,7 +579,7 @@ def create_backup(dest, by: str) -> Path:
         dest = dest.with_suffix(".zip")
     with zipfile.ZipFile(dest, "w", zipfile.ZIP_DEFLATED) as z:
         for p in base.rglob("*"):
-            if p.is_file() and p.resolve() != dest.resolve() and p.suffix.lower() not in (".tmp",) \
+            if p.is_file() and p.resolve() != dest.resolve() and p.suffix.lower() != ".tmp" \
                     and "Respaldos" not in p.relative_to(base).parts:
                 z.write(p, p.relative_to(base))
     log("backup_created", by, dest.name)

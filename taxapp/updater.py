@@ -24,7 +24,7 @@ import sys
 import tempfile
 import urllib.error
 import urllib.request
-from dataclasses import dataclass, asdict, field
+from dataclasses import dataclass, asdict
 from datetime import datetime
 from pathlib import Path
 from typing import Callable, Optional
@@ -122,7 +122,6 @@ class Release:
     asset_download_url: str = ""
     size: int = 0
     sha256: str = ""
-    extra: dict = field(default_factory=dict)
 
 
 # ---------------------------------------------------------------------------- HTTP
@@ -165,14 +164,14 @@ class _NoRedirect(urllib.request.HTTPRedirectHandler):
         return None
 
 
-def _resolve(url: str, headers: dict):
+def _resolve(url: str, headers: dict, timeout=TIMEOUT):
     """Con clave (encabezado Authorization): pide el archivo sin seguir la redireccion; la descarga real
     (servidor de GitHub) se hace sin la clave."""
     if "Authorization" not in headers:
         return urllib.request.Request(url, headers=headers)
     opener = urllib.request.build_opener(_NoRedirect, urllib.request.HTTPSHandler(context=ssl.create_default_context()))
     try:
-        r = opener.open(urllib.request.Request(url, headers=headers), timeout=TIMEOUT)
+        r = opener.open(urllib.request.Request(url, headers=headers), timeout=timeout)
         return r          # sin redireccion: el contenido viene directo
     except urllib.error.HTTPError as e:
         if e.code in (301, 302, 303, 307, 308) and e.headers.get("Location"):
@@ -184,9 +183,9 @@ def _download_bytes(url, token="", accept="application/octet-stream") -> bytes:
     return _read(_resolve(url, _headers(token, accept)))
 
 
-def _read(target) -> bytes:
+def _read(target, timeout=TIMEOUT) -> bytes:
     if isinstance(target, urllib.request.Request):
-        target = _open(target)
+        target = _open(target, timeout=timeout)
     with target as r:
         return r.read()
 
@@ -217,7 +216,6 @@ def latest_release(cfg: UpdateConfig) -> Release:
         except (UpdateError, urllib.error.URLError, OSError) as e:
             logger.warning("No se pudo leer la huella SHA-256 de %s; la descarga no se verificará: %s",
                            rel.asset_name, e)
-            rel.sha256 = ""
     return rel
 
 
@@ -361,7 +359,7 @@ def _fetch(url: str, token: str = "", accept: str = "*/*") -> bytes:
     if token:
         h["Authorization"] = f"token {token}"
     try:
-        return _read(_resolve(url, h))
+        return _read(_resolve(url, h, timeout=30), timeout=30)
     except urllib.error.HTTPError as e:
         if e.code == 404:
             raise UpdateError(_("No se encontró el repositorio o todavía no tiene versiones publicadas. "

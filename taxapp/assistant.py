@@ -202,7 +202,7 @@ def build_context(ret: Optional[TaxReturn], res: Optional[dict], section: str = 
     if cnz or cr.students:
         L.append("Credit inputs: " + ", ".join(f"{k}={v}" for k, v in cnz.items())
                  + (f"; students: {[(s.credit, _m(s.expenses)) for s in cr.students]}" if cr.students else "") + ".")
-    pnz = {k: v for k, v in vars(ret.payments).items() if v}
+    pnz = nonzero_amounts(ret.payments)
     if pnz:
         L.append("Payments: " + ", ".join(f"{k}={_m(v)}" for k, v in pnz.items()) + ".")
     se = nonzero_amounts(ret.state_extras)
