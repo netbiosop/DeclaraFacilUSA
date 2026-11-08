@@ -46,7 +46,7 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
   iguales para 2025 y 2026; MN y RI se ajustan cada año. Moverlos a `states_<año>.json` con valores 2026 verificados y
   pruebas por estado.
 - `taxapp/gui/screens.py` (~1.050 líneas) y `taxapp/lang_en.py` (~1.500 líneas) conviene dividirlos.
-- La interfaz (7 pruebas de GUI) no se puede probar en la nube: no hay Tkinter.
+- La interfaz no se prueba con el Python de la nube (sin Tkinter), pero sí con `uv venv --python 3.12 --python-preference only-managed` y `xvfb-run -a python -m unittest discover tests` (`pypdf` por `PYTHONPATH`).
 - **QSS (alta, cambia resultados)**: `federal.pick()` pasa por `sk()` y trata a QSS como MFJ en todos los umbrales de
   reducción (EITC `federal.py:~495`, CTC, Medicare adicional, base del Seguro Social, préstamo estudiantil, AOTC/LLC,
   QBI, Schedule 1-A, CDCC 2026). La ley da el umbral conjunto solo a MFJ; QSS sí comparte tramos, deducción estándar,
@@ -107,6 +107,12 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
   la casilla `lived_in_us` no es eso. ¿Campo de ciudadanía/residencia? Cambia montos.
 - Cerrar la app en los 5 s tras actualizar (`gui/app.py:73`, `after(5000, confirm_code_ok)`) marca la versión como mala
   para siempre. Llamar también `confirm_code_ok()` en `quit_app()` (interfaz: no se prueba en la nube).
+- Encontrados el 2026-11-08 (cambian montos o deciden el dueño):
+  - Residente parcial: el impuesto local no se prorratea (`local.py:51`, el estatal sí en `state.py:301`). MD Montgomery $80k, 6 meses: estatal $1,718, condado $2,350 (esperado ~$1,175). Verificar por estado.
+  - NIIT no resta la pérdida de capital de hasta $3,000 (`federal.py:469`, `build.py:885`; 8960 línea 5a). MFJ $300k, intereses $20k, dividendos $10k, línea 7 −$3,000: $1,140 vs $1,026. Verificar Reg. §1.1411-4.
+  - "Deducciones itemizadas estatales" se ignora sin aviso en estados con deducción federal (CO, MO…; `state.py:177-206`, `screens.py:804`). ¿Avisar o aplicarla?
+  - Interfaz (corregibles, probar con Xvfb): monto inválido en un diálogo se guarda como 0 (`widgets.py:192,332`); Tab por un campo vacío marca "cambios sin guardar" (`widgets.py:200`).
+  - Limpieza con resultados iguales: claves del resultado sin lector (`federal.py:541-587`, `state.py:312`); `_load_user` en `accounts.py` (3 copias); `_to_bytes` en `forms/pdf.py` (4 copias); tasa `override_rate` 2 veces y claves `kind`/`note` en `local.py`; `_require_repo` en `updater.py`; `TaxReturn.app_version` e `Instance.label` sin uso; cabecera de borrador repetida en `reports.py`; `std_is_credit` sin lector en `states_*.json`; envoltorios y estilos sin uso en `gui/` (`ask_ai_field(widget)`, `_after_change`, `Screens._changed`, `Surface.TFrame`, `Menu.TButton`).
 - Inicio de sesión: un usuario inexistente responde distinto y más rápido (sin PBKDF2) que uno existente ("Intentos
   restantes: N") → revela qué usuarios existen. ¿Mismo mensaje y mismo cálculo?
 - "Ajustes generales y seguridad" (intentos, minutos de bloqueo, largo de contraseña) los cambia quien tenga
@@ -155,6 +161,14 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
     `counties._all` con lector JSON propio; margen `0.6 * inch` 6 veces en `reports.py`.
 
 ## Historial
+### 2026-11-08 — revisión nocturna (PR #2, rama `revision-nocturna`; `main` sin cambios)
+- `gui/app.py:117` cerrar sesión dejaba el Workspace (nombre, SSN) visible al siguiente usuario → no se pone en None antes de destruir (prueba con Xvfb en `test_sesion.py`).
+- `gui/app.py`, `gui/assistant.py`: el chat con el cliente A seguía al abrir B y se enviaba al proveedor → `forget_client()` (también descarta la respuesta en camino).
+- `gui/assistant.py:325` marcar una opción borraba la clave de IA recién guardada → relee la configuración.
+- `accounts.py:126` `usuarios.json` con `[]` impedía abrir la app → camino de archivo dañado. `models.py`/`widgets.py`: "nan"/"inf" como montos → rechazados. `review.py`: aviso si 1099-R tiene bruto y no tributable.
+- `updater.py` `_fetch` reenviaba la clave de GitHub a otro host → `_resolve` (la conserva si el host no cambia).
+- Limpieza: `Release.extra`, `hash_password(iterations)`, doble orden en `forms/__init__.py`, docstring de `pdf.py`, `nonzero_amounts`.
+- Pruebas: 144 → 149 pasan (9 omitidas sin pantalla; con Xvfb, 158). Sin cambios de cálculo. Pendientes nuevos arriba.
 ### 2026-11-05 — revisión nocturna (PR #2, rama `revision-nocturna`)
 - `local.py:56` impuesto local personalizado sobre el AGI con AGI negativo (pérdida de negocio) daba impuesto negativo y
   "Reembolso local" → base acotada a 0 (prueba nueva; 3.000 declaraciones: solo cambian las 31 con base negativa).
