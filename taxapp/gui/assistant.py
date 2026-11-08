@@ -322,6 +322,7 @@ class AssistantPanel(tk.Frame):
         self.web_cb.state(["!disabled"] if c.supports_web() else ["disabled"])
 
     def _save_opts(self):
+        self.cfg = ai.load_config()  # la clave pudo cambiar en Configuración con este panel abierto
         self.cfg.include_data = bool(self.use_data.get())
         self.cfg.web_search = bool(self.web.get())
         try:
