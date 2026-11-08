@@ -123,6 +123,9 @@ def load() -> dict:
     except OSError as e:
         logger.error("No se pudo leer usuarios.json: %s", e)
         return {**_empty(), _UNREADABLE: True}
+    if not isinstance(d, dict):
+        _keep_damaged(p, "el contenido no es un objeto JSON")
+        return _empty()
     d.setdefault("users", [])
     m = d.setdefault("matrix", {})
     for r in ROLES:

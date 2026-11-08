@@ -63,6 +63,14 @@ class DamagedFileTests(AccountsBase):
         self.assertEqual(len(copies), 1)
         self.assertEqual(copies[0].read_text(encoding="utf-8"), "{ roto")
 
+    def test_users_file_with_valid_json_that_is_not_an_object(self):
+        self.admin()
+        A._file().write_text("[]", encoding="utf-8")
+        self.assertEqual(A.load()["users"], [])
+        copies = list(A._file().parent.glob("usuarios.danado-*.json"))
+        self.assertEqual(len(copies), 1)
+        self.assertEqual(copies[0].read_text(encoding="utf-8"), "[]")
+
     def test_locked_users_file_is_never_overwritten(self):
         self.admin()
         before = A._file().read_text(encoding="utf-8")
