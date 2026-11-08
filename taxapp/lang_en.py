@@ -679,6 +679,7 @@ EN = {
     "En {st} todos los condados cobran impuesto local: seleccione su condado.": "In {st} every county levies a local tax: select your county.",
     "Indique su condado (se usa para impuestos locales y la informacion de su zona).": "Enter your county (used for local taxes and your area information).",
     "Los dividendos calificados no pueden superar los dividendos ordinarios.": "Qualified dividends cannot exceed ordinary dividends.",
+    "1099-R con monto bruto y sin monto tributable: no se suma nada al ingreso. Si no es un traspaso o Roth, escriba la parte tributable.": "1099-R with a gross amount and no taxable amount: nothing is added to income. Unless it is a rollover or Roth, enter the taxable part.",
     "La parte tributable de jubilacion supera el monto bruto.": "The taxable retirement amount exceeds the gross amount.",
     "Retiro de IRA antes de los 59 1/2: puede aplicar una multa del 10% (Formulario 5329) que no esta incluida en el calculo.": "IRA withdrawal before age 59 1/2: a 10% penalty may apply (Form 5329), which is not included in the calculation.",
     "Horas extra: solo se deduce la 'prima' (la mitad extra del pago 1.5x), no el total.": "Overtime: only the 'premium' (the extra half of 1.5x pay) is deductible, not the total.",
