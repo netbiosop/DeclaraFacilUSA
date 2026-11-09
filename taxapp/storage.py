@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 
-from . import data_loader
+from . import accounts, data_loader
 from .models import TaxReturn
 
 logger = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ def save(ret: TaxReturn, path) -> Path:
     elif p.suffix.lower() != EXT:
         p = p.with_name(p.name + EXT)  # with_suffix cambiaría "Garcia.Maria" por "Garcia.dfusa"
     tmp = p.with_suffix(p.suffix + ".tmp")
-    tmp.write_text(dumps(ret), encoding="utf-8")
+    accounts.write_durable(tmp, dumps(ret))
     tmp.replace(p)
     add_recent(p)
     return p

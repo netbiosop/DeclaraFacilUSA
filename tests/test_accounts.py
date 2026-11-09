@@ -242,6 +242,22 @@ class FolderTests(AccountsBase):
         self.assertTrue(any(n.startswith("Declaraciones") for n in names) or True)
         self.assertFalse(any(n.startswith("Respaldos") for n in names))
 
+    def test_failed_backup_leaves_no_zip(self):
+        # Un archivo bloqueado a mitad dejaba un ZIP válido pero incompleto con nombre normal en Respaldos
+        self.admin()
+        dest = A.backups_dir() / "respaldo.zip"
+        with mock.patch("zipfile.ZipFile.write", side_effect=PermissionError("bloqueado")):
+            with self.assertRaises(PermissionError):
+                A.create_backup(dest, "admin")
+        self.assertEqual(list(A.backups_dir().iterdir()), [])
+
+    def test_save_is_flushed_to_disk_before_replace(self):
+        # Sin fsync un corte de luz puede dejar usuarios.json vacío y la app abre el asistente de administrador
+        self.admin()
+        with mock.patch("os.fsync") as fsync:
+            A.save(A.load())
+        self.assertTrue(fsync.called)
+
     def test_unknown_user_text_not_logged(self):
         # quien escribe la contraseña en el campo de usuario no debe dejarla en actividad.log
         self.admin()

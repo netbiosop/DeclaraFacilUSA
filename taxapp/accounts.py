@@ -144,12 +144,20 @@ def load() -> dict:
     return d
 
 
+def write_durable(path: Path, text: str):
+    """Escribe y fuerza el disco antes del replace: sin esto un corte de luz puede dejar el archivo vacío."""
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(text)
+        f.flush()
+        os.fsync(f.fileno())
+
+
 def save(db: dict):
     if db.get(_UNREADABLE):
         raise AccountError(_(_UNREADABLE_MSG))
     p = _file()
     tmp = p.with_suffix(".tmp")
-    tmp.write_text(json.dumps(db, indent=1, ensure_ascii=False), encoding="utf-8")
+    write_durable(tmp, json.dumps(db, indent=1, ensure_ascii=False))
     tmp.replace(p)
 
 
@@ -577,11 +585,17 @@ def create_backup(dest, by: str) -> Path:
     dest = Path(dest)
     if dest.suffix.lower() != ".zip":
         dest = dest.with_suffix(".zip")
-    with zipfile.ZipFile(dest, "w", zipfile.ZIP_DEFLATED) as z:
-        for p in base.rglob("*"):
-            if p.is_file() and p.resolve() != dest.resolve() and p.suffix.lower() != ".tmp" \
-                    and "Respaldos" not in p.relative_to(base).parts:
-                z.write(p, p.relative_to(base))
+    tmp = dest.with_name(dest.name + ".tmp")  # un fallo a mitad no debe dejar un ZIP válido e incompleto
+    try:
+        with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as z:
+            for p in base.rglob("*"):
+                if p.is_file() and p.resolve() != dest.resolve() and p.suffix.lower() != ".tmp" \
+                        and "Respaldos" not in p.relative_to(base).parts:
+                    z.write(p, p.relative_to(base))
+        tmp.replace(dest)
+    except OSError:
+        tmp.unlink(missing_ok=True)
+        raise
     log("backup_created", by, dest.name)
     return dest
 
