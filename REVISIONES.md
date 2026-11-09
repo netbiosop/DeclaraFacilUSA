@@ -160,7 +160,23 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
     autoguardado 5/60 a mano (`gui/settings.py:289,299`); 2210 `1000`/`0.9` sin nombre en `review.py:~150`;
     `counties._all` con lector JSON propio; margen `0.6 * inch` 6 veces en `reports.py`.
 
+- Encontrados el 2026-11-09 (deciden el dueño o cambian montos):
+  - "Participación material" del Anexo C no afecta el cálculo: con "No" y pérdida se resta completa sin límite pasivo (§469, Form 8582) ni aviso (`questions.py:197`, `screens.py:472`, `build.py:439`; `federal.py` no lo usa). Mínimo: aviso en `review.py` si `profit < 0 and not material_participation`. Limitar la pérdida cambia montos.
+  - Clientes homónimos comparten carpeta de PDF (`forms/__init__.py:73`, `Garcia_Maria_2025_formularios`): la segunda pisa los finales de la primera y un Anexo C con SSN queda mezclado. Propuesta: nombrar con el stem del `.dfusa`.
+  - Autoguardado sin control de mtime ni instancia única (`gui/app.py:~389`, `storage.py`): dos ventanas sobre la misma declaración, gana la última. Propuesta: guardar mtime al abrir (un mutex chocaría con `updater.restart`).
+  - `.dfusa`, PDF y respaldos ZIP (SSN, cuentas) sin cifrar en Documentos; si OneDrive respalda esa carpeta suben a la nube (`accounts.py:9`). ¿Carpeta fuera de Documentos, aviso o cifrado?
+  - Limpieza menor: contraseña temporal repetida (`gui/settings.py:774,815`), bloque "Notas" (`screens.py:308`, `gui/tools.py:102`), `view_frame` (`gui/app.py:125,135`), `after(150)` (`gui/assistant.py:190,494`).
+
 ## Historial
+### 2026-11-09 — revisión nocturna (PR #2, rama `revision-nocturna`; `main` sin cambios)
+- `gui/app.py:recalc_now` un cálculo fallido conservaba el resultado del cliente anterior y exportar/generar lo usaba con el nombre del actual → `self.result = None`, `result_or_warn()` en exportar, generar y preguntas guiadas (Xvfb, `test_sesion.py`).
+- `gui/app.py:65` Ctrl+N/Ctrl+O atravesaban diálogos modales y el W-2 abierto caía en otra declaración → `_shortcut`.
+- `forms/build.py:193` 1040 marcaba "No" a activos digitales con venta cripto en el Anexo D → Sí si hay venta digital. `forms/pdf.py:31` EIN con guion impreso como SSN (2441, 8995) → se respeta lo escrito, `_fmt_ein` en 8995. `build.py:608` cuarta persona del 2441 desaparecía → hoja adicional.
+- `storage.py`, `accounts.py` sin `fsync` antes de `replace` (corte → archivo vacío; con `usuarios.json` el asistente crea un admin) → `write_durable`. `accounts.create_backup` fallo a mitad dejaba ZIP válido e incompleto → `.tmp` + `replace`.
+- `updater.py:_get_json` reenviaba la clave a otro host → `_resolve`.
+- Limpieza: atributos, estilos e iconos sin uso, `skip()`, docstring de `key_dates`, constantes de tiempos y bloques.
+- Revisión del propio cambio: asistente sin resultado, `grab_current()` con combobox abierto (`tk.call("grab","current")`).
+- Pruebas: 149 → 155 pasan (12 omitidas sin pantalla; con Xvfb, 167). Sin cambios de cálculo. Pendientes nuevos arriba.
 ### 2026-11-08 — revisión nocturna (PR #2, rama `revision-nocturna`; `main` sin cambios)
 - `gui/app.py:117` cerrar sesión dejaba el Workspace (nombre, SSN) visible al siguiente usuario → no se pone en None antes de destruir (prueba con Xvfb en `test_sesion.py`).
 - `gui/app.py`, `gui/assistant.py`: el chat con el cliente A seguía al abrir B y se enviaba al proveedor → `forget_client()` (también descarta la respuesta en camino).
