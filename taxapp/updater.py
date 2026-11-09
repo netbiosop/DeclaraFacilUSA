@@ -139,8 +139,7 @@ def _open(req, timeout=TIMEOUT):
 
 def _get_json(url: str, token: str = "") -> dict:
     try:
-        with _open(urllib.request.Request(url, headers=_headers(token))) as r:
-            return json.loads(r.read().decode("utf-8"))
+        return json.loads(_read(_resolve(url, _headers(token))).decode("utf-8"))
     except urllib.error.HTTPError as e:
         if e.code == 404:
             raise UpdateError(_("No se encontró el repositorio o todavía no tiene versiones publicadas. "

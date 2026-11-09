@@ -19,6 +19,33 @@ SHA = hashlib.sha256(EXE).hexdigest()
 
 
 class TokenRedirectTests(unittest.TestCase):
+    def test_get_json_does_not_send_token_to_redirect_target(self):
+        import http.server
+        import threading
+        seen = {}
+
+        class H(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                seen[self.path] = self.headers.get("Authorization")
+                if self.path == "/a":
+                    self.send_response(302)
+                    self.send_header("Location", f"http://localhost:{self.server.server_port}/b")
+                    self.end_headers()
+                else:
+                    self.send_response(200)
+                    self.send_header("Content-Length", "2")
+                    self.end_headers()
+                    self.wfile.write(b"{}")
+
+            def log_message(self, *a):
+                pass
+        srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), H)
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+        self.addCleanup(srv.shutdown)
+        with mock.patch.dict(os.environ, {"no_proxy": "*", "NO_PROXY": "*"}):
+            self.assertEqual(U._get_json(f"http://127.0.0.1:{srv.server_port}/a", "ghp_SECRETO"), {})
+        self.assertIsNone(seen["/b"])
+
     def test_fetch_does_not_send_token_to_redirect_target(self):
         import http.server
         import threading
