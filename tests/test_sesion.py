@@ -39,6 +39,26 @@ class LogoutTests(unittest.TestCase):
             self.assertIsNone(win.result)
             save_dialog.assert_not_called()
 
+    def test_guided_questions_not_opened_when_calculation_fails(self):
+        with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home, "USERPROFILE": home}):
+            from taxapp import accounts
+            from taxapp.gui import app as A
+            from taxapp.gui import forms_view as F
+            accounts.create_user("admin", "Admin", "admin", "Secreta123")
+            win = A.App()
+            self.addCleanup(win.destroy)
+            user, _err = accounts.authenticate("admin", "Secreta123")
+            win.login_ok(user)
+            win.new_return(2025)
+            win.show_workspace("forms")
+            win.update()
+            view = win.workspace.screens["forms"]
+            with mock.patch.object(A, "compute_all", side_effect=ValueError("dañado")), \
+                    mock.patch.object(A, "messagebox") as box, mock.patch.object(F, "GuidedQuestions") as wizard:
+                view.open_wizard()
+            wizard.assert_not_called()
+            box.showerror.assert_called_once()
+
     def test_shortcut_ignored_while_modal_dialog_is_open(self):
         with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home, "USERPROFILE": home}):
             from taxapp import accounts
@@ -48,12 +68,13 @@ class LogoutTests(unittest.TestCase):
             self.addCleanup(win.destroy)
             user, _err = accounts.authenticate("admin", "Secreta123")
             win.login_ok(user)
+            win.update()
             action = mock.Mock()
-            with mock.patch.object(win, "grab_current", return_value=win):
-                win._shortcut(action)
+            win.grab_set()
+            win._shortcut(action)
             action.assert_not_called()
-            with mock.patch.object(win, "grab_current", return_value=None):
-                win._shortcut(action)
+            win.grab_release()
+            win._shortcut(action)
             action.assert_called_once()
 
     def test_logout_destroys_workspace(self):

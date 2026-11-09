@@ -208,7 +208,8 @@ class FormsScreen(Screen):
     def open_wizard(self, only_missing=True):
         if self.app.readonly:
             return self.app._deny(_("Su rol no permite modificar la declaración."))
-        self.app.recalc_now()
+        if not self.app.result_or_warn():
+            return
         GuidedQuestions(self.app, only_missing=only_missing, on_close=self.refresh)
 
     def generate_final(self):
@@ -346,8 +347,7 @@ class GuidedQuestions(tk.Toplevel):
 
     # ------------------------------------------------------------------ navegación
     def _questions(self):
-        self.app.recalc_now()
-        return qmod.questions(self.app.ret, self.app.result)
+        return qmod.questions(self.app.ret, self.app.result) if self.app.result_or_warn() else []
 
     def _goto_next(self, after_key):
         qs = self._questions()
@@ -468,6 +468,8 @@ class GuidedQuestions(tk.Toplevel):
                 return self._show(q, qs)
 
     def _finish(self):
+        if not self.app.result:  # el cálculo falló al responder: result_or_warn ya avisó
+            return self.close()
         self.cur = None
         for w in self.body.winfo_children():
             w.destroy()

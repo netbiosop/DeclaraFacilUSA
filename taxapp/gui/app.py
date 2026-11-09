@@ -460,7 +460,7 @@ class App(tk.Tk):
     # ================================================================ inactividad y autoguardado
     def _shortcut(self, action):
         """Atajos de teclado: con un diálogo modal abierto cambiarían la declaración debajo de él."""
-        if self.user and not self.grab_current():
+        if self.user and not self.tk.call("grab", "current", self._w):  # grab_current() falla con un combobox desplegado
             action()
 
     def _activity(self, _e=None):
