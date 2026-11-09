@@ -10,7 +10,7 @@ sys.path.insert(0, str(ROOT))
 
 from taxapp import forms  # noqa: E402
 from taxapp.engine import compute_all  # noqa: E402
-from taxapp.forms import catalog, mailing, questions  # noqa: E402
+from taxapp.forms import catalog, mailing, pdf, questions  # noqa: E402
 from taxapp.forms.build import m, whole  # noqa: E402
 from taxapp.models import (Address, CareProvider, Credits, Dependent, FilingInfo, OtherExpense, Payer,  # noqa: E402
                            Person, Sale, Student, TaxReturn, W2)
@@ -175,6 +175,33 @@ class BuilderTests(unittest.TestCase):
         f2441 = self.vals(p, "2441")
         self.assertEqual(num(f2441["L3"]), 3000)
         self.assertEqual(num(f2441["L11"]), whole(res["federal"]["credits"]["cdcc"]))
+
+    def test_digital_sale_answers_yes_on_1040(self):
+        # Una venta de activos digitales iba al Anexo D mientras el 1040 respondía "No" bajo juramento
+        ret = family()
+        ret.income.sales.append(Sale(description="BTC", proceeds=1000, cost=500, digital=True))
+        _res, p = self.plan(ret)
+        v = self.vals(p, "1040")
+        self.assertTrue(v["digital_yes"])
+        self.assertFalse(v.get("digital_no"))
+
+    def test_ein_is_not_printed_as_ssn(self):
+        path, _state, text = pdf._prepare("12-3456789", ["campo", None, 11])
+        self.assertEqual((path, text), ("campo", "12-3456789"))
+        self.assertEqual(pdf._prepare("123456789", ["campo", None, 11])[2], "123-45-6789")
+        ret = family()
+        ret.credits.care_expenses = 6000
+        ret.credits.care_providers = [CareProvider(name="Guarderia", address="1 Main", tin="12-3456789", amount=6000)]
+        _res, p = self.plan(ret)
+        self.assertEqual(self.vals(p, "2441")["prov0_tin"], "12-3456789")
+
+    def test_2441_fourth_care_person_goes_on_statement(self):
+        ret = family()
+        ret.credits.care_expenses = 8000
+        ret.dependents = [Dependent(first_name=f"Nino{i}", last_name="Perez", ssn=f"11122333{i}", dob="2019-03-01",
+                                    relationship="Hijo/a", months_lived=12) for i in range(4)]
+        _res, p = self.plan(ret)
+        self.assertTrue(any("NINO3" in line for st in p.statements for line in st["lines"]))
 
     def test_business_forms_consistent(self):
         ret = business()

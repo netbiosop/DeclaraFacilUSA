@@ -184,13 +184,14 @@ class Builder:
     def form_1040(self):
         r, L, fed = self.ret, self.L, self.fed
         tp, sp, a, fi = r.taxpayer, r.spouse, r.address, r.filing
+        has_digital = fi.digital_assets or any(s.digital for s in r.income.sales)
         v = {
             "first": upper(tp.first_name), "last": upper(tp.last_name), "ssn": digits(tp.ssn),
             "street": upper(a.street), "apt": upper(a.apt), "city": upper(a.city), "state": upper(a.state),
             "zip": a.zip.strip(), "home_us": True,
             "pec_you": tp.presidential_fund, "pec_spouse": r.is_joint() and sp.presidential_fund,
             "fs_" + self.status: True,
-            "digital_yes": fi.digital_assets, "digital_no": not fi.digital_assets,
+            "digital_yes": has_digital, "digital_no": not has_digital,
         }
         if r.is_joint():
             v.update({"sp_first": upper(sp.first_name), "sp_last": upper(sp.last_name), "sp_ssn": digits(sp.ssn)})
@@ -595,7 +596,7 @@ class Builder:
         if not provs:
             self.warn(_("Formulario 2441: falta el proveedor de cuidado (nombre, dirección e identificación)."))
         for i, p in enumerate(provs[:3]):
-            v.update({f"prov{i}_name": upper(p.name), f"prov{i}_addr": upper(p.address), f"prov{i}_tin": digits(p.tin),
+            v.update({f"prov{i}_name": upper(p.name), f"prov{i}_addr": upper(p.address), f"prov{i}_tin": p.tin.strip(),
                       f"prov{i}_hh_yes": p.household_employee, f"prov{i}_hh_no": not p.household_employee,
                       f"prov{i}_amt": m(p.amount, True)})
         if len(provs) > 3:
@@ -611,6 +612,10 @@ class Builder:
             v.update({f"q{i}_first": upper(dep.first_name), f"q{i}_last": upper(dep.last_name),
                       f"q{i}_ssn": digits(dep.ssn), f"q{i}_disabled": dep.disabled and (a is None or a >= 13),
                       f"q{i}_exp": m(share, True)})
+        if len(qual) > 3:
+            self.statement(self.t("Form 2441 - Part I Qualifying persons (continued)",
+                                  "Formulario 2441 - Parte I Personas calificadas (continuacion)"),
+                           [f"{upper(d.full_name())}  SSN {_fmt_ssn(d.ssn)}  {m(share, True)}" for d in qual[3:]])
         earned_tp = max(0.0, sum(w.box1_wages for w in r.w2s if w.owner != "conyuge") + f["profit"] - f["half_se"])
         earned_sp = sum(w.box1_wages for w in r.w2s if w.owner == "conyuge") if r.is_joint() else earned_tp
         benefits = cr.dependent_care_benefits
@@ -852,7 +857,7 @@ class Builder:
         rate = self.data["qbi"]["rate"]
         v = self.header()
         v.update({"b0_name": upper(inc.business_name or inc.business_activity or "SCHEDULE C"),
-                  "b0_tin": digits(inc.business_ein) or self.ssn(), "b0_qbi": m(qbi, True), "L2": m(qbi, True),
+                  "b0_tin": _fmt_ein(inc.business_ein) or self.ssn(), "b0_qbi": m(qbi, True), "L2": m(qbi, True),
                   "L4": m(qbi, True), "L5": m(qbi * rate, True), "L10": m(qbi * rate, True), "L11": m(ti, True),
                   "L12": m(pref, True), "L13": m(l13, True), "L14": m(l13 * rate, True), "L15": m(f["qbi"], True)})
         self.add("8995", v)

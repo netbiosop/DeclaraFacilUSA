@@ -28,7 +28,7 @@ def require():
 
 def _fmt_ssn(value: str, maxlen: Optional[int]) -> str:
     digits = "".join(ch for ch in value if ch.isdigit())
-    if maxlen == 11 and len(digits) == 9:
+    if maxlen == 11 and len(digits) == 9 and "-" not in value:  # con guion ya es SSN o EIN escrito por el usuario
         return f"{digits[:3]}-{digits[3:5]}-{digits[5:]}"
     return value
 
