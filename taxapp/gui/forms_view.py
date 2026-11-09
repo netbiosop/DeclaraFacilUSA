@@ -213,8 +213,9 @@ class FormsScreen(Screen):
         GuidedQuestions(self.app, only_missing=only_missing, on_close=self.refresh)
 
     def generate_final(self):
-        self.app.recalc_now()
-        res = self.app.result
+        res = self.app.result_or_warn()
+        if not res:
+            return
         missing = qmod.missing(self.ret, res, required_only=True)
         if missing:
             lst = "\n".join(f"• {_q(q)}" for q in missing[:12])
@@ -238,7 +239,8 @@ class FormsScreen(Screen):
     def generate(self, draft: bool):
         if not self.app.can("export"):
             return self.app._deny(_("Su rol no permite exportar."))
-        self.app.recalc_now()
+        if not self.app.result_or_warn():
+            return
         base = self.app.path.parent if self.app.path else storage.returns_dir()
         folder = forms.default_folder(self.ret, Path(base), draft)
         self.app.config(cursor="watch")

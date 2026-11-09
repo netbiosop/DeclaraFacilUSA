@@ -20,6 +20,42 @@ except tkinter.TclError:
 
 @unittest.skipUnless(HAS_DISPLAY, "tkinter o pantalla no disponible")
 class LogoutTests(unittest.TestCase):
+    def test_failed_calculation_does_not_keep_previous_client_result(self):
+        with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home, "USERPROFILE": home}):
+            from taxapp import accounts
+            from taxapp.gui import app as A
+            accounts.create_user("admin", "Admin", "admin", "Secreta123")
+            win = A.App()
+            self.addCleanup(win.destroy)
+            user, _err = accounts.authenticate("admin", "Secreta123")
+            win.login_ok(user)
+            win.new_return(2025)
+            win.recalc_now()
+            self.assertIsNotNone(win.result)
+            with mock.patch.object(A, "compute_all", side_effect=ValueError("archivo dañado")), \
+                    mock.patch.object(A, "messagebox"), \
+                    mock.patch.object(A.filedialog, "asksaveasfilename") as save_dialog:
+                win._export("html")
+            self.assertIsNone(win.result)
+            save_dialog.assert_not_called()
+
+    def test_shortcut_ignored_while_modal_dialog_is_open(self):
+        with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home, "USERPROFILE": home}):
+            from taxapp import accounts
+            from taxapp.gui import app as A
+            accounts.create_user("admin", "Admin", "admin", "Secreta123")
+            win = A.App()
+            self.addCleanup(win.destroy)
+            user, _err = accounts.authenticate("admin", "Secreta123")
+            win.login_ok(user)
+            action = mock.Mock()
+            with mock.patch.object(win, "grab_current", return_value=win):
+                win._shortcut(action)
+            action.assert_not_called()
+            with mock.patch.object(win, "grab_current", return_value=None):
+                win._shortcut(action)
+            action.assert_called_once()
+
     def test_logout_destroys_workspace(self):
         with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home, "USERPROFILE": home}):
             from taxapp import accounts

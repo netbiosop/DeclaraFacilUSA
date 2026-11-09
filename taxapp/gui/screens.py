@@ -947,7 +947,8 @@ class ReviewScreen(Screen):
                       style="CardMuted.TLabel").pack(side="left", padx=6)
 
     def on_show(self):
-        self.on_result(self.app.result)
+        if self.app.result:
+            self.on_result(self.app.result)
 
     def on_result(self, res):
         if not res:

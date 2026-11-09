@@ -78,6 +78,7 @@ EN = {
     "Acerca de": "About",
     "Ayuda": "Help",
     "Primero cree o abra una declaración.": "First create or open a return.",
+    "No se pudo calcular esta declaración. Revise los datos antes de continuar.": "This return could not be calculated. Check the data before continuing.",
     "Hay cambios sin guardar. ¿Desea guardarlos?": "You have unsaved changes. Do you want to save them?",
     "Declaración DeclaraFacil": "DeclaraFacil return",
     "El año {y} no está soportado; se usará 2025.": "Tax year {y} is not supported; 2025 will be used.",

@@ -63,8 +63,8 @@ class App(tk.Tk):
         self._apply_login_style()
         self.protocol("WM_DELETE_WINDOW", self.quit_app)
         self.bind_all("<Control-s>", lambda e: self.save() if self.user else None)
-        self.bind_all("<Control-o>", lambda e: self.open_file() if self.user else None)
-        self.bind_all("<Control-n>", lambda e: self.new_return(2025) if self.user else None)
+        self.bind_all("<Control-o>", lambda e: self._shortcut(self.open_file))
+        self.bind_all("<Control-n>", lambda e: self._shortcut(lambda: self.new_return(2025)))
         self.bind_all("<Control-i>", lambda e: self.open_assistant() if self.user else None)
         for ev in ("<Any-KeyPress>", "<Any-Button>", "<Motion>"):
             self.bind_all(ev, self._activity, add="+")
@@ -421,6 +421,13 @@ class App(tk.Tk):
             self.after_cancel(self._after)
         self._after = self.after(300, self.recalc_now)
 
+    def result_or_warn(self):
+        """Recalcula y devuelve el resultado; si el cálculo falla avisa y devuelve None."""
+        self.recalc_now()
+        if not self.result:
+            messagebox.showerror(APP_NAME, _("No se pudo calcular esta declaración. Revise los datos antes de continuar."))
+        return self.result
+
     def recalc_now(self):
         self._after = None
         if not self.ret:
@@ -429,6 +436,7 @@ class App(tk.Tk):
             self.result = compute_all(self.ret)
         except Exception as e:  # noqa: BLE001 - mostrar sin cerrar la app
             logger.exception("Error de cálculo")
+            self.result = None  # el anterior puede ser de otro cliente: no debe llegar a un borrador ni a un formulario
             if self.workspace:
                 self.workspace.status.configure(text=tr("Error de cálculo: {e}", e=e))
             return
@@ -450,6 +458,11 @@ class App(tk.Tk):
         return review(self.ret, self.result)
 
     # ================================================================ inactividad y autoguardado
+    def _shortcut(self, action):
+        """Atajos de teclado: con un diálogo modal abierto cambiarían la declaración debajo de él."""
+        if self.user and not self.grab_current():
+            action()
+
     def _activity(self, _e=None):
         self._last_activity = time.time()
 
@@ -483,7 +496,8 @@ class App(tk.Tk):
             return
         if not self.can("export"):
             return self._deny(_("Su rol no permite exportar."))
-        self.recalc_now()
+        if not self.result_or_warn():
+            return
         fnd = self.findings()
         errs = [f for f in fnd if f["severity"] == "error"]
         if errs and not messagebox.askyesno(APP_NAME, tr("La revisión encontró {n} error(es). ¿Exportar de todos modos?", n=len(errs))):
