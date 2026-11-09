@@ -46,6 +46,7 @@ PROVIDERS: Dict[str, dict] = {
 }
 ANTHROPIC_VERSION = "2023-06-01"
 TIMEOUT = 90
+OLLAMA_TIMEOUT = 180
 
 
 class AIError(Exception):
@@ -399,7 +400,7 @@ def ask(cfg: AIConfig, system: str, messages: List[dict], web: bool = False) -> 
     headers = {"Authorization": f"Bearer {key}"} if key else {}
     payload = {"model": model, "max_tokens": cfg.max_tokens,
                "messages": [{"role": "system", "content": system}] + messages}
-    d = _post(f"{base}/chat/completions", payload, headers, timeout=180 if p == "ollama" else TIMEOUT)
+    d = _post(f"{base}/chat/completions", payload, headers, timeout=OLLAMA_TIMEOUT if p == "ollama" else TIMEOUT)
     try:
         return (d["choices"][0]["message"]["content"] or "").strip(), []
     except (KeyError, IndexError) as e:

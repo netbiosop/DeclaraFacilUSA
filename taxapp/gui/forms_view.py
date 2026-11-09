@@ -36,7 +36,6 @@ class FormsScreen(Screen):
 
     def build(self):
         p = self.scroll()
-        self.p = p
         self.use_sr = tk.BooleanVar(value=True)
         self.editable = tk.BooleanVar(value=bool(accounts.settings().get("forms_editable")))
         # --- estado
@@ -333,7 +332,7 @@ class GuidedQuestions(tk.Toplevel):
         ttk.Button(bar, text=_("Cerrar"), command=self.close).pack(side="left", padx=8)
         self.next_btn = ttk.Button(bar, text=_("Siguiente ›"), style="Accent.TButton", command=self.next)
         self.next_btn.pack(side="right")
-        self.skip_btn = ttk.Button(bar, text=_("Omitir"), command=self.skip)
+        self.skip_btn = ttk.Button(bar, text=_("Omitir"), command=self._advance)
         self.skip_btn.pack(side="right", padx=8)
         self.protocol("WM_DELETE_WINDOW", self.close)
         self.bind("<Return>", lambda e: self.next() if self.cur and self.cur.kind != "list" else None)
@@ -449,9 +448,6 @@ class GuidedQuestions(tk.Toplevel):
         if q and q.key not in self.app.ret.filing.answered:
             self.app.ret.filing.answered.append(q.key)
             self.app.mark_changed()
-        self._advance()
-
-    def skip(self):
         self._advance()
 
     def _advance(self):

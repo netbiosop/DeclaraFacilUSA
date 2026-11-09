@@ -212,7 +212,6 @@ class AssistantPanel(tk.Frame):
     def __init__(self, parent, app, compact=False):
         super().__init__(parent, bg=COLORS["card"])
         self.app = app
-        self.compact = compact
         self.cfg = ai.load_config()
         self.history = []          # [{"role","content"}]
         self.busy = False
@@ -436,7 +435,7 @@ class AssistantPanel(tk.Frame):
         return "break"
 
     def quick(self, n):
-        label, prompt = ai.QUICK_ACTIONS[n]
+        prompt = ai.QUICK_ACTIONS[n][1]
         self.ask(tr(prompt, section=self.app.section_name()))
 
     def ask(self, question: str):

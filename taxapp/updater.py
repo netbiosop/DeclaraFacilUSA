@@ -38,6 +38,8 @@ logger = logging.getLogger(__name__)
 ASSET_RE = re.compile(r"^Instalar_DeclaraFacilUSA_.*\.exe$", re.I)
 API = "https://api.github.com"
 TIMEOUT = 20
+DOWNLOAD_TIMEOUT = 30
+CHUNK_SIZE = 256 * 1024
 
 
 class UpdateError(Exception):
@@ -252,7 +254,7 @@ def download(rel: Release, cfg: UpdateConfig = None, progress: Callable[[int, in
         got = 0
         with resp, open(dest, "wb") as fh:
             while True:
-                chunk = resp.read(256 * 1024)
+                chunk = resp.read(CHUNK_SIZE)
                 if not chunk:
                     break
                 fh.write(chunk)
@@ -346,7 +348,7 @@ def rolled_back_version() -> str:
 def sha256_file(p: Path) -> str:
     h = hashlib.sha256()
     with open(p, "rb") as f:
-        for chunk in iter(lambda: f.read(256 * 1024), b""):
+        for chunk in iter(lambda: f.read(CHUNK_SIZE), b""):
             h.update(chunk)
     return h.hexdigest()
 
@@ -362,7 +364,7 @@ def _fetch(url: str, token: str = "", accept: str = "*/*") -> bytes:
     if token:
         h["Authorization"] = f"token {token}"
     try:
-        return _read(_resolve(url, h, timeout=30), timeout=30)
+        return _read(_resolve(url, h, timeout=DOWNLOAD_TIMEOUT), timeout=DOWNLOAD_TIMEOUT)
     except urllib.error.HTTPError as e:
         if e.code == 404:
             raise UpdateError(_("No se encontró el repositorio o todavía no tiene versiones publicadas. "

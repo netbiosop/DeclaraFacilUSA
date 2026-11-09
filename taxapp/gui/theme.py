@@ -57,10 +57,10 @@ ICONS = {
     "back": ("", "←"), "home": ("", "⌂"), "map": ("", "◉"), "calc": ("", "▦"),
     "book": ("", "▥"), "ai": ("", "✦"), "download": ("", "↓"), "globe": ("", "◍"),
     "settings": ("", "⚙"), "user": ("", "●"), "users": ("", "●"), "calendar": ("", "▣"),
-    "check": ("", "✓"), "lock": ("", "■"), "logout": ("", "⏻"), "search": ("", "⌕"),
-    "save": ("", "▾"), "doc": ("", "▯"), "info": ("", "i"), "help": ("", "?"),
+    "check": ("", "✓"), "lock": ("", "■"), "logout": ("", "⏻"),
+    "doc": ("", "▯"), "info": ("", "i"),
     "shield": ("", "◆"), "history": ("", "↺"), "palette": ("", "◐"), "send": ("", "➤"),
-    "refresh": ("", "↻"), "close": ("", "✕"), "more": ("", "⋯"), "money": ("", "$"),
+    "refresh": ("", "↻"), "money": ("", "$"),
     "exit": ("", "✕"), "edit": ("", "✎"), "table": ("", "▦"),
 }
 
@@ -263,9 +263,7 @@ def style_ttk(root):
     st.configure("Surface.TFrame", background=c["surface"])
     st.configure("TLabel", background=c["bg"], foreground=c["text"])
     st.configure("Card.TLabel", background=c["card"], foreground=c["text"])
-    st.configure("Muted.TLabel", foreground=c["muted"])
     st.configure("CardMuted.TLabel", background=c["card"], foreground=c["muted"])
-    st.configure("Title.TLabel", font=f(20, "bold"), foreground=c["text"])
     st.configure("CardTitle.TLabel", font=f(18, "bold"), foreground=c["text"], background=c["card"])
     st.configure("Section.TLabel", font=f(11, "bold"), foreground=c["primary"], background=c["card"])
     st.configure("Big.TLabel", font=f(13, "bold"), background=c["card"], foreground=c["text"])

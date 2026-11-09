@@ -74,7 +74,6 @@ class Builder:
                  lang: str = "en"):
         self.lang = lang          # idioma de los formularios: "es" usa las versiones oficiales en español
         self.ret = ret
-        self.res = res
         self.fed = res["federal"]
         self.L = self.fed["lines"]
         self.d = self.fed.get("detail", {})

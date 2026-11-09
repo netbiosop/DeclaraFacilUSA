@@ -397,7 +397,6 @@ class IncomeScreen(Screen):
     def build(self):
         nb = ttk.Notebook(self.body)
         nb.pack(fill="both", expand=True, padx=16, pady=10)
-        self.nb = nb
         self._w2_tab(nb)
         inc = lambda: self.ret.income  # noqa: E731
 
