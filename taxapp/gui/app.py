@@ -289,6 +289,18 @@ class App(tk.Tk):
         messagebox.showwarning(APP_NAME, msg or _("Su rol no tiene permiso para esta acción."))
 
     # ================================================================ archivo
+    def _editor_open(self) -> bool:
+        """Un diálogo que escribe en la declaración sigue abierto (aunque haya perdido el grab)."""
+        stack = [self]
+        while stack:
+            w = stack.pop()
+            if getattr(w, "edits_return", False):
+                w.lift()
+                messagebox.showinfo(APP_NAME, _("Cierre primero la ventana abierta de esta declaración."))
+                return True
+            stack.extend(w.winfo_children())
+        return False
+
     def _confirm_discard(self) -> bool:
         if self.ret and self.dirty and not self.readonly:
             ans = messagebox.askyesnocancel(APP_NAME, _("Hay cambios sin guardar. ¿Desea guardarlos?"))
@@ -304,7 +316,7 @@ class App(tk.Tk):
     def new_return(self, year: int):
         if not self.can("edit"):
             return self._deny(_("Su rol no permite crear declaraciones."))
-        if not self._confirm_discard():
+        if self._editor_open() or not self._confirm_discard():
             return
         self.ret = TaxReturn(tax_year=year)
         self.path = None
@@ -334,7 +346,7 @@ class App(tk.Tk):
     def open_file(self, path=None):
         if not self.can("view_own"):
             return self._deny()
-        if not self._confirm_discard():
+        if self._editor_open() or not self._confirm_discard():
             return
         if not path:
             init = accounts.returns_root() if self.can("view_all") else storage.returns_dir()

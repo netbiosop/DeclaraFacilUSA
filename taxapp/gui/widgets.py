@@ -304,6 +304,7 @@ def make_tree(parent, columns, headings, widths=None, height=8, anchors=None) ->
 
 class Dialog(tk.Toplevel):
     """Dialogo modal con un formulario sobre un objeto temporal; on_ok(obj) al aceptar."""
+    edits_return = True
 
     def __init__(self, master, title, obj, build: Callable, on_ok: Callable, width=560, height=560):
         super().__init__(master)

@@ -77,6 +77,29 @@ class LogoutTests(unittest.TestCase):
             win._shortcut(action)
             action.assert_called_once()
 
+    def test_open_or_new_refused_while_edit_dialog_is_open_without_grab(self):
+        with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home, "USERPROFILE": home}):
+            from taxapp import accounts
+            from taxapp.models import W2
+            from taxapp.gui import app as A
+            from taxapp.gui import widgets as W
+            accounts.create_user("admin", "Admin", "admin", "Secreta123")
+            win = A.App()
+            self.addCleanup(win.destroy)
+            user, _err = accounts.authenticate("admin", "Secreta123")
+            win.login_ok(user)
+            win.new_return(2025)
+            client_a = win.ret
+            dialog = W.Dialog(win, "W-2", W2(), lambda f: None, lambda o: client_a.w2s.append(o))
+            win.update()
+            dialog.grab_release()  # p. ej. el ✦ de la IA suelta el grab para usar el asistente
+            with mock.patch.object(A, "messagebox"):
+                win._shortcut(lambda: win.new_return(2025))
+            self.assertIs(win.ret, client_a)
+            dialog.destroy()
+            win._shortcut(lambda: win.new_return(2025))
+            self.assertIsNot(win.ret, client_a)
+
     def test_logout_destroys_workspace(self):
         with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home, "USERPROFILE": home}):
             from taxapp import accounts

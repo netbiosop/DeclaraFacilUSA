@@ -1034,6 +1034,7 @@ EN = {
     'Su progreso': 'Your progress',
     'Su rol no incluye el asistente de IA.': 'Your role does not include the AI assistant.',
     'Su rol no permite crear declaraciones.': 'Your role does not allow creating returns.',
+    'Cierre primero la ventana abierta de esta declaración.': 'First close the open window for this return.',
     'Su rol no permite exportar.': 'Your role does not allow exporting.',
     'Su rol no permite guardar cambios.': 'Your role does not allow saving changes.',
     'Su rol no tiene permiso para esta acción.': 'Your role does not have permission for this action.',

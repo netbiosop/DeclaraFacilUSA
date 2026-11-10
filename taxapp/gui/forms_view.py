@@ -298,6 +298,7 @@ def _q(q) -> str:
 # ==================================================================================================== preguntas
 class GuidedQuestions(tk.Toplevel):
     """Una pregunta a la vez; las preguntas dependen de las respuestas (p. ej. depósito directo → número de cuenta)."""
+    edits_return = True
 
     def __init__(self, app, only_missing=True, on_close=None):
         super().__init__(app)
