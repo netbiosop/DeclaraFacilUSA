@@ -370,7 +370,7 @@ class Builder:
         it = f["itemized_detail"]
         agi = f["agi"]
         v = self.header()
-        floor = self.data["medical_floor"] * agi
+        floor = self.data["medical_floor"] * max(0.0, agi)
         v.update({"L1": m(ded.medical), "L2": m(agi, True), "L3": m(floor), "L4": m(it["medical"], True)})
         salt_first = it["salt_raw"] - ded.real_estate_tax - ded.personal_property_tax
         v.update({"L5a_sales": ded.salt_use_sales_tax, "L5a": m(salt_first), "L5b": m(ded.real_estate_tax),

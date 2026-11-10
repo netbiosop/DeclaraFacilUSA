@@ -15,6 +15,7 @@ from taxapp.engine import compute_all  # noqa: E402
 from taxapp.models import TaxReturn, W2, Dependent, Person, CustomLocalTax, clean_money_text  # noqa: E402
 from taxapp.review import review, valid_ssn  # noqa: E402
 from taxapp import storage  # noqa: E402
+from taxapp.forms.build import build  # noqa: E402
 
 
 def make(year=2025, status="single", wages=0.0, state="TX", county="", locality="", dob="1985-06-01", **income):
@@ -145,6 +146,19 @@ class StateLocalTests(unittest.TestCase):
         loc = compute_all(r)["local"]
         self.assertEqual(loc["total"], 0)
         self.assertEqual(loc["refund"], 0)
+
+    def test_itemized_on_negative_agi_has_no_negative_floor_or_charity_cap(self):
+        r = make(2025, wages=20000, state="CO", business_gross=10000, exp_supplies=40000)
+        r.deductions.mode = "itemized"
+        r.deductions.mortgage_interest = 12000
+        res = compute_all(r)
+        it = res["federal"]["itemized_detail"]
+        self.assertLess(res["federal"]["agi"], 0)
+        self.assertEqual(it["medical"], 0)
+        self.assertEqual(it["charity"], 0)
+        self.assertAlmostEqual(res["federal"]["itemized_net"], 12000)
+        sa = [i for i in build(r, res).instances if i.form == "sa"][0]
+        self.assertNotIn("(", sa.values.get("L3", ""))
 
     def test_maryland_anne_arundel_graduated(self):
         res = compute_all(make(2025, wages=80000, state="MD", county="Anne Arundel"))
