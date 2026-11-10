@@ -156,11 +156,6 @@ def _get_json(url: str, token: str = "") -> dict:
         raise UpdateError(tr("Sin conexión con GitHub: {e}", e=e)) from e
 
 
-def _get_text(url: str, token: str = "", accept="application/octet-stream") -> str:
-    data = _download_bytes(url, token, accept)
-    return data.decode("utf-8", "replace")
-
-
 class _NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         return None
@@ -182,10 +177,6 @@ def _resolve(url: str, headers: dict, timeout=TIMEOUT, hops: int = 5):
                 return _resolve(target, headers, timeout, hops - 1)  # p. ej. repositorio renombrado: sigue en la API
             return urllib.request.Request(target, headers={"User-Agent": f"DeclaraFacilUSA/{__version__}"})
         raise
-
-
-def _download_bytes(url, token="", accept="application/octet-stream") -> bytes:
-    return _read(_resolve(url, _headers(token, accept)))
 
 
 def _read(target, timeout=TIMEOUT) -> bytes:
@@ -215,7 +206,8 @@ def latest_release(cfg: UpdateConfig) -> Release:
             sha_asset = a
     if sha_asset:
         try:
-            txt = _get_text(sha_asset["url"] if tok else sha_asset["browser_download_url"], tok)
+            sha_url = sha_asset["url"] if tok else sha_asset["browser_download_url"]
+            txt = _read(_resolve(sha_url, _headers(tok, "application/octet-stream"))).decode("utf-8", "replace")
             m = re.search(r"\b[0-9a-fA-F]{64}\b", txt)
             rel.sha256 = m.group(0).lower() if m else ""
         except (UpdateError, urllib.error.URLError, OSError) as e:

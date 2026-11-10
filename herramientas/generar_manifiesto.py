@@ -19,7 +19,8 @@ SKIP_SUFFIX = {".pyc", ".pyo", ".tmp"}
 def build(root: Path = ROOT) -> dict:
     init = (root / "taxapp" / "__init__.py").read_text(encoding="utf-8")
     version = re.search(r'__version__\s*=\s*"([^"]+)"', init).group(1)
-    base = (re.search(r'__base__\s*=\s*"([^"]+)"', init) or re.search(r'__version__\s*=\s*"([^"]+)"', init)).group(1)
+    base_match = re.search(r'__base__\s*=\s*"([^"]+)"', init)
+    base = base_match.group(1) if base_match else version
     notes_file = root / "instalador" / "NOTAS_VERSION.md"
     notes = notes_file.read_text(encoding="utf-8") if notes_file.exists() else ""
     files = {}

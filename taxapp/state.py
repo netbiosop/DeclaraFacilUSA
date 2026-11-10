@@ -69,8 +69,8 @@ def _ss_subtraction(rule: str, taxable_ss: float, agi: float, status: str, tp_ag
     return taxable_ss
 
 
-def compute_state(ret: TaxReturn, fedres: dict, code: str = None) -> dict:
-    code = (code or ret.address.state or "").upper()
+def compute_state(ret: TaxReturn, fedres: dict) -> dict:
+    code = (ret.address.state or "").upper()
     year = ret.tax_year
     status = ret.filing_status
     joint = status in ("mfj", "qss")

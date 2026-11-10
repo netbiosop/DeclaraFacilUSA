@@ -211,18 +211,14 @@ class Form:
         self.row += 1
         return ent
 
-    def text(self, label, attr, help_text=None, width=32, upper=False, show=None):
+    def text(self, label, attr, help_text=None, width=32):
         self._label(label, help_text)
         var = tk.StringVar(value=str(getattr(self.getobj(), attr, "") or ""))
-        ent = ttk.Entry(self.parent, textvariable=var, width=width, show=show or "")
+        ent = ttk.Entry(self.parent, textvariable=var, width=width)
         ent.grid(row=self.row, column=1, sticky="w", pady=3)
 
         def changed(*_):
-            v = var.get()
-            if upper and v != v.upper():
-                var.set(v.upper())
-                return
-            self._set(attr, v.strip())
+            self._set(attr, var.get().strip())
 
         var.trace_add("write", changed)
         self.vars[attr] = var
