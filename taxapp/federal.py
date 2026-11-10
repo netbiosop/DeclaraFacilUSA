@@ -264,9 +264,9 @@ def compute_federal(ret: TaxReturn) -> dict:
     std_total = std + boxes * add_amt
 
     # ---------------- Itemizadas (Schedule A)
-    # Con AGI negativo los pisos y topes por % del AGI son 0, no negativos.
-    agi_floor_base = max(0.0, agi)
-    medical = max(0.0, ded.medical - fed["medical_floor"] * agi_floor_base)
+    # Con AGI negativo el piso médico y los topes por % del AGI son 0, no negativos.
+    agi_pct_base = max(0.0, agi)
+    medical = max(0.0, ded.medical - fed["medical_floor"] * agi_pct_base)
     state_local_income = (sum(w.box17_state_withheld + w.box19_local_withheld for w in ret.w2s)
                           + ded.state_income_tax_paid_extra + ret.payments.state_estimated + ret.payments.local_estimated)
     salt_first = ded.sales_tax_paid if ded.salt_use_sales_tax else state_local_income
@@ -278,10 +278,10 @@ def compute_federal(ret: TaxReturn) -> dict:
     salt_cap = max(floor, cap - sl["phaseout_rate"] * max(0.0, magi - start))
     salt = min(salt_raw, salt_cap)
     interest = ded.mortgage_interest + ded.mortgage_points + ded.investment_interest
-    charity = (min(ded.charity_cash, CHARITY_CASH_AGI_PCT * agi_floor_base)
-               + min(ded.charity_noncash, CHARITY_NONCASH_AGI_PCT * agi_floor_base))
+    charity = (min(ded.charity_cash, CHARITY_CASH_AGI_PCT * agi_pct_base)
+               + min(ded.charity_noncash, CHARITY_NONCASH_AGI_PCT * agi_pct_base))
     if fed["charitable_floor_pct"]:
-        charity = max(0.0, charity - fed["charitable_floor_pct"] * agi_floor_base)
+        charity = max(0.0, charity - fed["charitable_floor_pct"] * agi_pct_base)
     itemized = medical + salt + interest + charity + ded.casualty_loss + ded.other_itemized
     itemized_limit_red = 0.0
     if fed.get("itemized_37_limit") and itemized > 0:

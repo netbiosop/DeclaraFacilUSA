@@ -242,9 +242,10 @@ class FormsScreen(Screen):
             return
         self.generate(draft=bool(ans))
 
-    def _generate_final_checked(self):
-        if self._final_ready():
-            self.generate(False)
+    def _final_button(self):
+        """Botón de finales del paquete: solo para la declaración con la que se generó el borrador."""
+        ret = self.ret
+        return lambda: self.app.ret is ret and self._final_ready() and self.generate(False)
 
     def generate(self, draft: bool):
         if not self.app.can("export"):
@@ -294,11 +295,11 @@ class FormsScreen(Screen):
         self.open_last_btn.pack(anchor="w", pady=(4, 0))
         accounts.log("forms_generated", self.app.user["username"],
                      f"{'draft' if out.draft else 'final'} {self.ret.tax_year} {out.folder.name}")
-        PackageDialog(self.app, out, on_final=self._generate_final_checked)
+        PackageDialog(self.app, out, on_final=self._final_button())
 
     def _show_last(self):
         if self.last:
-            PackageDialog(self.app, self.last, on_final=self._generate_final_checked)
+            PackageDialog(self.app, self.last, on_final=self._final_button())
 
 
 def _q(q) -> str:

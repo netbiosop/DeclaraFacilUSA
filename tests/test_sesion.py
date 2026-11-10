@@ -124,6 +124,30 @@ class LogoutTests(unittest.TestCase):
             generate.assert_not_called()
             box.askyesno.assert_called_once()
 
+    def test_final_button_of_previous_client_does_nothing_after_switching(self):
+        with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home, "USERPROFILE": home}):
+            from taxapp import accounts
+            from taxapp.gui import app as A
+            from taxapp.gui import forms_view as F
+            accounts.create_user("admin", "Admin", "admin", "Secreta123")
+            win = A.App()
+            self.addCleanup(win.destroy)
+            user, _err = accounts.authenticate("admin", "Secreta123")
+            win.login_ok(user)
+            win.new_return(2025)
+            win.show_workspace("forms")
+            win.update()
+            view = win.workspace.screens["forms"]
+            view.last = mock.Mock(draft=True)
+            with mock.patch.object(F, "PackageDialog") as package:
+                view._show_last()
+            on_final = package.call_args.kwargs["on_final"]
+            win.new_return(2026)
+            with mock.patch.object(F, "messagebox") as box, mock.patch.object(view, "generate") as generate:
+                on_final()
+            generate.assert_not_called()
+            box.askyesno.assert_not_called()
+
     def test_logout_destroys_workspace(self):
         with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home, "USERPROFILE": home}):
             from taxapp import accounts
