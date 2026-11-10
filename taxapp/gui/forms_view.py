@@ -212,22 +212,28 @@ class FormsScreen(Screen):
             return
         GuidedQuestions(self.app, only_missing=only_missing, on_close=self.refresh)
 
-    def generate_final(self):
+    def _final_ready(self) -> bool:
+        """Datos obligatorios completos y errores de la revisión aceptados: se pueden generar los finales."""
         res = self.app.result_or_warn()
         if not res:
-            return
+            return False
         missing = qmod.missing(self.ret, res, required_only=True)
         if missing:
             lst = "\n".join(f"• {_q(q)}" for q in missing[:12])
             if messagebox.askyesno(APP_NAME, tr("Faltan datos obligatorios para los formularios finales:\n\n{l}\n\n"
                                                 "¿Desea responder las preguntas ahora?", l=lst), parent=self.app):
                 self.open_wizard(only_missing=True)
-            return
+            return False
         fnd = self.app.findings()
         errs = [f for f in fnd if f["severity"] == "error"]
         if errs and not messagebox.askyesno(APP_NAME, tr("La revisión encontró {n} error(es). ¿Generar de todos modos?",
                                                          n=len(errs)), parent=self.app):
             self.app.workspace.show("review")
+            return False
+        return True
+
+    def generate_final(self):
+        if not self._final_ready():
             return
         ans = messagebox.askyesnocancel(APP_NAME, _("¿Desea generar primero un BORRADOR para revisarlo antes de llenar "
                                                     "los formularios finales?\n\nSí: borrador con marca de agua.\n"
@@ -235,6 +241,10 @@ class FormsScreen(Screen):
         if ans is None:
             return
         self.generate(draft=bool(ans))
+
+    def _generate_final_checked(self):
+        if self._final_ready():
+            self.generate(False)
 
     def generate(self, draft: bool):
         if not self.app.can("export"):
@@ -284,11 +294,11 @@ class FormsScreen(Screen):
         self.open_last_btn.pack(anchor="w", pady=(4, 0))
         accounts.log("forms_generated", self.app.user["username"],
                      f"{'draft' if out.draft else 'final'} {self.ret.tax_year} {out.folder.name}")
-        PackageDialog(self.app, out, on_final=lambda: self.generate(False))
+        PackageDialog(self.app, out, on_final=self._generate_final_checked)
 
     def _show_last(self):
         if self.last:
-            PackageDialog(self.app, self.last, on_final=lambda: self.generate(False))
+            PackageDialog(self.app, self.last, on_final=self._generate_final_checked)
 
 
 def _q(q) -> str:
