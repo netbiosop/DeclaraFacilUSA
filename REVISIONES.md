@@ -40,6 +40,12 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
   puesta en el campo equivocado (`actividad.log` lo ven Supervisores y va en los respaldos).
 - Al eliminar un usuario, lo que queda en su carpeta (PDF exportados) pasa a `<quien recibe>/<usuario>_eliminado_<fecha>/`
   con `rename` (todo o nada); `list_returns` no lo muestra como declaración, `can_access_path` sí lo permite a quien lo recibe.
+- Ventanas que escriben en la declaración llevan `edits_return = True` (`Dialog`, `GuidedQuestions`): `open_file`/`new_return`
+  se niegan mientras haya una abierta, aunque haya perdido el grab (el ✦ de la IA lo suelta a propósito). Una ventana nueva
+  que escriba en `app.ret` debe llevar la marca. `PackageDialog` no la lleva: su botón de finales solo actúa si sigue
+  abierta la declaración del borrador (`_final_button`).
+- El `main.py` de la base 1.5.1 solo importa `taxapp.i18n` y `taxapp.gui.app.main`: se pueden quitar funciones internas
+  de `updater` sin romper la base.
 
 ## Pendientes
 - `taxapp/state.py` `_ss_subtraction`: umbrales estatales de Seguro Social (CT, MN, NM, RI, VT, WV) escritos en código e
@@ -167,7 +173,28 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
   - `.dfusa`, PDF y respaldos ZIP (SSN, cuentas) sin cifrar en Documentos; si OneDrive respalda esa carpeta suben a la nube (`accounts.py:9`). ¿Carpeta fuera de Documentos, aviso o cifrado?
   - Limpieza menor: contraseña temporal repetida (`gui/settings.py:774,815`), bloque "Notas" (`screens.py:308`, `gui/tools.py:102`), `view_frame` (`gui/app.py:125,135`), `after(150)` (`gui/assistant.py:190,494`).
 
+- Encontrados el 2026-11-10 (limpieza con resultados iguales, sin urgencia): parámetros que nadie pasa `mpos(zero)` y
+  `header(name_key, ssn_key)` (`build.py:36,108`), `lang_toggle(bg)` (`ui.py:251`, además `bg` sin uso), `ListEditor(factory)`,
+  `_help_icon(column)`, `scroll(padding)`, `settings.field(width)`, `ui.card(border)`; atributos sin lector
+  `SettingsView.section`, `Pill.title`, `ListEditor.kind`, `self.students` (`screens.py:731`); `"*.dfusa"` 7 veces aunque
+  existe `storage.EXT`; `accounts.authenticate` repetido en las dos ramas de `login.py:148,155`; `timeout=60` de
+  `updater.download()` sin nombre; `layout._num` lee `padx` en tupla `(0, 10)` como 0 (la etiqueta puede salir ~10 px más
+  ancha); `release_json(with_sha)` en `tests/test_updater.py`.
+
 ## Historial
+### 2026-11-10 — revisión nocturna (PR #2, rama `revision-nocturna`; `main` sin cambios)
+- `federal.py:267,279`, `build.py:373`: con AGI negativo el piso médico sumaba y los topes de donaciones restaban (Anexo A
+  L3 "(750)", L14 "(9,000)", deducción negativa; CO/ID/MO/NM/DC cobraban de más) → base `max(0, AGI)`. 6.000 declaraciones
+  aleatorias: solo cambian las 196 con AGI < 0 y solo la deducción (impuesto federal igual). Prueba en `test_engine.py`.
+- `gui/app.py`: el bloqueo de Ctrl+O/Ctrl+N dependía del grab, que se pierde al cerrar un `Dialog` abierto desde las preguntas
+  guiadas o con el ✦ de la IA → se abría otro cliente y el diálogo (W-2, número de cuenta) escribía los datos de A en B →
+  `_editor_open()` (ver Decisiones). Prueba con Xvfb.
+- `gui/forms_view.py`: "Todo correcto: generar finales" del paquete tras un borrador saltaba los datos obligatorios y la
+  confirmación de errores → `_final_ready()`; y tras cambiar de cliente actuaba sobre el nuevo → `_final_button()`.
+- Limpieza: `fmt_money(signed)`, `compute_state(code)`, `Form.text(upper, show)`, `_right_pad`, `_get_text`/`_download_bytes`,
+  regex doble en `generar_manifiesto.py`.
+- Revisión del propio cambio (ponytail-review + Thermos): botón de finales de otro cliente (arriba), nombre `agi_pct_base`.
+- Pruebas: 155 → 156 pasan (15 omitidas sin pantalla; con Xvfb, 171). Pendientes nuevos arriba.
 ### 2026-11-09 — revisión nocturna (PR #2, rama `revision-nocturna`; `main` sin cambios)
 - `gui/app.py:recalc_now` un cálculo fallido conservaba el resultado del cliente anterior y exportar/generar lo usaba con el nombre del actual → `self.result = None`, `result_or_warn()` en exportar, generar y preguntas guiadas (Xvfb, `test_sesion.py`).
 - `gui/app.py:65` Ctrl+N/Ctrl+O atravesaban diálogos modales y el W-2 abierto caía en otra declaración → `_shortcut`.
