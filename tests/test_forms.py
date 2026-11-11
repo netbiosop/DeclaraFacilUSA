@@ -267,6 +267,16 @@ class QuestionTests(unittest.TestCase):
         ret.filing.routing = "111000026"
         self.assertIn("routing", {q.key for q in questions.missing(ret, compute_all(ret), required_only=True)})
 
+    def test_state_must_be_a_known_code(self):
+        # "tx" o "XX" se aceptaban: la pantalla de dirección fallaba con KeyError y el estado salía $0 sin error
+        ret = family()
+        ret.address.state = "tx"
+        q = [q for q in questions.missing(ret, compute_all(ret)) if q.key == "state"]
+        self.assertEqual(len(q), 1)
+        self.assertFalse(q[0].check("XX"))
+        self.assertFalse(q[0].check("tx"))
+        self.assertTrue(q[0].check("TX"))
+
     def test_conditional_questions(self):
         ret = business()
         ret.income.exp_car = 1000

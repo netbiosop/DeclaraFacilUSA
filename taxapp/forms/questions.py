@@ -10,6 +10,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Callable, List, Optional, Tuple
 
+from .. import data_loader
 from ..i18n import N_
 from ..models import TaxReturn
 
@@ -97,9 +98,9 @@ def questions(ret: TaxReturn, res: dict) -> List[Question]:
     Q.append(Question("city", G2, N_("Ciudad"), "text", a, "city", required=True, width=28))
     Q.append(Question("zip", G2, N_("Código postal (ZIP)"), "text", a, "zip", required=True, width=12,
                       check=lambda v: bool(re.match(r"^\d{5}(-\d{4})?$", (v or "").strip()))))
-    if not ret.address.state:
+    if ret.address.state not in data_loader.states_info():
         Q.append(Question("state", G2, N_("Estado (2 letras, p. ej. TX)"), "text", a, "state", required=True, width=6,
-                          check=lambda v: bool(re.match(r"^[A-Za-z]{2}$", (v or "").strip()))))
+                          check=lambda v: (v or "").strip() in data_loader.states_info()))
     G3 = N_("Preguntas del Formulario 1040")
     f = lambda r: r.filing  # noqa: E731
     Q.append(Question("digital", G3, N_("En el año, ¿recibió, vendió, intercambió o transfirió activos digitales "
