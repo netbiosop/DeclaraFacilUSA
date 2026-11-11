@@ -181,7 +181,35 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
   `updater.download()` sin nombre; `layout._num` lee `padx` en tupla `(0, 10)` como 0 (la etiqueta puede salir ~10 px más
   ancha); `release_json(with_sha)` en `tests/test_updater.py`.
 
+- Encontrados el 2026-11-11 (deciden el dueño o necesitan la interfaz):
+  - `accounts.can()` sin `db` relee `usuarios.json` en cada comprobación (`App.can`, ~35 sitios): con el archivo bloqueado un
+    momento, `_empty()` da los permisos por defecto (un Supervisor puede ganar permisos). ¿Matriz fija al iniciar sesión (lo que
+    dice `settings.py:505`)? Hoy un permiso quitado se aplica al momento.
+  - `gui/login.py:151`: `update_settings("", remember_user=…)` corre antes de autenticar (también en intentos fallidos). Guardarlo
+    tras un `authenticate` correcto (Tk).
+  - Casilla 3 del W-2 vacía → `box1` como salario de Seguro Social en el Anexo SE (`federal.py:128`): empleado público sin SS
+    (casillas 3 y 4 en 0) + Anexo C $180k paga $6,216 menos. Igual que el pendiente de Medicare: qué significa una casilla vacía.
+  - Transferir o eliminar un usuario con una de sus declaraciones abierta (`gui/settings.py:493,850`): `app.path` sigue en la
+    carpeta vieja y el autoguardado la recrea. Negarse o actualizar la ruta (Tk).
+  - `casualty_loss` en negativo resta de las itemizadas (mismo patrón que la pérdida arrastrada; `federal.py:285`, `build.py:385`).
+  - Aviso de IRA (`review.py:132`) con la edad al 31-dic: quien cumple 59 en el año no recibe el aviso de 59½.
+  - La pregunta del estado rechaza "tx" con el mensaje genérico en vez de pasarlo a mayúsculas (`forms_view.py:438`).
+  - Limpieza: `except Exception` amplio en `counties.py:361` y `gui/app.py:569` (sin `from` ni traceback); `catalog.py` repite
+    `ORDER`/`SHORT`/`FILE_NAMES` que ya están en el JSON (`"seq"` sin lector); "Recargar tablas" (`gui/settings.py:603`) no limpia
+    `catalog._load` ni `counties._all` (→ `data_loader.reload()`); `tests/test_sesion.py` repite la preparación 8 veces sin
+    parchear `ITERATIONS`; fechas 15-abr/15-oct en `gui/ui.py:283` además de `deadline` en `federal_<año>.json`.
+
 ## Historial
+### 2026-11-11 — revisión nocturna (PR #2, rama `revision-nocturna`; `main` sin cambios)
+- `forms/questions.py:101`: la pregunta del estado aceptaba "tx"/"XX" → `KeyError` en la pantalla de dirección (`screens.py:282`)
+  y estado $0 sin error → se valida contra `states_info()` y la pregunta reaparece si el guardado es inválido.
+- `federal.py:136`: pérdida arrastrada escrita "(3,000)" (−3000) se sumaba como ganancia (+$720 en el ejemplo) mientras el
+  Anexo D imprimía pérdida (`mpos`) → `abs()`. 1.500 declaraciones aleatorias con valores positivos: resultados idénticos.
+- `accounts.py:587`: `create_backup` con `with_suffix` convertía "Respaldo_oficina.2026" en "Respaldo_oficina.zip" y pisaba ese
+  respaldo → `with_name(name + ".zip")`. Quitada la excepción `last_user` de `update_settings` (nadie la pasa).
+- Limpieza: `getattr(app, "readonly")` en `gui/lists.py`; prueba de que `CODE_DIRS` es igual en `updater.py` y `generar_manifiesto.py`.
+- Revisión del propio cambio (ponytail-review + Thermos): prueba movida a `FederalTests`.
+- Pruebas: 156 → 160 pasan (15 omitidas sin pantalla). Pendientes nuevos arriba.
 ### 2026-11-10 — revisión nocturna (PR #2, rama `revision-nocturna`; `main` sin cambios)
 - `federal.py:267,279`, `build.py:373`: con AGI negativo el piso médico sumaba y los topes de donaciones restaban (Anexo A
   L3 "(750)", L14 "(9,000)", deducción negativa; CO/ID/MO/NM/DC cobraban de más) → base `max(0, AGI)`. 6.000 declaraciones
