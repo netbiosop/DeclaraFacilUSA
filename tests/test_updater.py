@@ -306,6 +306,12 @@ def make_tree(base: pathlib.Path, version="1.4.0", extra=b"x = 1\n"):
     (base / "taxapp" / "__pycache__" / "x.pyc").write_bytes(b"junk")
 
 
+class ManifestContractTests(unittest.TestCase):
+    def test_publisher_and_installer_agree_on_code_dirs(self):
+        # una carpeta publicada que el actualizador no conoce se descarta en _safe_rel
+        self.assertEqual(GEN.CODE_DIRS, U.CODE_DIRS)
+
+
 class CodeUpdateTests(Base):
     def setUp(self):
         super().setUp()

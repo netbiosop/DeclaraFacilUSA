@@ -115,7 +115,7 @@ class ListEditor(ttk.Frame):
                         ttk.Button(bar, text=_("Eliminar"), command=self.remove)]
         for i, b in enumerate(self.buttons):
             b.pack(side="left", padx=(0 if i == 0 else 6, 0))
-        if getattr(app, "readonly", False):
+        if app.readonly:
             for b in self.buttons:
                 b.state(["disabled"])
         self.refresh()
