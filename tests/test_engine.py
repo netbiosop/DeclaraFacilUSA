@@ -34,6 +34,13 @@ def make(year=2025, status="single", wages=0.0, state="TX", county="", locality=
 
 
 class FederalTests(unittest.TestCase):
+    def test_carryover_typed_negative_is_still_a_loss(self):
+        # "(3,000)" como en la línea 6 del Anexo D se leía como −3000 y se sumaba como ganancia
+        pos = compute_all(make(2025, wages=60000, capital_loss_carryover=3000))["federal"]
+        neg = compute_all(make(2025, wages=60000, capital_loss_carryover=-3000))["federal"]
+        self.assertAlmostEqual(neg["tax"], pos["tax"], places=2)
+        self.assertAlmostEqual(neg["detail"]["st_net"], -3000)
+
     def test_single_2025(self):
         f = compute_all(make(2025, wages=60000))["federal"]
         self.assertAlmostEqual(f["taxable_income"], 44250)
@@ -159,13 +166,6 @@ class StateLocalTests(unittest.TestCase):
         self.assertAlmostEqual(res["federal"]["itemized_net"], 12000)
         sa = [i for i in build(r, res).instances if i.form == "sa"][0]
         self.assertNotIn("(", sa.values.get("L3", ""))
-
-    def test_carryover_typed_negative_is_still_a_loss(self):
-        # "(3,000)" como en la línea 6 del Anexo D se leía como −3000 y se sumaba como ganancia
-        pos = compute_all(make(2025, wages=60000, capital_loss_carryover=3000))["federal"]
-        neg = compute_all(make(2025, wages=60000, capital_loss_carryover=-3000))["federal"]
-        self.assertAlmostEqual(neg["tax"], pos["tax"], places=2)
-        self.assertAlmostEqual(neg["detail"]["st_net"], -3000)
 
     def test_maryland_anne_arundel_graduated(self):
         res = compute_all(make(2025, wages=80000, state="MD", county="Anne Arundel"))
