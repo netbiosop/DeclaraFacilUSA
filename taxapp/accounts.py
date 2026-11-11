@@ -435,8 +435,7 @@ def update_settings(by: str, **kw):
         return
     db["settings"].update(changed)
     save(db)
-    if set(changed) - {"last_user"}:
-        log("settings_changed", by, ", ".join(sorted(changed)))
+    log("settings_changed", by, ", ".join(sorted(changed)))
 
 
 def prefs_for(username: str) -> dict:
@@ -584,7 +583,7 @@ def create_backup(dest, by: str) -> Path:
     base = data_loader.user_dir()
     dest = Path(dest)
     if dest.suffix.lower() != ".zip":
-        dest = dest.with_suffix(".zip")
+        dest = dest.with_name(dest.name + ".zip")
     tmp = dest.with_name(dest.name + ".tmp")  # un fallo a mitad no debe dejar un ZIP válido e incompleto
     try:
         with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as z:

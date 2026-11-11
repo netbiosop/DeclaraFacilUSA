@@ -251,6 +251,15 @@ class FolderTests(AccountsBase):
                 A.create_backup(dest, "admin")
         self.assertEqual(list(A.backups_dir().iterdir()), [])
 
+    def test_backup_name_with_dot_does_not_overwrite_another(self):
+        # with_suffix convertía "Respaldo_oficina.2026" en "Respaldo_oficina.zip" y lo pisaba
+        self.admin()
+        other = A.backups_dir() / "Respaldo_oficina.zip"
+        other.write_bytes(b"otro respaldo")
+        dest = A.create_backup(A.backups_dir() / "Respaldo_oficina.2026", "admin")
+        self.assertEqual(dest.name, "Respaldo_oficina.2026.zip")
+        self.assertEqual(other.read_bytes(), b"otro respaldo")
+
     def test_save_is_flushed_to_disk_before_replace(self):
         # Sin fsync un corte de luz puede dejar usuarios.json vacío y la app abre el asistente de administrador
         self.admin()
