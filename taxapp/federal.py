@@ -133,7 +133,7 @@ def compute_federal(ret: TaxReturn) -> dict:
     profit = inc.schedule_c_profit()
 
     # Ganancias de capital (Schedule D simplificado)
-    st_net = inc.short_term_gain + inc.sales_gain("short") - inc.capital_loss_carryover
+    st_net = inc.short_term_gain + inc.sales_gain("short") - abs(inc.capital_loss_carryover)  # se escribe a veces como "(3,000)"
     lt_net = inc.long_term_gain + inc.sales_gain("long") + inc.capital_gain_distributions
     net_cap = st_net + lt_net
     loss_limit = fed["capital_loss_limit"]["mfs" if st == "mfs" else "other"]
