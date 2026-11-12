@@ -46,6 +46,10 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
   abierta la declaración del borrador (`_final_button`).
 - El `main.py` de la base 1.5.1 solo importa `taxapp.i18n` y `taxapp.gui.app.main`: se pueden quitar funciones internas
   de `updater` sin romper la base.
+- Escritura atómica: `data_loader.write_atomic(path, texto)` (.tmp + fsync + replace) para usuarios.json, declaraciones,
+  `estado.json` y `ai_config.json`. `main.py` `_save_state` escribe aparte porque es la base fija (ver Pendientes).
+- Texto de los PDF: `pdf._cp1252` quita el acento a las letras que no están en Windows-1252 (Ễ→E, Đ→D); las que no tienen
+  forma sin acento (chino, emoji) siguen saliendo "?". El logger `pypdf` queda en ERROR porque sus avisos citan nombres.
 
 ## Pendientes
 - `taxapp/state.py` `_ss_subtraction`: umbrales estatales de Seguro Social (CT, MN, NM, RI, VT, WV) escritos en código e
@@ -199,7 +203,29 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
     `catalog._load` ni `counties._all` (→ `data_loader.reload()`); `tests/test_sesion.py` repite la preparación 8 veces sin
     parchear `ITERATIONS`; fechas 15-abr/15-oct en `gui/ui.py:283` además de `deadline` en `federal_<año>.json`.
 
+- `main.py` `_save_state` (base fija): escribe `estado.json` con `open("w")` sin fsync ni replace; un corte de luz tras
+  `_rollback_now` puede perder la lista "bad". Corregirlo exige un instalador nuevo (main.py no se toca en correcciones).
+- `gui/forms_view.py:261`: la generación de PDF en otro hilo lee `self.ret` en vivo mientras el usuario puede seguir
+  editando; propuesta `copy.deepcopy(self.ret)` al empezar (Tkinter, no se puede probar a fondo aquí).
+- `forms/questions.py:55` `_ssn_ok` solo mira el formato ("000-00-0000" cuenta como completo); `review.valid_ssn` es más
+  estricto. Usarlo cambia qué falta para los formularios finales: decide el dueño.
+- `review.py:165`: la revisión muestra notas federales y locales pero no las estatales (`st["notes"]`).
+- Estructura: DPAPI (`protect`/`unprotect`) vive en `assistant.py` y lo usa el actualizador; `forms/build.py` (958 líneas)
+  pasa de 1.000 con el próximo formulario; `state.py:213-260` cadena de `if "XX_…" in special`; `assistant.ask` un `if` por
+  proveedor. Anexo A 2026 (`build.py:382`): con el piso de 0,5 % avisaría "supera el límite" sin pasarlo (sin PDF 2026 aún).
+
 ## Historial
+### 2026-11-12 — revisión nocturna (PR #2, rama `revision-nocturna`; `main` sin cambios)
+- `forms/pdf.py:98,194,296`: un nombre como "Nguyễn Đức" salía `NGUY?N ??C` en el 1040 final y pypdf anotaba el nombre en
+  `errores.log` (va en los respaldos) → `_cp1252` en `_prepare`/`_pdf_str` y logger `pypdf` en ERROR. Prueba en `test_forms.py`.
+- `gui/screens.py:331,537`, `gui/lists.py:110`: en Solo lectura el doble clic abría el diálogo de edición y cambiaba `app.ret`
+  (el siguiente cálculo y los formularios lo usaban) → `edit`/`edit_w2`/`ListEditor.edit` salen si `app.readonly`. Prueba Xvfb.
+- `updater.py:324`, `assistant.py:115`: `estado.json` y `ai_config.json` sin fsync ni replace → `data_loader.write_atomic`,
+  que ahora usan también accounts y storage (antes había cuatro copias). Prueba en `test_updater.py`.
+- Limpieza: comparación encadenada en `review.py:128`, `SSN_RE`/ZIP duplicados en `questions.py`, `num_people()` en
+  `local.py`, variable sin usar en `home.py`, comentario 0.6/0.62 em en `pdf.py`.
+- Revisión del propio cambio (ponytail-review + Thermos): guardado atómico en un solo lugar; `main.py` queda en Pendientes.
+- Pruebas: 160 → 162 pasan (16 omitidas sin pantalla; con Xvfb, 178). Pendientes nuevos arriba.
 ### 2026-11-11 — revisión nocturna (PR #2, rama `revision-nocturna`; `main` sin cambios)
 - `forms/questions.py:101`: la pregunta del estado aceptaba "tx"/"XX" → `KeyError` en la pantalla de dirección (`screens.py:282`)
   y estado $0 sin error → se valida contra `states_info()` y la pregunta reaparece si el guardado es inválido.
