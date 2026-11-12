@@ -20,6 +20,7 @@ from dataclasses import dataclass, field, asdict
 from typing import Dict, List, Optional, Tuple
 
 from . import data_loader
+from .accounts import write_durable
 from .i18n import _, N_, tr, get_language
 from .models import TaxReturn, nonzero_amounts
 
@@ -113,7 +114,10 @@ def load_config() -> AIConfig:
 
 
 def save_config(cfg: AIConfig):
-    _config_path().write_text(json.dumps(asdict(cfg), indent=1), encoding="utf-8")
+    path = _config_path()
+    tmp = path.with_suffix(".tmp")
+    write_durable(tmp, json.dumps(asdict(cfg), indent=1))
+    tmp.replace(path)
 
 
 # DPAPI (Windows) — cifra con la cuenta del usuario; fuera de Windows se usa base64 (solo ofuscacion).
