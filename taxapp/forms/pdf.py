@@ -53,7 +53,7 @@ def _fmt_ssn(value: str, maxlen: Optional[int]) -> str:
 def _prepare(value, spec):
     """Convierte el valor del constructor en lo que espera el campo. spec: ruta | [ruta, estado] | [ruta, None, maxlen]."""
     if isinstance(spec, str):
-        return spec, None, _cp1252(str(value))
+        spec = [spec, None]
     path, state = spec[0], spec[1]
     if state:  # casilla
         return path, state, None

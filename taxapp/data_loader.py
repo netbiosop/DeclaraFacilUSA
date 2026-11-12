@@ -17,6 +17,16 @@ SUPPORTED_YEARS = (2025, 2026)
 logger = logging.getLogger(__name__)
 
 
+def write_atomic(path: Path, text: str):
+    """Escribe en <archivo>.tmp, fuerza el disco y reemplaza: sin fsync un corte de luz puede dejar el archivo vacío."""
+    tmp = path.with_name(path.name + ".tmp")
+    with open(tmp, "w", encoding="utf-8") as f:
+        f.write(text)
+        f.flush()
+        os.fsync(f.fileno())
+    tmp.replace(path)
+
+
 def read_json(path, default=None):
     """Lee un JSON. Si no existe devuelve `default` sin avisar; si está dañado lo anota y devuelve `default`."""
     try:

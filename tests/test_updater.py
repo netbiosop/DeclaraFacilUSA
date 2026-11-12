@@ -405,13 +405,13 @@ class CodeUpdateTests(Base):
         with mock.patch.object(U, "_fetch", side_effect=self.fake_fetch([])):
             self.assertIsNone(U.check_code(U.UpdateConfig(repo="o/r")))
 
-
     def test_state_is_flushed_to_disk_before_replace(self):
         # estado.json vacío tras un corte de luz perdía la lista "bad" y se volvía a instalar una versión mala
         with mock.patch("os.fsync") as fsync:
             U.save_state({"bad": ["1.4.1"]})
         self.assertTrue(fsync.called)
         self.assertEqual(U.load_state(), {"bad": ["1.4.1"]})
+
 
 class BootstrapTests(Base):
     """main.choose_code_root: elige el codigo actualizado y vuelve atras si no arranco."""

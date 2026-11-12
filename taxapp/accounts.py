@@ -144,21 +144,10 @@ def load() -> dict:
     return d
 
 
-def write_durable(path: Path, text: str):
-    """Escribe y fuerza el disco antes del replace: sin esto un corte de luz puede dejar el archivo vacío."""
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(text)
-        f.flush()
-        os.fsync(f.fileno())
-
-
 def save(db: dict):
     if db.get(_UNREADABLE):
         raise AccountError(_(_UNREADABLE_MSG))
-    p = _file()
-    tmp = p.with_suffix(".tmp")
-    write_durable(tmp, json.dumps(db, indent=1, ensure_ascii=False))
-    tmp.replace(p)
+    data_loader.write_atomic(_file(), json.dumps(db, indent=1, ensure_ascii=False))
 
 
 def has_users() -> bool:

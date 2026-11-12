@@ -31,7 +31,6 @@ from pathlib import Path
 from typing import Callable, Optional
 
 from . import __version__, data_loader
-from .accounts import write_durable
 from .i18n import _, tr
 
 logger = logging.getLogger(__name__)
@@ -323,10 +322,7 @@ def load_state() -> dict:
 
 
 def save_state(st: dict):
-    path = _state_path()
-    tmp = path.with_suffix(".tmp")
-    write_durable(tmp, json.dumps(st, indent=1))
-    tmp.replace(path)
+    data_loader.write_atomic(_state_path(), json.dumps(st, indent=1))
 
 
 def current_root() -> Path:
