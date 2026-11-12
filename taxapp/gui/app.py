@@ -735,6 +735,7 @@ def _setup_logging():
     except OSError:
         handler = logging.NullHandler()   # sin acceso a Documentos la app igual abre; solo no hay registro
     logging.basicConfig(handlers=[handler], level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+    logging.getLogger("pypdf").setLevel(logging.ERROR)  # sus avisos citan el texto del campo: nombres de clientes
 
 
 def main():

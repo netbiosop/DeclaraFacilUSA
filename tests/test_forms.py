@@ -195,6 +195,11 @@ class BuilderTests(unittest.TestCase):
         _res, p = self.plan(ret)
         self.assertEqual(self.vals(p, "2441")["prov0_tin"], "12-3456789")
 
+    def test_letters_outside_cp1252_are_not_printed_as_question_marks(self):
+        self.assertEqual(pdf._prepare("NGUYỄN ĐỨC", "campo")[2], "NGUYEN DUC")
+        self.assertEqual(pdf._prepare("ZOË Ñ", "campo")[2], "ZOË Ñ")
+        self.assertEqual(pdf._pdf_str("Łukasz"), "Lukasz")
+
     def test_2441_fourth_care_person_goes_on_statement(self):
         ret = family()
         ret.credits.care_expenses = 8000
