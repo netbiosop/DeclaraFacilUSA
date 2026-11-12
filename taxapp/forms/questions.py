@@ -13,8 +13,7 @@ from typing import Callable, List, Optional, Tuple
 from .. import data_loader
 from ..i18n import N_
 from ..models import TaxReturn
-
-SSN_RE = re.compile(r"^\d{3}-?\d{2}-?\d{4}$")
+from ..review import SSN_RE, ZIP_RE
 
 
 @dataclass
@@ -97,7 +96,7 @@ def questions(ret: TaxReturn, res: dict) -> List[Question]:
     Q.append(Question("street", G2, N_("Calle y número (o apartado postal)"), "text", a, "street", required=True, width=40))
     Q.append(Question("city", G2, N_("Ciudad"), "text", a, "city", required=True, width=28))
     Q.append(Question("zip", G2, N_("Código postal (ZIP)"), "text", a, "zip", required=True, width=12,
-                      check=lambda v: bool(re.match(r"^\d{5}(-\d{4})?$", (v or "").strip()))))
+                      check=lambda v: bool(ZIP_RE.match((v or "").strip()))))
     if ret.address.state not in data_loader.states_info():
         Q.append(Question("state", G2, N_("Estado (2 letras, p. ej. TX)"), "text", a, "state", required=True, width=6,
                           check=lambda v: (v or "").strip() in data_loader.states_info()))

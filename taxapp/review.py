@@ -125,7 +125,7 @@ def review(ret: TaxReturn, res: dict) -> List[dict]:
         out.append(_f("error", "income", _("Los dividendos calificados no pueden superar los dividendos ordinarios.")))
     if inc.ira_taxable > inc.ira_gross > 0 or inc.pension_taxable > inc.pension_gross > 0:
         out.append(_f("error", "income", _("La parte tributable de jubilacion supera el monto bruto.")))
-    if inc.ira_gross > 0 == inc.ira_taxable or inc.pension_gross > 0 == inc.pension_taxable:
+    if (inc.ira_gross > 0 and inc.ira_taxable == 0) or (inc.pension_gross > 0 and inc.pension_taxable == 0):
         out.append(_f("aviso", "income", _("1099-R con monto bruto y sin monto tributable: no se suma nada al ingreso. "
                                            "Si no es un traspaso o Roth, escriba la parte tributable.")))
     tp_age = ret.taxpayer_age()

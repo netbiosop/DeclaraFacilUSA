@@ -198,7 +198,7 @@ def _watermark_page(width: float, height: float, big: str, small: str):
         NameObject("/ExtGState"): DictionaryObject({NameObject("/WmG"): gs, NameObject("/WmH"): gs2}),
     })
     size = 58 if len(big) <= 12 else max(30, int(58 * 12 / len(big)))
-    # ancho aproximado de Helvetica-Bold: 0.6 em por carácter
+    # ancho aproximado de Helvetica-Bold: 0.62 em por carácter
     tw = 0.62 * size * len(big)
     c, s = 0.8192, 0.5736  # cos/sin de 35°
     cx, cy = width / 2, height / 2

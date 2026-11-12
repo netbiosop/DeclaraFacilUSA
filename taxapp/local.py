@@ -57,7 +57,7 @@ def _apply(j: dict, name: str, ret: TaxReturn, fedres: dict, stres: dict, overri
     if method == "flat":
         rate = (override_rate / 100.0) if (override_rate and j.get("editable")) else j["rate"]
         if base_key == "earned_less_exemptions":
-            people = (2 if ret.is_joint() else 1) + len(ret.dependents)
+            people = ret.num_people() + len(ret.dependents)
             base = max(0.0, bases["earned"] + ret.income.taxable_interest + ret.income.ordinary_dividends
                        - j.get("exemption", 0) * people)
         tax = base * rate
