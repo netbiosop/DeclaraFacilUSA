@@ -100,6 +100,34 @@ class LogoutTests(unittest.TestCase):
             win._shortcut(lambda: win.new_return(2025))
             self.assertIsNot(win.ret, client_a)
 
+    def test_read_only_user_cannot_edit_with_double_click(self):
+        with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home, "USERPROFILE": home}):
+            from taxapp import accounts, storage
+            from taxapp.models import Dependent, Person, TaxReturn, W2
+            from taxapp.gui import app as A
+            from taxapp.gui import widgets as W
+            accounts.create_user("admin", "Admin", "admin", "Secreta123")
+            accounts.create_user("lector", "Lector", "viewer", "Secreta123", by="admin")
+            r = TaxReturn(tax_year=2025)
+            r.taxpayer = Person(first_name="A", last_name="B")
+            r.w2s = [W2(employer="E", box1_wages=50000)]
+            r.dependents = [Dependent(first_name="C", last_name="B")]
+            path = storage.save(r, accounts.returns_dir("lector") / "cliente")
+            win = A.App()
+            self.addCleanup(win.destroy)
+            user, _err = accounts.authenticate("lector", "Secreta123")
+            win.login_ok(user)
+            win.open_file(str(path))
+            self.assertTrue(win.readonly)
+            for name, tree, edit in (("income", "w2tree", "edit_w2"), ("dependents", "tree", "edit")):
+                win.show_workspace(name)
+                win.update()
+                screen = win.workspace.screens[name]
+                getattr(screen, tree).selection_set("0")
+                getattr(screen, edit)()
+                win.update()
+                self.assertFalse([w for w in win.winfo_children() if isinstance(w, W.Dialog)], name)
+
     def test_final_button_after_draft_checks_required_data(self):
         with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home, "USERPROFILE": home}):
             from taxapp import accounts

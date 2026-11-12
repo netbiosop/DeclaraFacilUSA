@@ -370,6 +370,8 @@ class DependentsScreen(Screen):
         self._dialog(Dependent(last_name=self.ret.taxpayer.last_name), ok)
 
     def edit(self):
+        if self.app.readonly:  # el doble clic sigue enlazado aunque los botones estén desactivados
+            return
         sel = self.tree.selection()
         if not sel:
             return
@@ -590,6 +592,8 @@ class IncomeScreen(Screen):
         self._w2_dialog(W2(state=self.ret.address.state), ok)
 
     def edit_w2(self):
+        if self.app.readonly:  # el doble clic sigue enlazado aunque los botones estén desactivados
+            return
         sel = self.w2tree.selection()
         if not sel:
             return

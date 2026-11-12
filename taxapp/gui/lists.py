@@ -140,6 +140,8 @@ class ListEditor(ttk.Frame):
         Dialog(self.app, _(self.title), self.factory(), self.build, ok, height=self.dlg_h)
 
     def edit(self):
+        if self.app.readonly:  # el doble clic sigue enlazado aunque los botones estén desactivados
+            return
         sel = self.tree.selection()
         if not sel:
             return
