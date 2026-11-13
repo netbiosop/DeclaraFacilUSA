@@ -47,7 +47,12 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
 - El `main.py` de la base 1.5.1 solo importa `taxapp.i18n` y `taxapp.gui.app.main`: se pueden quitar funciones internas
   de `updater` sin romper la base.
 - Escritura atómica: `data_loader.write_atomic(path, texto)` (.tmp + fsync + replace) para usuarios.json, declaraciones,
-  `estado.json` y `ai_config.json`. `main.py` `_save_state` escribe aparte porque es la base fija (ver Pendientes).
+  `estado.json`, `ai_config.json`, `actualizaciones.json`, `config.json` (idioma), condados y recientes. `main.py`
+  `_save_state` escribe aparte porque es la base fija (ver Pendientes). Exportar HTML y `.completo` siguen con `write_text`.
+- `data_loader.read_json(path, default)`: un JSON válido de otro tipo que `default` (p. ej. `[]` donde se espera `{}`) se
+  anota y se toma como `default`, igual que uno dañado.
+- Diálogos de edición de filas (dependientes, W-2, `ListEditor`) reemplazan por identidad con `gui/lists.replace_row`: si la
+  fila se borró con el diálogo abierto (el "?" de la IA suelta el grab), Aceptar la vuelve a agregar en vez de perderla.
 - Texto de los PDF: `pdf._cp1252` quita el acento a las letras que no están en Windows-1252 (Ễ→E, Đ→D); las que no tienen
   forma sin acento (chino, emoji) siguen saliendo "?". El logger `pypdf` queda en ERROR porque sus avisos citan nombres.
 
@@ -214,7 +219,37 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
   pasa de 1.000 con el próximo formulario; `state.py:213-260` cadena de `if "XX_…" in special`; `assistant.ask` un `if` por
   proveedor. Anexo A 2026 (`build.py:382`): con el piso de 0,5 % avisaría "supera el límite" sin pasarlo (sin PDF 2026 aún).
 
+- Encontrados el 2026-11-13 (cambian montos o limpieza; no se corrigieron):
+  - Utah resta la exención por dependiente del ingreso y además la usa en el crédito del contribuyente (`state.py:263` y
+    `:286-288`). 2025 soltero UT $60k con 2 dependientes: neto $1,868.57 vs ~$2,052.71 esperado. Verificar con el TC-40
+    antes de tocar (cambia montos).
+  - `summary["total_tax"]` (`engine.py:25`) sin lector; `gui/tools.py:177` rehace la misma suma.
+  - `wait_visibility()` + `grab_set()` copiado 5 veces: un `ui.make_modal(win)`.
+  - `App.findings()` (`gui/app.py:467-470`): el respaldo `recalc_now` si no hay resultado es inalcanzable y, si corriera,
+    `review(ret, None)` lanzaría TypeError. Quitarlo o usar `result_or_warn()`.
+  - Confirmación "La revisión encontró {n} error(es)…" duplicada (`gui/app.py:515`, `forms_view.py:229`).
+  - `herramientas/generar_manifiesto.py:46,60` repite la rama (`main`) y el nombre `actualizacion.json` que `updater` tiene
+    como `BRANCH`/`MANIFEST`; la regex de versión está copiada en 3 archivos.
+  - `herramientas/mapear_formularios.py`: `zip()` sin `strict=True` en las listas de campos (una lista más corta pierde
+    campos sin aviso).
+  - La prueba nueva del borrador PDF se omite en el venv de Xvfb (reportlab de Python 3.13 por `PYTHONPATH`, su PIL no
+    carga en 3.12); corre con `python3 -m pytest`.
+
 ## Historial
+### 2026-11-13 — revisión nocturna (PR #2, rama `revision-nocturna`; `main` sin cambios)
+- `gui/screens.py:381,603`, `gui/lists.py:160`: los diálogos de edición guardaban el índice; con el "?" de la IA (suelta el
+  grab, `gui/app.py:705`) se podía borrar otra fila y Aceptar pisaba la equivocada o daba IndexError → `replace_row` por
+  identidad. `forms/questions.py:92` (SSN del dependiente por índice) → apunta al dependiente. Prueba Xvfb y `test_forms.py`.
+- `gui/app.py:229`: cambiar idioma dentro de la declaración → KeyError 'appearance' y pantalla vacía → `_rebuild()` sin
+  `section`. Prueba Xvfb.
+- `models.py:566`: `.dfusa` viejos con "tx" → `TaxReturn.from_dict` pasa el estado a mayúsculas. Prueba en `test_engine.py`.
+- `reports.py:208,218`: el borrador PDF imprimía "■■c Nguy■n" → `_cp1252` en filas y pie. Prueba con pypdf.
+- `data_loader.read_json`: `[]` en config/ai_config/actualizaciones.json cerraba la app al arrancar → devuelve `default`.
+- `updater.py:97`, `i18n.py:73`, `counties.py:76`, `storage.py:74` sin fsync ni replace → `write_atomic`.
+- `updater.py:257-262`: descarga cortada o incompleta dejaba el `.exe` truncado → se borra; `apply_code` borra `<ver>.tmp`
+  si `_raw_file` falla. `forms/mailing.py:51`: clave `"group"` sin lector, quitada.
+- Revisión del propio cambio (ponytail-review): línea en blanco en `gui/lists.py`; prueba de reportlab omitible.
+- Pruebas: 162 → 169 pasan (18 omitidas sin pantalla; con Xvfb, 178 → 187 con 1 omitida). Pendientes nuevos arriba.
 ### 2026-11-12 — revisión nocturna (PR #2, rama `revision-nocturna`; `main` sin cambios)
 - `forms/pdf.py:98,194,296`: un nombre como "Nguyễn Đức" salía `NGUY?N ??C` en el 1040 final y pypdf anotaba el nombre en
   `errores.log` (va en los respaldos) → `_cp1252` en `_prepare`/`_pdf_str` y logger `pypdf` en ERROR. Prueba en `test_forms.py`.
