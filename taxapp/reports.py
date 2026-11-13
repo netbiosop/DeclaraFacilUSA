@@ -185,6 +185,7 @@ def to_pdf(ret: TaxReturn, res: dict, findings: List[dict], path: str) -> str:
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.units import inch
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, KeepTogether
+    from .forms.pdf import _cp1252
 
     styles = getSampleStyleSheet()
     green = colors.HexColor("#0b5d3b")
@@ -205,7 +206,7 @@ def to_pdf(ret: TaxReturn, res: dict, findings: List[dict], path: str) -> str:
     for t_, rows in build_sections(ret, res, findings):
         data = [[Paragraph(f"<b>{html.escape(t_)}</b>", head), ""]]
         for k, v in rows:
-            data.append([Paragraph(html.escape(str(k)), cell), Paragraph(html.escape(str(v)), cell_r)])
+            data.append([Paragraph(html.escape(_cp1252(str(k))), cell), Paragraph(html.escape(_cp1252(str(v))), cell_r)])
         t = Table(data, colWidths=[4.9 * inch, 2.4 * inch], repeatRows=1)
         t.setStyle(TableStyle([
             ("BACKGROUND", (0, 0), (-1, 0), green), ("SPAN", (0, 0), (-1, 0)),
@@ -215,7 +216,7 @@ def to_pdf(ret: TaxReturn, res: dict, findings: List[dict], path: str) -> str:
             ("TOPPADDING", (0, 0), (-1, -1), 3), ("BOTTOMPADDING", (0, 0), (-1, -1), 3)]))
         story += [KeepTogether([t]) if len(rows) < 25 else t, Spacer(1, 10)]
 
-    foot_left = tr("{app} - borrador no oficial - {n}", app=APP_NAME, n=ret.taxpayer.full_name())
+    foot_left = _cp1252(tr("{app} - borrador no oficial - {n}", app=APP_NAME, n=ret.taxpayer.full_name()))
 
     def footer(canvas, d):
         canvas.saveState()

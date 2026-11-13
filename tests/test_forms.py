@@ -353,6 +353,16 @@ class GenerateTests(unittest.TestCase):
             single = [p for p in e.files if "Anexo_C" in p.name or "Schedule_C" in p.name][0]
             self.assertTrue(pypdf.PdfReader(str(single)).get_fields())
 
+    def test_draft_report_prints_names_outside_cp1252_without_accents(self):
+        from taxapp import reports
+        ret = family()
+        ret.taxpayer.first_name, ret.taxpayer.last_name = "Đức", "Nguyễn"
+        with tempfile.TemporaryDirectory() as tmp:
+            path = reports.to_pdf(ret, compute_all(ret), [], str(pathlib.Path(tmp) / "b.pdf"))
+            text = pypdf.PdfReader(path).pages[0].extract_text()
+        self.assertIn("Duc Nguyen", text)
+        self.assertNotIn("■", text)
+
 
 if __name__ == "__main__":
     unittest.main()
