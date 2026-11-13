@@ -226,7 +226,7 @@ class App(tk.Tk):
         if self.user:
             accounts.save_prefs(self.user["username"], language=lang)
             self.prefs["language"] = lang
-        self._rebuild(section=self.settings_section)
+        self._rebuild()  # Ajustes vuelve solo a settings_section; en la declaración, section sería una pantalla
 
     # ================================================================ menus
     def _build_menu(self):

@@ -141,6 +141,26 @@ class LogoutTests(unittest.TestCase):
                 dialog._ok()
                 self.assertEqual([getattr(x, attr) for x in rows()], ["Beto editado", "Carla"], name)
 
+    def test_language_change_inside_a_return_keeps_the_screen(self):
+        with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home, "USERPROFILE": home}):
+            from taxapp import accounts, i18n
+            from taxapp.gui import app as A
+            accounts.create_user("admin", "Admin", "admin", "Secreta123")
+            win = A.App()
+            self.addCleanup(win.destroy)
+            user, _err = accounts.authenticate("admin", "Secreta123")
+            win.login_ok(user)
+            win.new_return(2025)
+            win.show_workspace("income")
+            win.update()
+            before = i18n.get_language()
+            try:
+                win.set_language("en" if before == "es" else "es")
+                win.update()
+                self.assertEqual(win.workspace.current, "income")
+            finally:
+                i18n.set_language(before)
+
     def test_read_only_user_cannot_edit_with_double_click(self):
         with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home, "USERPROFILE": home}):
             from taxapp import accounts, storage
