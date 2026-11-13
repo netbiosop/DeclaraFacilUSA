@@ -276,6 +276,14 @@ class StorageAndReview(unittest.TestCase):
         s = storage.dumps(r)
         self.assertEqual(storage.loads(s).to_dict(), d)
 
+    def test_old_file_with_lowercase_state_is_read_as_uppercase(self):
+        # un .dfusa viejo con "tx" fallaba en la pantalla de dirección (KeyError) y el estado salía $0
+        d = make(2025, wages=60000, state="NY").to_dict()
+        d["address"]["state"] = " ny "
+        r = TaxReturn.from_dict(d)
+        self.assertEqual(r.address.state, "NY")
+        self.assertGreater(compute_all(r)["state"]["tax"], 0)
+
     def test_review_flags(self):
         r = make(2025, wages=1000, state="MD")
         r.taxpayer.ssn = "12"

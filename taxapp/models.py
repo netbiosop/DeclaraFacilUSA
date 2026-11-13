@@ -564,6 +564,7 @@ class TaxReturn:
         r.taxpayer = _from_dict(Person, d.get("taxpayer"))
         r.spouse = _from_dict(Person, d.get("spouse"))
         r.address = _from_dict(Address, d.get("address"))
+        r.address.state = (r.address.state or "").strip().upper()  # archivos viejos guardaban "tx"
         r.dependents = [_from_dict(Dependent, x) for x in d.get("dependents", [])]
         r.w2s = [_from_dict(W2, x) for x in d.get("w2s", [])]
         r.income = _from_dict(Income, d.get("income"))
