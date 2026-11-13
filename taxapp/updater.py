@@ -255,10 +255,13 @@ def download(rel: Release, cfg: UpdateConfig = None, progress: Callable[[int, in
                 if progress:
                     progress(got, total)
     except urllib.error.URLError as e:
+        dest.unlink(missing_ok=True)
         raise UpdateError(tr("No se pudo descargar la actualización: {e}", e=getattr(e, "reason", e))) from e
     except OSError as e:
+        dest.unlink(missing_ok=True)
         raise UpdateError(tr("No se pudo descargar la actualización: {e}", e=e)) from e
     if rel.size and got != rel.size:
+        dest.unlink(missing_ok=True)
         raise UpdateError(_("La descarga está incompleta. Intente de nuevo."))
     if rel.sha256 and h.hexdigest().lower() != rel.sha256:
         dest.unlink(missing_ok=True)
@@ -427,7 +430,11 @@ def apply_code(upd: CodeUpdate, cfg: UpdateConfig = None, progress: Callable[[in
         if rel not in upd.changed and local.is_file():
             shutil.copyfile(local, target)
         else:
-            data = _raw_file(cfg.repo, upd.commit, rel, tok)
+            try:
+                data = _raw_file(cfg.repo, upd.commit, rel, tok)
+            except UpdateError:
+                shutil.rmtree(tmp, ignore_errors=True)
+                raise
             if hashlib.sha256(data).hexdigest() != info["sha256"]:
                 shutil.rmtree(tmp, ignore_errors=True)
                 raise UpdateError(tr("El archivo {f} no coincide con su huella SHA-256; actualización cancelada.", f=rel))

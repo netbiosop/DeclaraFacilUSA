@@ -239,6 +239,22 @@ class CheckDownloadTests(Base):
                 U.download(rel, U.UpdateConfig(repo="o/r"), dest_dir=pathlib.Path(self.tmp.name))
         self.assertFalse((pathlib.Path(self.tmp.name) / rel.asset_name).exists())
 
+    def test_incomplete_or_failed_download_is_deleted(self):
+        # un .exe truncado quedaba en la carpeta temporal; solo se borraba si fallaba la huella
+        rel = U.Release("9.1.0", "v9.1.0", "n", "", "", "", asset_name="Instalar_DeclaraFacilUSA_9.1.0.exe",
+                        asset_download_url="https://x/Instalar_DeclaraFacilUSA_9.1.0.exe", size=len(EXE) + 10)
+        dest = pathlib.Path(self.tmp.name) / rel.asset_name
+
+        class Cut(Resp):
+            def read(self, n=-1):
+                raise ConnectionResetError("cortada")
+
+        for resp in (Resp(EXE), Cut(EXE)):
+            with mock.patch("urllib.request.urlopen", return_value=resp):
+                with self.assertRaises(U.UpdateError):
+                    U.download(rel, U.UpdateConfig(repo="o/r"), dest_dir=pathlib.Path(self.tmp.name))
+            self.assertFalse(dest.exists())
+
     def test_missing_installer_asset(self):
         rj = release_json()
         rj["assets"] = []
@@ -390,6 +406,14 @@ class CodeUpdateTests(Base):
             with self.assertRaises(U.UpdateError):
                 U.apply_code(upd, U.UpdateConfig(repo="o/r"))
         self.assertFalse((U.code_store() / "1.4.1").exists())
+
+    def test_failed_file_download_removes_partial_folder(self):
+        with mock.patch.object(U, "_fetch", side_effect=self.fake_fetch([])):
+            upd = U.check_code(U.UpdateConfig(repo="o/r"))
+        with mock.patch.object(U, "_raw_file", side_effect=U.UpdateError("sin red")):
+            with self.assertRaises(U.UpdateError):
+                U.apply_code(upd, U.UpdateConfig(repo="o/r"))
+        self.assertFalse((U.code_store() / "1.4.1.tmp").exists())
 
     def test_unsafe_paths_ignored(self):
         self.man["files"]["../../evil.py"] = {"sha256": "1" * 64, "size": 1}
