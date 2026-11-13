@@ -89,7 +89,7 @@ def questions(ret: TaxReturn, res: dict) -> List[Question]:
     if ret.is_joint():
         Q.append(Question("sp_occ", G1, N_("Ocupación de su cónyuge"), "text", sp, "occupation"))
     for i, d in enumerate(ret.dependents):
-        Q.append(Question(f"dep_ssn{i}", G1, N_("SSN del dependiente {n}"), "text", lambda r, i=i: r.dependents[i],
+        Q.append(Question(f"dep_ssn{i}", G1, N_("SSN del dependiente {n}"), "text", lambda r, d=d: d,
                           "ssn", required=True, check=_ssn_ok, width=16, params={"n": d.full_name() or i + 1}))
     a = lambda r: r.address  # noqa: E731
     G2 = N_("Dirección postal")

@@ -15,6 +15,14 @@ from ..models import CareProvider, OtherExpense, Payer, Sale, Student
 from .widgets import Dialog, make_tree
 
 
+def replace_row(rows: list, old, new):
+    """Pone `new` donde está `old` (por identidad: con el diálogo abierto se pueden borrar filas); si ya no está, lo agrega."""
+    for k, x in enumerate(rows):
+        if x is old:
+            rows[k] = new
+            return
+    rows.append(new)
+
 def _sale_dialog(f):
     f.text(_("Descripción (p. ej. 100 sh. XYZ Co.)"), "description", width=34)
     f.text(_("Fecha de compra (MM/DD/AAAA o VARIOUS)"), "acquired", width=14)
@@ -145,12 +153,12 @@ class ListEditor(ttk.Frame):
         sel = self.tree.selection()
         if not sel:
             return
-        i = int(sel[0])
+        orig = self.items()[int(sel[0])]
 
         def ok(x):
-            self.items()[i] = x
+            replace_row(self.items(), orig, x)
             self._changed()
-        Dialog(self.app, _(self.title), copy.deepcopy(self.items()[i]), self.build, ok, height=self.dlg_h)
+        Dialog(self.app, _(self.title), copy.deepcopy(orig), self.build, ok, height=self.dlg_h)
 
     def remove(self):
         sel = self.tree.selection()

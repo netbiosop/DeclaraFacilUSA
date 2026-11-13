@@ -100,6 +100,47 @@ class LogoutTests(unittest.TestCase):
             win._shortcut(lambda: win.new_return(2025))
             self.assertIsNot(win.ret, client_a)
 
+    def test_edit_dialog_replaces_its_own_row_after_another_row_is_deleted(self):
+        with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home, "USERPROFILE": home}):
+            from taxapp import accounts
+            from taxapp.models import Dependent, Payer, W2
+            from taxapp.gui import app as A
+            from taxapp.gui import lists as L
+            from taxapp.gui import screens as S
+            from taxapp.gui import widgets as W
+            accounts.create_user("admin", "Admin", "admin", "Secreta123")
+            win = A.App()
+            self.addCleanup(win.destroy)
+            user, _err = accounts.authenticate("admin", "Secreta123")
+            win.login_ok(user)
+            win.new_return(2025)
+            win.ret.dependents = [Dependent(first_name=n) for n in ("Ana", "Beto", "Carla")]
+            win.ret.w2s = [W2(employer=n) for n in ("Ana", "Beto", "Carla")]
+            win.ret.income.interest_payers = [Payer(name=n) for n in ("Ana", "Beto", "Carla")]
+            win.show_workspace("income")
+            win.update()
+            payers = L.ListEditor(win, win, "interest_payers")
+            cases = (("dependents", "tree", "edit", "remove", lambda: win.ret.dependents, "first_name"),
+                     ("income", "w2tree", "edit_w2", "remove_w2", lambda: win.ret.w2s, "employer"),
+                     (None, "tree", "edit", "remove", lambda: win.ret.income.interest_payers, "name"))
+            for name, tree, edit, remove, rows, attr in cases:
+                if name:
+                    win.show_workspace(name)
+                    win.update()
+                screen = win.workspace.screens[name] if name else payers
+                getattr(screen, tree).selection_set("1")
+                getattr(screen, edit)()
+                win.update()
+                dialog = [w for w in win.winfo_children() if isinstance(w, W.Dialog)][-1]
+                dialog.grab_release()  # el "?" de la IA suelta el grab y deja usar la ventana principal
+                getattr(screen, tree).selection_set("0")
+                with mock.patch.object(S.messagebox, "askyesno", return_value=True), \
+                        mock.patch.object(L.messagebox, "askyesno", return_value=True):
+                    getattr(screen, remove)()
+                setattr(dialog.obj, attr, "Beto editado")
+                dialog._ok()
+                self.assertEqual([getattr(x, attr) for x in rows()], ["Beto editado", "Carla"], name)
+
     def test_read_only_user_cannot_edit_with_double_click(self):
         with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"HOME": home, "USERPROFILE": home}):
             from taxapp import accounts, storage

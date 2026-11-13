@@ -11,7 +11,7 @@ from ..engine import fmt_money, balance_text
 from ..i18n import _, N_, tr, reverse
 from ..local import localities_for_state, county_tax_info
 from ..models import (FILING_STATUSES, Dependent, W2, CustomLocalTax, age_at_year_end)
-from .lists import ListEditor
+from .lists import ListEditor, replace_row
 from .widgets import (COLORS, Form, ScrollFrame, Dialog, make_tree, font)
 
 NONE_LOC = N_("(ninguna)")
@@ -375,13 +375,13 @@ class DependentsScreen(Screen):
         sel = self.tree.selection()
         if not sel:
             return
-        i = int(sel[0])
+        orig = self.ret.dependents[int(sel[0])]
 
         def ok(d):
-            self.ret.dependents[i] = d
+            replace_row(self.ret.dependents, orig, d)
             self.refresh()
             self.changed()
-        self._dialog(copy.deepcopy(self.ret.dependents[i]), ok)
+        self._dialog(copy.deepcopy(orig), ok)
 
     def remove(self):
         sel = self.tree.selection()
@@ -597,13 +597,13 @@ class IncomeScreen(Screen):
         sel = self.w2tree.selection()
         if not sel:
             return
-        i = int(sel[0])
+        orig = self.ret.w2s[int(sel[0])]
 
         def ok(w):
-            self.ret.w2s[i] = w
+            replace_row(self.ret.w2s, orig, w)
             self.refresh_w2()
             self.changed()
-        self._w2_dialog(copy.deepcopy(self.ret.w2s[i]), ok)
+        self._w2_dialog(copy.deepcopy(orig), ok)
 
     def remove_w2(self):
         sel = self.w2tree.selection()

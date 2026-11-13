@@ -282,6 +282,14 @@ class QuestionTests(unittest.TestCase):
         self.assertFalse(q[0].check("tx"))
         self.assertTrue(q[0].check("TX"))
 
+    def test_dependent_ssn_question_keeps_its_dependent_after_a_deletion(self):
+        # la ventana de preguntas guarda la pregunta en pantalla; si se borra otro dependiente, el SSN iba al siguiente
+        ret = family()
+        ret.dependents = [Dependent(first_name="Ana"), Dependent(first_name="Beto")]
+        q = [q for q in questions.questions(ret, compute_all(ret)) if q.key == "dep_ssn1"][0]
+        del ret.dependents[0]
+        self.assertEqual(q.obj(ret).first_name, "Beto")
+
     def test_conditional_questions(self):
         ret = business()
         ret.income.exp_car = 1000
