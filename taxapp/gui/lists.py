@@ -23,6 +23,7 @@ def replace_row(rows: list, old, new):
             return
     rows.append(new)
 
+
 def _sale_dialog(f):
     f.text(_("Descripción (p. ej. 100 sh. XYZ Co.)"), "description", width=34)
     f.text(_("Fecha de compra (MM/DD/AAAA o VARIOUS)"), "acquired", width=14)
