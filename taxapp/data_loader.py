@@ -28,14 +28,19 @@ def write_atomic(path: Path, text: str):
 
 
 def read_json(path, default=None):
-    """Lee un JSON. Si no existe devuelve `default` sin avisar; si está dañado lo anota y devuelve `default`."""
+    """Lee un JSON. Si no existe devuelve `default` sin avisar; si está dañado o no es del tipo de `default`, lo
+    anota y devuelve `default`."""
     try:
-        return json.loads(Path(path).read_text(encoding="utf-8"))
+        data = json.loads(Path(path).read_text(encoding="utf-8"))
     except FileNotFoundError:
         return default
     except (OSError, ValueError) as e:
         logger.warning("No se pudo leer %s: %s", path, e)
         return default
+    if default is not None and not isinstance(data, type(default)):
+        logger.warning("No se pudo leer %s: se esperaba %s", path, type(default).__name__)
+        return default
+    return data
 
 
 def app_dir() -> Path:

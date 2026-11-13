@@ -194,6 +194,12 @@ class ConfigTests(Base):
         U.save_config(cfg)
         self.assertEqual(U.load_config().repo, "mi/Fork")
 
+    def test_valid_json_of_another_type_falls_back_to_default(self):
+        # "[]" en actualizaciones.json (o config.json, ai_config.json) cerraba la app al arrancar con AttributeError
+        U._user_file().write_text("[]", encoding="utf-8")
+        with self.assertLogs("taxapp.data_loader", "WARNING"):
+            self.assertEqual(U.load_config().repo, "netbiosop/DeclaraFacilUSA")
+
     def test_bad_repo(self):
         with self.assertRaises(U.UpdateError):
             U.latest_release(U.UpdateConfig(repo="sin-barra"))
