@@ -194,6 +194,15 @@ class ConfigTests(Base):
         U.save_config(cfg)
         self.assertEqual(U.load_config().repo, "mi/Fork")
 
+    def test_config_is_flushed_to_disk_before_replace(self):
+        # actualizaciones.json vacío tras un corte de luz perdía el repositorio y el token elegidos
+        cfg = U.load_config()
+        cfg.repo = "mi/Fork"
+        with mock.patch("os.fsync") as fsync:
+            U.save_config(cfg)
+        self.assertTrue(fsync.called)
+        self.assertEqual(U.load_config().repo, "mi/Fork")
+
     def test_valid_json_of_another_type_falls_back_to_default(self):
         # "[]" en actualizaciones.json (o config.json, ai_config.json) cerraba la app al arrancar con AttributeError
         U._user_file().write_text("[]", encoding="utf-8")

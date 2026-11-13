@@ -71,7 +71,7 @@ def recent() -> List[str]:
 def add_recent(p: Path):
     items = [str(Path(p).resolve())] + [x for x in recent() if x != str(Path(p).resolve())]
     try:
-        _recent_file().write_text(json.dumps(items[:8], indent=1), encoding="utf-8")
+        data_loader.write_atomic(_recent_file(), json.dumps(items[:8], indent=1))
     except OSError as e:
         logger.warning("No se pudo actualizar la lista de archivos recientes: %s", e)
 

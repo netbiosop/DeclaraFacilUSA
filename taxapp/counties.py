@@ -73,7 +73,7 @@ def parse_census(text: str) -> Dict[str, List[str]]:
 
 
 def save_lists(lists: Dict[str, List[str]]):
-    _cache_file().write_text(json.dumps(lists, indent=1, ensure_ascii=False), encoding="utf-8")
+    data_loader.write_atomic(_cache_file(), json.dumps(lists, indent=1, ensure_ascii=False))
     _all.cache_clear()
 
 

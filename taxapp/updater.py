@@ -94,7 +94,7 @@ def save_config(cfg: UpdateConfig):
     publicado en data/ llega a todas las PC que no eligieron otro."""
     published = asdict(_overlay(UpdateConfig(), _published_file()))
     own = {k: v for k, v in asdict(cfg).items() if v != published[k]}
-    _user_file().write_text(json.dumps(own, indent=1), encoding="utf-8")
+    data_loader.write_atomic(_user_file(), json.dumps(own, indent=1))
 
 
 # ---------------------------------------------------------------------------- versiones

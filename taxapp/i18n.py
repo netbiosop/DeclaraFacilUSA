@@ -65,12 +65,12 @@ def set_language(lang: str, save: bool = True):
         return
     _lang = lang
     if save:
-        from .data_loader import read_json
+        from .data_loader import read_json, write_atomic
         p = _config_file()
         cfg = read_json(p, {})
         cfg["language"] = lang
         try:
-            p.write_text(json.dumps(cfg, indent=1), encoding="utf-8")
+            write_atomic(p, json.dumps(cfg, indent=1))
         except OSError as e:
             logger.warning("No se pudo guardar el idioma elegido: %s", e)
 
