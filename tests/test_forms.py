@@ -20,6 +20,11 @@ try:
     HAVE_PYPDF = True
 except ImportError:
     HAVE_PYPDF = False
+try:
+    import reportlab.platypus  # noqa: F401
+    HAVE_REPORTLAB = True
+except ImportError:  # p. ej. el venv de Xvfb toma reportlab del Python 3.13 y su PIL no carga
+    HAVE_REPORTLAB = False
 
 
 def family():
@@ -353,6 +358,7 @@ class GenerateTests(unittest.TestCase):
             single = [p for p in e.files if "Anexo_C" in p.name or "Schedule_C" in p.name][0]
             self.assertTrue(pypdf.PdfReader(str(single)).get_fields())
 
+    @unittest.skipUnless(HAVE_REPORTLAB, "reportlab no disponible")
     def test_draft_report_prints_names_outside_cp1252_without_accents(self):
         from taxapp import reports
         ret = family()
