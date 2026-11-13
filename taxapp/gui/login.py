@@ -147,7 +147,11 @@ class LoginView(tk.Frame):
                     return
                 user, err = accounts.authenticate(v["user"], v["pw"])
             else:
-                accounts.update_settings("", remember_user=bool(self.remember.get()))
+                try:
+                    accounts.update_settings("", remember_user=bool(self.remember.get()))
+                except accounts.AccountError as e:
+                    self.err.configure(text=str(e))
+                    return
                 user, err = accounts.authenticate(v["user"], v["pw"])
             if not user:
                 self.err.configure(text=err)

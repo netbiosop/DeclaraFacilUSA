@@ -7,6 +7,7 @@ página y se quitan los campos, para que se vea e imprima igual en cualquier vis
 from __future__ import annotations
 
 import io
+import unicodedata
 from typing import Dict, Iterable, List, Optional
 
 try:  # pypdf es necesario solo para generar los formularios
@@ -26,9 +27,25 @@ def require():
         raise MissingDependency("pypdf")
 
 
+_NO_DECOMPOSITION = str.maketrans("ĐđŁłĦħ", "DdLlHh")
+
+
+def _cp1252(text: str) -> str:
+    """Las fuentes del PDF son Windows-1252: una letra fuera de ese juego se imprime sin su acento (Ễ→E) y no como "?"."""
+    out = []
+    for ch in text:
+        try:
+            ch.encode("cp1252")
+        except UnicodeEncodeError:
+            ch = "".join(c for c in unicodedata.normalize("NFKD", ch.translate(_NO_DECOMPOSITION))
+                         if not unicodedata.combining(c))
+        out.append(ch)
+    return "".join(out)
+
+
 def _fmt_ssn(value: str, maxlen: Optional[int]) -> str:
     digits = "".join(ch for ch in value if ch.isdigit())
-    if maxlen == 11 and len(digits) == 9:
+    if maxlen == 11 and len(digits) == 9 and "-" not in value:  # con guion ya es SSN o EIN escrito por el usuario
         return f"{digits[:3]}-{digits[3:5]}-{digits[5:]}"
     return value
 
@@ -36,12 +53,12 @@ def _fmt_ssn(value: str, maxlen: Optional[int]) -> str:
 def _prepare(value, spec):
     """Convierte el valor del constructor en lo que espera el campo. spec: ruta | [ruta, estado] | [ruta, None, maxlen]."""
     if isinstance(spec, str):
-        return spec, None, str(value)
+        spec = [spec, None]
     path, state = spec[0], spec[1]
     if state:  # casilla
         return path, state, None
     maxlen = spec[2] if len(spec) > 2 else None
-    text = str(value)
+    text = _cp1252(str(value))
     if maxlen:
         text = _fmt_ssn(text, maxlen) if maxlen in (9, 11) else text
         if maxlen == 9 or maxlen == 17:  # SSN / número de ruta / cuenta en casillas: solo dígitos
@@ -163,7 +180,7 @@ def _marks_page(width, height, rects):
 
 # ---------------------------------------------------------------------------------------------------- borrador
 def _pdf_str(s: str) -> str:
-    return s.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
+    return _cp1252(s).replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
 
 
 def _watermark_page(width: float, height: float, big: str, small: str):
@@ -181,7 +198,7 @@ def _watermark_page(width: float, height: float, big: str, small: str):
         NameObject("/ExtGState"): DictionaryObject({NameObject("/WmG"): gs, NameObject("/WmH"): gs2}),
     })
     size = 58 if len(big) <= 12 else max(30, int(58 * 12 / len(big)))
-    # ancho aproximado de Helvetica-Bold: 0.6 em por carácter
+    # ancho aproximado de Helvetica-Bold: 0.62 em por carácter
     tw = 0.62 * size * len(big)
     c, s = 0.8192, 0.5736  # cos/sin de 35°
     cx, cy = width / 2, height / 2
@@ -246,7 +263,7 @@ def _wrap(text: str, width: int) -> List[str]:
 
 def text_document(blocks: List[tuple], footer: str = "") -> bytes:
     """PDF tamaño carta con texto simple (Helvetica). blocks: lista de (estilo, texto); estilos: 'h1', 'h2', 'p',
-    'mono', 'box' (recuadro destacado), 'sp' (espacio). Sin dependencias externas."""
+    'mono', 'box' (recuadro destacado), 'sp' (espacio)."""
     require()
     W, H, M = 612, 792, 54
     writer = pypdf.PdfWriter()

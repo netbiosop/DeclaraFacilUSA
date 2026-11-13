@@ -1,21 +1,22 @@
 """Widgets y utilidades de la interfaz (tkinter/ttk)."""
 from __future__ import annotations
 
+import math
 import tkinter as tk
 from tkinter import ttk
 from typing import Callable, List, Optional
 
 from ..i18n import _
+from ..models import clean_money_text
 
 # ----------------------------------------------------------------------------- paleta y fuentes
 COLORS = {
-    "primary": "#0B5D3B", "primary_dark": "#08442B", "accent": "#1F8A5B", "accent_light": "#E7F4EC",
+    "primary": "#0B5D3B", "accent": "#1F8A5B", "accent_light": "#E7F4EC",
     "sidebar": "#12302A", "sidebar_fg": "#CFE3DA", "sidebar_sel": "#1F8A5B",
     "bg": "#F4F7F5", "card": "#FFFFFF", "text": "#1D2733", "muted": "#5B6775", "border": "#D9E0E7",
     "refund": "#1E9E5A", "owe": "#C0392B", "warn": "#B9770E", "info": "#2471A3",
 }  # se reemplaza por la paleta del tema activo (theme.apply)
 STYLE = {"family": "Segoe UI", "scale": 1.0}
-FONT = "Segoe UI"
 
 
 def font(size=10, weight="normal"):
@@ -23,7 +24,7 @@ def font(size=10, weight="normal"):
 
 
 def parse_money(text: str) -> Optional[float]:
-    t = (text or "").strip().replace(",", "").replace("$", "").replace(" ", "")
+    t = clean_money_text(text or "")
     if t in ("", "-", "."):
         return 0.0
     neg = t.startswith("(") and t.endswith(")")
@@ -31,6 +32,8 @@ def parse_money(text: str) -> Optional[float]:
     try:
         v = float(t)
     except ValueError:
+        return None
+    if not math.isfinite(v):
         return None
     return -v if neg else v
 
@@ -40,15 +43,6 @@ def money_str(v) -> str:
         return ""
     v = float(v)
     return f"{v:,.2f}".rstrip("0").rstrip(".") if v != int(v) else f"{int(v):,}"
-
-
-def setup_styles(root: tk.Tk):
-    from .theme import style_ttk
-    if "on_accent" not in COLORS:   # aun sin tema aplicado
-        from .theme import palette
-        COLORS.clear()
-        COLORS.update(palette("A"))
-    style_ttk(root)
 
 
 # ----------------------------------------------------------------------------- tooltip
@@ -217,18 +211,14 @@ class Form:
         self.row += 1
         return ent
 
-    def text(self, label, attr, help_text=None, width=32, upper=False, show=None):
+    def text(self, label, attr, help_text=None, width=32):
         self._label(label, help_text)
         var = tk.StringVar(value=str(getattr(self.getobj(), attr, "") or ""))
-        ent = ttk.Entry(self.parent, textvariable=var, width=width, show=show or "")
+        ent = ttk.Entry(self.parent, textvariable=var, width=width)
         ent.grid(row=self.row, column=1, sticky="w", pady=3)
 
         def changed(*_):
-            v = var.get()
-            if upper and v != v.upper():
-                var.set(v.upper())
-                return
-            self._set(attr, v.strip())
+            self._set(attr, var.get().strip())
 
         var.trace_add("write", changed)
         self.vars[attr] = var
@@ -245,7 +235,7 @@ class Form:
             try:
                 self._set(attr, int(var.get() or 0))
             except ValueError:
-                pass
+                pass  # el número está a medio escribir; se guarda en la próxima tecla válida
 
         var.trace_add("write", changed)
         self.vars[attr] = var
@@ -291,18 +281,6 @@ class Form:
         self.row += 1
         return cb
 
-    def widget_row(self, label, widget_factory, help_text=None):
-        self._label(label, help_text)
-        w = widget_factory(self.parent)
-        w.grid(row=self.row, column=1, sticky="w", pady=3)
-        self.row += 1
-        return w
-
-
-def card(parent, padding=16) -> ttk.Frame:
-    f = ttk.Frame(parent, style="Card.TFrame", padding=padding)
-    return f
-
 
 def make_tree(parent, columns, headings, widths=None, height=8, anchors=None) -> ttk.Treeview:
     frame = ttk.Frame(parent, style="Card.TFrame")
@@ -322,6 +300,7 @@ def make_tree(parent, columns, headings, widths=None, height=8, anchors=None) ->
 
 class Dialog(tk.Toplevel):
     """Dialogo modal con un formulario sobre un objeto temporal; on_ok(obj) al aceptar."""
+    edits_return = True
 
     def __init__(self, master, title, obj, build: Callable, on_ok: Callable, width=560, height=560):
         super().__init__(master)

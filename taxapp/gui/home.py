@@ -8,7 +8,7 @@ from pathlib import Path
 from tkinter import ttk
 
 from .. import APP_NAME, __version__, accounts, storage
-from ..i18n import _, N_, tr
+from ..i18n import _, tr
 from . import theme
 from .theme import icon, icon_font, mix
 from .ui import (C, Tile, Progress, IconButton, flat_button, user_chip, lang_toggle, label, card, fmt_date,
@@ -366,10 +366,10 @@ class HomeC(tk.Frame):
 
         chips = tk.Frame(center, bg=c["bg"])
         chips.pack(pady=(18, 0))
-        name, pct, cmd = _continue_info(app)
+        _name, pct, cmd = _continue_info(app)
         items = []
         if cmd:
-            items.append((("next"), tr("Continuar ({p}%)", p=f"{pct * 100:.0f}") if pct is not None else _("Continuar"), cmd))
+            items.append(("next", tr("Continuar ({p}%)", p=f"{pct * 100:.0f}") if pct is not None else _("Continuar"), cmd))
         items += [("open", _("Abrir guardada"), app.open_file), ("calc", _("Calculadora rápida"), app.open_quick_calc)]
         if acts["counties"]["enabled"]:
             items.append(("download", _("Actualizar condados"), app.download_counties))

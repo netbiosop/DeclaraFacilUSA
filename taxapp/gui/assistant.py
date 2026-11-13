@@ -1,6 +1,7 @@
 """Ventana del asistente de IA (chat) y dialogo de configuracion / AI assistant window and settings dialog."""
 from __future__ import annotations
 
+import logging
 import os
 import queue
 import re
@@ -15,6 +16,8 @@ from . import widgets
 from .theme import icon, icon_font
 from .widgets import COLORS, font, Tooltip
 from . import layout
+
+logger = logging.getLogger(__name__)
 
 MAX_HISTORY = 16   # mensajes que se reenvian como contexto de la conversacion
 
@@ -158,7 +161,7 @@ class AISettingsDialog(tk.Toplevel):
         for c, k in self.keys.items():
             if k:
                 cfg.set_key(k, c)
-            elif c in self.keys and c in cfg.keys and not k:
+            else:
                 cfg.keys.pop(c, None)
         return cfg
 
@@ -172,7 +175,10 @@ class AISettingsDialog(tk.Toplevel):
                 txt = ai.test_connection(cfg)
                 q.put((True, tr("Conexión correcta con {p} ({m}). Respuesta: {t}", p=provider_label(cfg.provider),
                                 m=cfg.effective_model(), t=txt[:60])))
-            except Exception as e:  # noqa: BLE001
+            except ai.AIError as e:
+                q.put((False, str(e)))
+            except Exception as e:  # noqa: BLE001 - un error de programación no debe dejar la prueba colgada
+                logger.exception("Error inesperado al probar la conexión del asistente")
                 q.put((False, str(e)))
         threading.Thread(target=work, daemon=True).start()
 
@@ -206,10 +212,10 @@ class AssistantPanel(tk.Frame):
     def __init__(self, parent, app, compact=False):
         super().__init__(parent, bg=COLORS["card"])
         self.app = app
-        self.compact = compact
         self.cfg = ai.load_config()
         self.history = []          # [{"role","content"}]
         self.busy = False
+        self.discard_reply = False
         self.q = queue.Queue()
         self.link_n = 0
         c = COLORS
@@ -316,12 +322,14 @@ class AssistantPanel(tk.Frame):
         self.web_cb.state(["!disabled"] if c.supports_web() else ["disabled"])
 
     def _save_opts(self):
+        self.cfg = ai.load_config()  # la clave pudo cambiar en Configuración con este panel abierto
         self.cfg.include_data = bool(self.use_data.get())
         self.cfg.web_search = bool(self.web.get())
         try:
             ai.save_config(self.cfg)
-        except OSError:
-            pass
+        except OSError as e:
+            logger.warning("No se pudo guardar la configuración del asistente: %s", e)
+            messagebox.showwarning(APP_NAME, _("No se pudo guardar la configuración del asistente."), parent=self)
 
     def open_settings(self):
         if not self.app.can("ai_settings"):
@@ -347,6 +355,14 @@ class AssistantPanel(tk.Frame):
     def clear(self):
         if self.busy:
             return
+        self._wipe()
+
+    def forget_client(self):
+        """Otra declaración: la conversación y la respuesta en camino eran del cliente anterior."""
+        self.discard_reply = self.busy
+        self._wipe()
+
+    def _wipe(self):
         self.history = []
         self.txt.configure(state="normal")
         self.txt.delete("1.0", "end")
@@ -396,12 +412,9 @@ class AssistantPanel(tk.Frame):
         self.txt.configure(state="disabled")
 
     # ---------------------------------------------------------------- contexto
-    def section_name(self) -> str:
-        return self.app.section_name()
-
     def _system(self):
         res = self.app.result if self.app.ret else None
-        return ai.system_prompt(self.app.ret, res, self.section_name(), include_data=bool(self.use_data.get()),
+        return ai.system_prompt(self.app.ret, res, self.app.section_name(), include_data=bool(self.use_data.get()),
                                 web=bool(self.web.get()) and self.cfg.supports_web())
 
     def show_payload(self):
@@ -422,8 +435,8 @@ class AssistantPanel(tk.Frame):
         return "break"
 
     def quick(self, n):
-        label, prompt = ai.QUICK_ACTIONS[n]
-        self.ask(tr(prompt, section=self.section_name()))
+        prompt = ai.QUICK_ACTIONS[n][1]
+        self.ask(tr(prompt, section=self.app.section_name()))
 
     def ask(self, question: str):
         if self.busy:
@@ -461,7 +474,10 @@ class AssistantPanel(tk.Frame):
         def work():
             try:
                 self.q.put(("ok",) + ai.ask(cfg, system, msgs, web=web))
-            except Exception as e:  # noqa: BLE001
+            except ai.AIError as e:
+                self.q.put(("err", str(e), []))
+            except Exception as e:  # noqa: BLE001 - un error de programación no debe dejar la pregunta colgada
+                logger.exception("Error inesperado al preguntar al asistente")
                 self.q.put(("err", str(e), []))
         threading.Thread(target=work, daemon=True).start()
 
@@ -482,6 +498,9 @@ class AssistantPanel(tk.Frame):
         self.busy = False
         self.send_btn.state(["!disabled"])
         self.status.configure(text="")
+        if self.discard_reply:
+            self.discard_reply = False
+            return
         self._write("\n" + _("Asistente") + f" ({provider_label(self.cfg.provider)})\n", "ai")
         if kind == "ok":
             text = text or _("(respuesta vacía)")

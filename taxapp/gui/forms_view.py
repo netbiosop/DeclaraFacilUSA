@@ -1,7 +1,7 @@
 """Formularios oficiales del IRS: preguntas guiadas, borrador y formularios finales / Official IRS forms screen."""
 from __future__ import annotations
 
-import os
+import logging
 import sys
 import threading
 import tkinter as tk
@@ -15,28 +15,16 @@ from ..forms import catalog, questions as qmod
 from ..i18n import _, N_, tr
 from .lists import ListEditor
 from .screens import Screen
-from .ui import C, label
+from .ui import C, label, open_path
 from .widgets import COLORS, font, make_tree, money_str, parse_money, ScrollFrame
 from . import layout
+
+logger = logging.getLogger(__name__)
 
 
 def preparer_info() -> dict:
     p = accounts.settings().get("preparer") or {}
     return {k: p.get(k, "") for k in accounts.PREPARER_FIELDS}
-
-
-def open_path(p, verb=None):
-    try:
-        if sys.platform.startswith("win"):
-            if verb:
-                os.startfile(str(p), verb)  # type: ignore[attr-defined]
-            else:
-                os.startfile(str(p))  # type: ignore[attr-defined]
-        else:
-            webbrowser.open(Path(p).resolve().as_uri())
-    except Exception:  # noqa: BLE001
-        return False
-    return True
 
 
 # ==================================================================================================== pantalla
@@ -48,7 +36,6 @@ class FormsScreen(Screen):
 
     def build(self):
         p = self.scroll()
-        self.p = p
         self.use_sr = tk.BooleanVar(value=True)
         self.editable = tk.BooleanVar(value=bool(accounts.settings().get("forms_editable")))
         # --- estado
@@ -221,24 +208,32 @@ class FormsScreen(Screen):
     def open_wizard(self, only_missing=True):
         if self.app.readonly:
             return self.app._deny(_("Su rol no permite modificar la declaración."))
-        self.app.recalc_now()
+        if not self.app.result_or_warn():
+            return
         GuidedQuestions(self.app, only_missing=only_missing, on_close=self.refresh)
 
-    def generate_final(self):
-        self.app.recalc_now()
-        res = self.app.result
+    def _final_ready(self) -> bool:
+        """Datos obligatorios completos y errores de la revisión aceptados: se pueden generar los finales."""
+        res = self.app.result_or_warn()
+        if not res:
+            return False
         missing = qmod.missing(self.ret, res, required_only=True)
         if missing:
             lst = "\n".join(f"• {_q(q)}" for q in missing[:12])
             if messagebox.askyesno(APP_NAME, tr("Faltan datos obligatorios para los formularios finales:\n\n{l}\n\n"
                                                 "¿Desea responder las preguntas ahora?", l=lst), parent=self.app):
                 self.open_wizard(only_missing=True)
-            return
+            return False
         fnd = self.app.findings()
         errs = [f for f in fnd if f["severity"] == "error"]
         if errs and not messagebox.askyesno(APP_NAME, tr("La revisión encontró {n} error(es). ¿Generar de todos modos?",
                                                          n=len(errs)), parent=self.app):
             self.app.workspace.show("review")
+            return False
+        return True
+
+    def generate_final(self):
+        if not self._final_ready():
             return
         ans = messagebox.askyesnocancel(APP_NAME, _("¿Desea generar primero un BORRADOR para revisarlo antes de llenar "
                                                     "los formularios finales?\n\nSí: borrador con marca de agua.\n"
@@ -247,10 +242,16 @@ class FormsScreen(Screen):
             return
         self.generate(draft=bool(ans))
 
+    def _final_button(self):
+        """Botón de finales del paquete: solo para la declaración con la que se generó el borrador."""
+        ret = self.ret
+        return lambda: self.app.ret is ret and self._final_ready() and self.generate(False)
+
     def generate(self, draft: bool):
         if not self.app.can("export"):
             return self.app._deny(_("Su rol no permite exportar."))
-        self.app.recalc_now()
+        if not self.app.result_or_warn():
+            return
         base = self.app.path.parent if self.app.path else storage.returns_dir()
         folder = forms.default_folder(self.ret, Path(base), draft)
         self.app.config(cursor="watch")
@@ -267,7 +268,8 @@ class FormsScreen(Screen):
                 out = forms.generate(ret, res, folder, **opts)
                 self.app.after(0, lambda: self._done(out))
             except Exception as e:  # noqa: BLE001
-                self.app.after(0, lambda: self._failed(e))
+                logger.exception("No se pudieron generar los formularios")
+                self.app.after(0, lambda err=e: self._failed(err))
         threading.Thread(target=work, daemon=True).start()
 
     def _restore(self):
@@ -293,11 +295,11 @@ class FormsScreen(Screen):
         self.open_last_btn.pack(anchor="w", pady=(4, 0))
         accounts.log("forms_generated", self.app.user["username"],
                      f"{'draft' if out.draft else 'final'} {self.ret.tax_year} {out.folder.name}")
-        PackageDialog(self.app, out, on_final=lambda: self.generate(False))
+        PackageDialog(self.app, out, on_final=self._final_button())
 
     def _show_last(self):
         if self.last:
-            PackageDialog(self.app, self.last, on_final=lambda: self.generate(False))
+            PackageDialog(self.app, self.last, on_final=self._final_button())
 
 
 def _q(q) -> str:
@@ -307,6 +309,7 @@ def _q(q) -> str:
 # ==================================================================================================== preguntas
 class GuidedQuestions(tk.Toplevel):
     """Una pregunta a la vez; las preguntas dependen de las respuestas (p. ej. depósito directo → número de cuenta)."""
+    edits_return = True
 
     def __init__(self, app, only_missing=True, on_close=None):
         super().__init__(app)
@@ -342,7 +345,7 @@ class GuidedQuestions(tk.Toplevel):
         ttk.Button(bar, text=_("Cerrar"), command=self.close).pack(side="left", padx=8)
         self.next_btn = ttk.Button(bar, text=_("Siguiente ›"), style="Accent.TButton", command=self.next)
         self.next_btn.pack(side="right")
-        self.skip_btn = ttk.Button(bar, text=_("Omitir"), command=self.skip)
+        self.skip_btn = ttk.Button(bar, text=_("Omitir"), command=self._advance)
         self.skip_btn.pack(side="right", padx=8)
         self.protocol("WM_DELETE_WINDOW", self.close)
         self.bind("<Return>", lambda e: self.next() if self.cur and self.cur.kind != "list" else None)
@@ -356,8 +359,7 @@ class GuidedQuestions(tk.Toplevel):
 
     # ------------------------------------------------------------------ navegación
     def _questions(self):
-        self.app.recalc_now()
-        return qmod.questions(self.app.ret, self.app.result)
+        return qmod.questions(self.app.ret, self.app.result) if self.app.result_or_warn() else []
 
     def _goto_next(self, after_key):
         qs = self._questions()
@@ -460,9 +462,6 @@ class GuidedQuestions(tk.Toplevel):
             self.app.mark_changed()
         self._advance()
 
-    def skip(self):
-        self._advance()
-
     def _advance(self):
         q = self.cur
         if q:
@@ -481,6 +480,8 @@ class GuidedQuestions(tk.Toplevel):
                 return self._show(q, qs)
 
     def _finish(self):
+        if not self.app.result:  # el cálculo falló al responder: result_or_warn ya avisó
+            return self.close()
         self.cur = None
         for w in self.body.winfo_children():
             w.destroy()

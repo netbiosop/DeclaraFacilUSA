@@ -6,12 +6,41 @@ Las listas de condados descargadas del Censo se guardan en la carpeta de usuario
 from __future__ import annotations
 
 import json
+import logging
 import os
 import sys
 from functools import lru_cache
 from pathlib import Path
 
 SUPPORTED_YEARS = (2025, 2026)
+
+logger = logging.getLogger(__name__)
+
+
+def write_atomic(path: Path, text: str):
+    """Escribe en <archivo>.tmp, fuerza el disco y reemplaza: sin fsync un corte de luz puede dejar el archivo vacío."""
+    tmp = path.with_name(path.name + ".tmp")
+    with open(tmp, "w", encoding="utf-8") as f:
+        f.write(text)
+        f.flush()
+        os.fsync(f.fileno())
+    tmp.replace(path)
+
+
+def read_json(path, default=None):
+    """Lee un JSON. Si no existe devuelve `default` sin avisar; si está dañado o no es del tipo de `default`, lo
+    anota y devuelve `default`."""
+    try:
+        data = json.loads(Path(path).read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return default
+    except (OSError, ValueError) as e:
+        logger.warning("No se pudo leer %s: %s", path, e)
+        return default
+    if default is not None and not isinstance(data, type(default)):
+        logger.warning("No se pudo leer %s: se esperaba %s", path, type(default).__name__)
+        return default
+    return data
 
 
 def app_dir() -> Path:
@@ -30,11 +59,18 @@ def data_dir() -> Path:
 def user_dir() -> Path:
     base = Path(os.environ.get("USERPROFILE") or Path.home())
     docs = base / "Documents"
+    # la carpeta que ya tiene datos gana: si Documentos aparece después, cambiarse dejaría
+    # las cuentas atrás y la app pediría crear un Administrador nuevo
+    candidates = (docs / "DeclaraFacilUSA", base / "DeclaraFacilUSA")
+    fallback = Path.home() / ".declarafacilusa"  # si Documentos estaba bloqueado (acceso controlado a carpetas)
+    with_accounts = [c for c in candidates + (fallback,) if (c / "usuarios.json").is_file()]
+    for d in with_accounts + [c for c in candidates if c.is_dir()]:
+        return d
     d = (docs if docs.exists() else base) / "DeclaraFacilUSA"
     try:
         d.mkdir(parents=True, exist_ok=True)
     except OSError:
-        d = Path.home() / ".declarafacilusa"
+        d = fallback
         d.mkdir(parents=True, exist_ok=True)
     return d
 
@@ -87,8 +123,3 @@ def code_from_label(label: str) -> str:
         if i["name"].lower() == label.lower():
             return c
     return ""
-
-
-def reload_all():
-    for fn in (federal, states, local, states_info):
-        fn.cache_clear()

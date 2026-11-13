@@ -14,7 +14,7 @@ from typing import Dict, List, Optional
 from .. import data_loader
 from ..federal import pick
 from ..i18n import _, tr
-from ..models import TaxReturn, age_at_year_end
+from ..models import TaxReturn
 
 
 # ------------------------------------------------------------------------------------------------- utilidades
@@ -74,7 +74,6 @@ class Builder:
                  lang: str = "en"):
         self.lang = lang          # idioma de los formularios: "es" usa las versiones oficiales en español
         self.ret = ret
-        self.res = res
         self.fed = res["federal"]
         self.L = self.fed["lines"]
         self.d = self.fed.get("detail", {})
@@ -83,9 +82,8 @@ class Builder:
         self.year = ret.tax_year
         st = ret.filing_status
         self.status = st
-        self.other = "mfj" if st in ("mfj", "qss") else "other"
         tp_age = ret.taxpayer_age()
-        sp_age = age_at_year_end(ret.spouse.dob, self.year) if ret.has_spouse() else None
+        sp_age = ret.spouse_age()
         self.tp65 = tp_age is not None and tp_age >= 65
         self.sp65 = ret.is_joint() and sp_age is not None and sp_age >= 65
         sr_ok = self.tp65 or self.sp65
@@ -185,13 +183,14 @@ class Builder:
     def form_1040(self):
         r, L, fed = self.ret, self.L, self.fed
         tp, sp, a, fi = r.taxpayer, r.spouse, r.address, r.filing
+        has_digital = fi.digital_assets or any(s.digital for s in r.income.sales)
         v = {
             "first": upper(tp.first_name), "last": upper(tp.last_name), "ssn": digits(tp.ssn),
             "street": upper(a.street), "apt": upper(a.apt), "city": upper(a.city), "state": upper(a.state),
             "zip": a.zip.strip(), "home_us": True,
             "pec_you": tp.presidential_fund, "pec_spouse": r.is_joint() and sp.presidential_fund,
             "fs_" + self.status: True,
-            "digital_yes": fi.digital_assets, "digital_no": not fi.digital_assets,
+            "digital_yes": has_digital, "digital_no": not has_digital,
         }
         if r.is_joint():
             v.update({"sp_first": upper(sp.first_name), "sp_last": upper(sp.last_name), "sp_ssn": digits(sp.ssn)})
@@ -210,7 +209,7 @@ class Builder:
                       f"dep{i}_ssn": digits(d.ssn), f"dep{i}_rel": upper(self.rel(d.relationship, self.main)),
                       f"dep{i}_lived": d.months_lived > 6, f"dep{i}_us": d.months_lived > 6 and d.lived_in_us,
                       f"dep{i}_student": d.full_time_student, f"dep{i}_disabled": d.disabled,
-                      f"dep{i}_ctc": ctc, f"dep{i}_odc": not ctc})
+                      f"dep{i}_ctc": ctc, f"dep{i}_odc": not ctc and d.born_by(self.year)})
         if len(deps) > 4:
             v["dep_more"] = True
             lines = []
@@ -243,9 +242,11 @@ class Builder:
             v["L27c_noeic"] = True
         refund = L["34"]
         if refund >= 0.5:
-            next_year = min(fi.apply_to_next_year, refund)
-            v.update({"L34": m(refund), "L35a": m(refund - next_year, True), "L36": m(next_year)})
-            if fi.direct_deposit and refund - next_year >= 0.5:
+            # En dólares enteros para que L35a + L36 = L34; lo aplicado al año próximo va de 0 al reembolso.
+            refund_whole = whole(refund)
+            next_year = min(max(0, whole(fi.apply_to_next_year)), refund_whole)
+            v.update({"L34": m(refund_whole), "L35a": m(refund_whole - next_year, True), "L36": m(next_year)})
+            if fi.direct_deposit and refund_whole > next_year:
                 v.update({"routing": digits(fi.routing), "account": fi.account.replace(" ", "").replace("-", ""),
                           "acct_checking": fi.account_type != "savings", "acct_savings": fi.account_type == "savings"})
         if L["37"] >= 0.5:
@@ -369,7 +370,7 @@ class Builder:
         it = f["itemized_detail"]
         agi = f["agi"]
         v = self.header()
-        floor = self.data["medical_floor"] * agi
+        floor = self.data["medical_floor"] * max(0.0, agi)
         v.update({"L1": m(ded.medical), "L2": m(agi, True), "L3": m(floor), "L4": m(it["medical"], True)})
         salt_first = it["salt_raw"] - ded.real_estate_tax - ded.personal_property_tax
         v.update({"L5a_sales": ded.salt_use_sales_tax, "L5a": m(salt_first), "L5b": m(ded.real_estate_tax),
@@ -594,7 +595,7 @@ class Builder:
         if not provs:
             self.warn(_("Formulario 2441: falta el proveedor de cuidado (nombre, dirección e identificación)."))
         for i, p in enumerate(provs[:3]):
-            v.update({f"prov{i}_name": upper(p.name), f"prov{i}_addr": upper(p.address), f"prov{i}_tin": digits(p.tin),
+            v.update({f"prov{i}_name": upper(p.name), f"prov{i}_addr": upper(p.address), f"prov{i}_tin": p.tin.strip(),
                       f"prov{i}_hh_yes": p.household_employee, f"prov{i}_hh_no": not p.household_employee,
                       f"prov{i}_amt": m(p.amount, True)})
         if len(provs) > 3:
@@ -602,7 +603,7 @@ class Builder:
                                       "Formulario 2441 - Parte I Proveedores de cuidado (continuacion)"),
                            [f"{upper(p.name)}  {upper(p.address)}  TIN {p.tin}  {m(p.amount, True)}" for p in provs[3:]])
         qual = [dep for dep in r.dependents if dep.qualifies_care(self.year)]
-        n = len(qual) or cr.care_persons
+        n = f["credits"]["n_care"]
         limit = self.data["cdcc"]["expense_limit_one"] if n <= 1 else self.data["cdcc"]["expense_limit_two"]
         share = cr.care_expenses / len(qual) if qual else 0.0
         for i, dep in enumerate(qual[:3]):
@@ -610,7 +611,11 @@ class Builder:
             v.update({f"q{i}_first": upper(dep.first_name), f"q{i}_last": upper(dep.last_name),
                       f"q{i}_ssn": digits(dep.ssn), f"q{i}_disabled": dep.disabled and (a is None or a >= 13),
                       f"q{i}_exp": m(share, True)})
-        earned_tp = sum(w.box1_wages for w in r.w2s if w.owner != "conyuge") + max(0.0, f["profit"] - f["half_se"])
+        if len(qual) > 3:
+            self.statement(self.t("Form 2441 - Part I Qualifying persons (continued)",
+                                  "Formulario 2441 - Parte I Personas calificadas (continuacion)"),
+                           [f"{upper(d.full_name())}  SSN {_fmt_ssn(d.ssn)}  {m(share, True)}" for d in qual[3:]])
+        earned_tp = max(0.0, sum(w.box1_wages for w in r.w2s if w.owner != "conyuge") + f["profit"] - f["half_se"])
         earned_sp = sum(w.box1_wages for w in r.w2s if w.owner == "conyuge") if r.is_joint() else earned_tp
         benefits = cr.dependent_care_benefits
         if benefits > 0:
@@ -686,7 +691,7 @@ class Builder:
         thr = pick(ctc["phaseout_start"], self.status)
         over = max(0.0, agi - thr)
         l10 = math.ceil(over / 1000) * 1000 if over > 0 else 0
-        l11 = l10 * 0.05
+        l11 = l10 * ctc["reduce_per_1000"] / 1000
         l8 = d.get("ctc_gross", 0.0)
         v = self.header()
         v.update({"L1": m(agi, True), "L3": m(agi, True), "L4": str(c["n_ctc"]), "L5": m(c["n_ctc"] * ctc["per_child"], True),
@@ -724,16 +729,19 @@ class Builder:
         f, d, c = self.fed, self.d, self.fed["credits"]
         students = [s for s in self.ret.credits.students if s.expenses > 0]
         agi = f["agi"]
-        joint = self.status == "mfj"
-        top, rng = (180000, 20000) if joint else (90000, 10000)
+        ed = self.data["aotc"]
+        # Solo "mfj" usa el límite alto; QSS usa el de "other". federal.py no (pick() trata QSS como mfj):
+        # pendiente en REVISIONES.md.
+        lo, top = ed["phaseout"]["mfj" if self.status == "mfj" else "other"]
+        rng = top - lo
         l4 = max(0.0, top - agi)
-        aotc = [s for s in students if s.credit.upper() == "AOTC"]
+        aotc = [s for s in students if s.aotc_eligible()]
         llc = [s for s in students if s.credit.upper() == "LLC"]
 
         def l30(s):
-            l27 = min(s.expenses, 4000)
-            l28 = max(0.0, l27 - 2000)
-            return l27, l28, l28 * 0.25, (l27 if l28 == 0 else 2000 + l28 * 0.25)
+            l27 = min(s.expenses, ed["max_expenses"])
+            l28 = max(0.0, l27 - ed["full_expenses"])
+            return l27, l28, l28 * ed["excess_rate"], (l27 if l28 == 0 else ed["full_expenses"] + l28 * ed["excess_rate"])
 
         def split_ssn(s):
             dg = digits(s)
@@ -754,7 +762,7 @@ class Builder:
             l11 = min(l10, self.data["llc"]["max_expenses"])
             fac = d.get("llc_factor", 1.0)
             l15 = max(0.0, top - agi)
-            v.update({"L10": m(l10, True), "L11": m(l11, True), "L12": m(l11 * 0.2, True), "L13": m(top),
+            v.update({"L10": m(l10, True), "L11": m(l11, True), "L12": m(l11 * self.data["llc"]["rate"], True), "L13": m(top),
                       "L14": m(agi, True), "L15": m(l15, True)})
             if l15 > 0:
                 v.update({"L16": m(rng), "L17_int": "1" if fac >= 1 else "0",
@@ -772,11 +780,13 @@ class Builder:
                 for k, ch in enumerate(ein):
                     sv[f"L22a_ein{k}"] = ch
             if s.credit.upper() == "AOTC":
-                l27, l28, l29, l30v = l30(s)
                 sv.update({"L23_no": True, "L24_yes" if s.half_time else "L24_no": True,
-                           "L25_no" if s.first_four_years else "L25_yes": True, "L26_no": True,
-                           "L27": m(l27, True), "L28": m(l28, True), "L29": m(l29, True), "L30": m(l30v, True)})
-                if not s.half_time or not s.first_four_years:
+                           "L25_no" if s.first_four_years else "L25_yes": True})
+                if s in aotc:
+                    l27, l28, l29, l30v = l30(s)
+                    sv.update({"L26_no": True, "L27": m(l27, True), "L28": m(l28, True), "L29": m(l29, True),
+                               "L30": m(l30v, True)})
+                else:  # el 8863 dice "Stop" en la línea 24 o 25: sin líneas 26-30
                     self.warn(tr("Formulario 8863: {n} no cumple los requisitos del AOTC (medio tiempo / primeros 4 años); "
                                  "considere el crédito LLC.", n=s.name or _("estudiante")))
             else:
@@ -843,11 +853,12 @@ class Builder:
         pref = f["net_capital_gain"] + f["qualified_div"]
         ti = d.get("ti_before_qbi", 0.0)
         l13 = max(0.0, ti - pref)
+        rate = self.data["qbi"]["rate"]
         v = self.header()
         v.update({"b0_name": upper(inc.business_name or inc.business_activity or "SCHEDULE C"),
-                  "b0_tin": digits(inc.business_ein) or self.ssn(), "b0_qbi": m(qbi, True), "L2": m(qbi, True),
-                  "L4": m(qbi, True), "L5": m(qbi * 0.2, True), "L10": m(qbi * 0.2, True), "L11": m(ti, True),
-                  "L12": m(pref, True), "L13": m(l13, True), "L14": m(l13 * 0.2, True), "L15": m(f["qbi"], True)})
+                  "b0_tin": _fmt_ein(inc.business_ein) or self.ssn(), "b0_qbi": m(qbi, True), "L2": m(qbi, True),
+                  "L4": m(qbi, True), "L5": m(qbi * rate, True), "L10": m(qbi * rate, True), "L11": m(ti, True),
+                  "L12": m(pref, True), "L13": m(l13, True), "L14": m(l13 * rate, True), "L15": m(f["qbi"], True)})
         self.add("8995", v)
 
     # ------------------------------------------------------------------ Formulario 8959
@@ -866,7 +877,7 @@ class Builder:
             v.update({"L8": m(se_net, True), "L9": m(thr), "L10": m(wages, True), "L11": m(l11, True),
                       "L12": m(l12, True), "L13": m(l12 * rate, True)})
         withheld = d.get("medicare_withheld", 0.0)
-        reg = wages * 0.0145
+        reg = wages * self.data["se"]["medicare_rate"] / 2   # parte del empleado de la tasa de Medicare
         v.update({"L18": m(f["other_taxes"]["addl_medicare"], True), "L19": m(withheld, True), "L20": m(wages, True),
                   "L21": m(reg, True), "L22": m(max(0.0, withheld - reg), True),
                   "L24": m(f["payments"]["addl_medicare_withheld"], True)})

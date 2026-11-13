@@ -1,8 +1,5 @@
 """Pruebas de los formularios oficiales / Official forms tests: mapa de campos, valores de cada formulario, preguntas
 guiadas, direcciones del IRS y generación de los PDF."""
-import io
-import json
-import os
 import pathlib
 import sys
 import tempfile
@@ -13,8 +10,8 @@ sys.path.insert(0, str(ROOT))
 
 from taxapp import forms  # noqa: E402
 from taxapp.engine import compute_all  # noqa: E402
-from taxapp.forms import catalog, mailing, questions  # noqa: E402
-from taxapp.forms.build import Builder, m, whole  # noqa: E402
+from taxapp.forms import catalog, mailing, pdf, questions  # noqa: E402
+from taxapp.forms.build import m, whole  # noqa: E402
 from taxapp.models import (Address, CareProvider, Credits, Dependent, FilingInfo, OtherExpense, Payer,  # noqa: E402
                            Person, Sale, Student, TaxReturn, W2)
 
@@ -23,6 +20,11 @@ try:
     HAVE_PYPDF = True
 except ImportError:
     HAVE_PYPDF = False
+try:
+    import reportlab.platypus  # noqa: F401
+    HAVE_REPORTLAB = True
+except ImportError:  # p. ej. el venv de Xvfb toma reportlab del Python 3.13 y su PIL no carga
+    HAVE_REPORTLAB = False
 
 
 def family():
@@ -132,6 +134,17 @@ class BuilderTests(unittest.TestCase):
     def vals(self, plan, fid, n=0):
         return [i for i in plan.instances if i.form == fid][n].values
 
+    def test_refund_lines_34_35a_36_add_up(self):
+        def lines(next_year):
+            r = TaxReturn(tax_year=2025, filing_status="single")
+            r.taxpayer = Person(first_name="Ana", last_name="Perez", ssn="123-45-6789", dob="1985-06-01")
+            r.w2s.append(W2(employer="ACME", box1_wages=60000, box2_fed_withheld=5171.99))
+            r.filing.apply_to_next_year = next_year
+            v = self.vals(self.plan(r)[1], "1040")
+            return v.get("L34"), v.get("L35a"), v.get("L36")
+        self.assertEqual(lines(20.50), ("100", "79", "21"))   # reembolso 100.49
+        self.assertEqual(lines(-500), ("100", "100", None))
+
     def test_family_forms_and_lines(self):
         ret = family()
         res, p = self.plan(ret)
@@ -158,6 +171,47 @@ class BuilderTests(unittest.TestCase):
         f8863 = self.vals(p, "8863")
         self.assertEqual(num(f8863["L8"]), whole(L["29"]))
         self.assertEqual(f8863["L21_a"], "333")
+
+    def test_2441_uses_same_care_persons_as_calculation(self):
+        # Con "personas cuidadas" indicado a mano, el formulario usaba el número de niños y no coincidía con el cálculo
+        ret = family()
+        ret.credits.care_expenses, ret.credits.care_persons, ret.credits.dependent_care_benefits = 6000, 1, 0
+        res, p = self.plan(ret)
+        f2441 = self.vals(p, "2441")
+        self.assertEqual(num(f2441["L3"]), 3000)
+        self.assertEqual(num(f2441["L11"]), whole(res["federal"]["credits"]["cdcc"]))
+
+    def test_digital_sale_answers_yes_on_1040(self):
+        # Una venta de activos digitales iba al Anexo D mientras el 1040 respondía "No" bajo juramento
+        ret = family()
+        ret.income.sales.append(Sale(description="BTC", proceeds=1000, cost=500, digital=True))
+        _res, p = self.plan(ret)
+        v = self.vals(p, "1040")
+        self.assertTrue(v["digital_yes"])
+        self.assertFalse(v.get("digital_no"))
+
+    def test_ein_is_not_printed_as_ssn(self):
+        path, _state, text = pdf._prepare("12-3456789", ["campo", None, 11])
+        self.assertEqual((path, text), ("campo", "12-3456789"))
+        self.assertEqual(pdf._prepare("123456789", ["campo", None, 11])[2], "123-45-6789")
+        ret = family()
+        ret.credits.care_expenses = 6000
+        ret.credits.care_providers = [CareProvider(name="Guarderia", address="1 Main", tin="12-3456789", amount=6000)]
+        _res, p = self.plan(ret)
+        self.assertEqual(self.vals(p, "2441")["prov0_tin"], "12-3456789")
+
+    def test_letters_outside_cp1252_are_not_printed_as_question_marks(self):
+        self.assertEqual(pdf._prepare("NGUYỄN ĐỨC", "campo")[2], "NGUYEN DUC")
+        self.assertEqual(pdf._prepare("ZOË Ñ", "campo")[2], "ZOË Ñ")
+        self.assertEqual(pdf._pdf_str("Łukasz"), "Lukasz")
+
+    def test_2441_fourth_care_person_goes_on_statement(self):
+        ret = family()
+        ret.credits.care_expenses = 8000
+        ret.dependents = [Dependent(first_name=f"Nino{i}", last_name="Perez", ssn=f"11122333{i}", dob="2019-03-01",
+                                    relationship="Hijo/a", months_lived=12) for i in range(4)]
+        _res, p = self.plan(ret)
+        self.assertTrue(any("NINO3" in line for st in p.statements for line in st["lines"]))
 
     def test_business_forms_consistent(self):
         ret = business()
@@ -216,6 +270,30 @@ class QuestionTests(unittest.TestCase):
         ret.taxpayer.ssn = "123-45-6789"
         ret.filing.routing = "111000025"
         self.assertEqual(questions.missing(ret, compute_all(ret), required_only=True), [])
+
+    def test_routing_number_checksum(self):
+        # 9 dígitos con un dígito mal tipeado: el IRS rechaza el depósito y el reembolso llega por cheque
+        ret = family()
+        ret.filing.routing = "111000026"
+        self.assertIn("routing", {q.key for q in questions.missing(ret, compute_all(ret), required_only=True)})
+
+    def test_state_must_be_a_known_code(self):
+        # "tx" o "XX" se aceptaban: la pantalla de dirección fallaba con KeyError y el estado salía $0 sin error
+        ret = family()
+        ret.address.state = "tx"
+        q = [q for q in questions.missing(ret, compute_all(ret)) if q.key == "state"]
+        self.assertEqual(len(q), 1)
+        self.assertFalse(q[0].check("XX"))
+        self.assertFalse(q[0].check("tx"))
+        self.assertTrue(q[0].check("TX"))
+
+    def test_dependent_ssn_question_keeps_its_dependent_after_a_deletion(self):
+        # la ventana de preguntas guarda la pregunta en pantalla; si se borra otro dependiente, el SSN iba al siguiente
+        ret = family()
+        ret.dependents = [Dependent(first_name="Ana"), Dependent(first_name="Beto")]
+        q = [q for q in questions.questions(ret, compute_all(ret)) if q.key == "dep_ssn1"][0]
+        del ret.dependents[0]
+        self.assertEqual(q.obj(ret).first_name, "Beto")
 
     def test_conditional_questions(self):
         ret = business()
@@ -279,6 +357,17 @@ class GenerateTests(unittest.TestCase):
             e = forms.generate(ret, res, pathlib.Path(tmp) / "e", draft=False, editable=True)
             single = [p for p in e.files if "Anexo_C" in p.name or "Schedule_C" in p.name][0]
             self.assertTrue(pypdf.PdfReader(str(single)).get_fields())
+
+    @unittest.skipUnless(HAVE_REPORTLAB, "reportlab no disponible")
+    def test_draft_report_prints_names_outside_cp1252_without_accents(self):
+        from taxapp import reports
+        ret = family()
+        ret.taxpayer.first_name, ret.taxpayer.last_name = "Đức", "Nguyễn"
+        with tempfile.TemporaryDirectory() as tmp:
+            path = reports.to_pdf(ret, compute_all(ret), [], str(pathlib.Path(tmp) / "b.pdf"))
+            text = pypdf.PdfReader(path).pages[0].extract_text()
+        self.assertIn("Duc Nguyen", text)
+        self.assertNotIn("■", text)
 
 
 if __name__ == "__main__":

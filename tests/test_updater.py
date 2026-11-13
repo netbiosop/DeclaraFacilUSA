@@ -18,6 +18,92 @@ EXE = b"MZ" + b"x" * 5000
 SHA = hashlib.sha256(EXE).hexdigest()
 
 
+class TokenRedirectTests(unittest.TestCase):
+    def test_get_json_does_not_send_token_to_redirect_target(self):
+        import http.server
+        import threading
+        seen = {}
+
+        class H(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                seen[self.path] = self.headers.get("Authorization")
+                if self.path == "/a":
+                    self.send_response(302)
+                    self.send_header("Location", f"http://localhost:{self.server.server_port}/b")
+                    self.end_headers()
+                else:
+                    self.send_response(200)
+                    self.send_header("Content-Length", "2")
+                    self.end_headers()
+                    self.wfile.write(b"{}")
+
+            def log_message(self, *a):
+                pass
+        srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), H)
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+        self.addCleanup(srv.shutdown)
+        with mock.patch.dict(os.environ, {"no_proxy": "*", "NO_PROXY": "*"}):
+            self.assertEqual(U._get_json(f"http://127.0.0.1:{srv.server_port}/a", "ghp_SECRETO"), {})
+        self.assertIsNone(seen["/b"])
+
+    def test_fetch_does_not_send_token_to_redirect_target(self):
+        import http.server
+        import threading
+        seen = {}
+
+        class H(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                seen[self.path] = self.headers.get("Authorization")
+                if self.path == "/a":
+                    self.send_response(302)
+                    self.send_header("Location", f"http://localhost:{self.server.server_port}/b")
+                    self.end_headers()
+                else:
+                    self.send_response(200)
+                    self.send_header("Content-Length", "2")
+                    self.end_headers()
+                    self.wfile.write(b"ok")
+
+            def log_message(self, *a):
+                pass
+        srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), H)
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+        self.addCleanup(srv.shutdown)
+        with mock.patch.dict(os.environ, {"no_proxy": "*", "NO_PROXY": "*"}):
+            data = U._fetch(f"http://127.0.0.1:{srv.server_port}/a", "ghp_SECRETO")
+        self.assertEqual(data, b"ok")
+        self.assertIn("ghp_SECRETO", seen["/a"])
+        self.assertIsNone(seen["/b"])
+
+    def test_fetch_keeps_token_on_same_host_redirect(self):
+        import http.server
+        import threading
+        seen = {}
+
+        class H(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                seen[self.path] = (self.headers.get("Authorization"), self.headers.get("Accept"))
+                if self.path == "/viejo":
+                    self.send_response(301)
+                    self.send_header("Location", "/nuevo")
+                    self.end_headers()
+                else:
+                    self.send_response(200)
+                    self.send_header("Content-Length", "3")
+                    self.end_headers()
+                    self.wfile.write(b"sha")
+
+            def log_message(self, *a):
+                pass
+        srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), H)
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+        self.addCleanup(srv.shutdown)
+        with mock.patch.dict(os.environ, {"no_proxy": "*", "NO_PROXY": "*"}):
+            data = U._fetch(f"http://127.0.0.1:{srv.server_port}/viejo", "ghp_SECRETO", "application/vnd.github.sha")
+        self.assertEqual(data, b"sha")
+        self.assertEqual(seen["/nuevo"], ("token ghp_SECRETO", "application/vnd.github.sha"))
+
+
 class Resp:
     def __init__(self, data: bytes, headers=None):
         self.buf = io.BytesIO(data)
@@ -92,6 +178,37 @@ class ConfigTests(Base):
         U.save_config(cfg)
         self.assertEqual(U.load_config().get_token(), "ghp_secreto")
 
+    def test_repo_from_data_is_not_frozen_in_user_file(self):
+        """check() guarda la configuración: el repositorio de data/ no puede quedar copiado en la PC,
+        si no, al publicar otro repositorio en data/actualizaciones.json las PC seguirían en el viejo."""
+        U.save_config(U.load_config())
+        data = pathlib.Path(self.tmp.name) / "data"
+        data.mkdir()
+        (data / "actualizaciones.json").write_text('{"repo": "otro/Repo"}', encoding="utf-8")
+        with mock.patch.object(U.data_loader, "data_dir", return_value=data):
+            self.assertEqual(U.load_config().repo, "otro/Repo")
+
+    def test_repo_chosen_by_admin_is_kept(self):
+        cfg = U.load_config()
+        cfg.repo = "mi/Fork"
+        U.save_config(cfg)
+        self.assertEqual(U.load_config().repo, "mi/Fork")
+
+    def test_config_is_flushed_to_disk_before_replace(self):
+        # actualizaciones.json vacío tras un corte de luz perdía el repositorio y el token elegidos
+        cfg = U.load_config()
+        cfg.repo = "mi/Fork"
+        with mock.patch("os.fsync") as fsync:
+            U.save_config(cfg)
+        self.assertTrue(fsync.called)
+        self.assertEqual(U.load_config().repo, "mi/Fork")
+
+    def test_valid_json_of_another_type_falls_back_to_default(self):
+        # "[]" en actualizaciones.json (o config.json, ai_config.json) cerraba la app al arrancar con AttributeError
+        U._user_file().write_text("[]", encoding="utf-8")
+        with self.assertLogs("taxapp.data_loader", "WARNING"):
+            self.assertEqual(U.load_config().repo, "netbiosop/DeclaraFacilUSA")
+
     def test_bad_repo(self):
         with self.assertRaises(U.UpdateError):
             U.latest_release(U.UpdateConfig(repo="sin-barra"))
@@ -121,6 +238,22 @@ class CheckDownloadTests(Base):
             with self.assertRaises(U.UpdateError):
                 U.download(rel, U.UpdateConfig(repo="o/r"), dest_dir=pathlib.Path(self.tmp.name))
         self.assertFalse((pathlib.Path(self.tmp.name) / rel.asset_name).exists())
+
+    def test_incomplete_or_failed_download_is_deleted(self):
+        # un .exe truncado quedaba en la carpeta temporal; solo se borraba si fallaba la huella
+        rel = U.Release("9.1.0", "v9.1.0", "n", "", "", "", asset_name="Instalar_DeclaraFacilUSA_9.1.0.exe",
+                        asset_download_url="https://x/Instalar_DeclaraFacilUSA_9.1.0.exe", size=len(EXE) + 10)
+        dest = pathlib.Path(self.tmp.name) / rel.asset_name
+
+        class Cut(Resp):
+            def read(self, n=-1):
+                raise ConnectionResetError("cortada")
+
+        for resp in (Resp(EXE), Cut(EXE)):
+            with mock.patch("urllib.request.urlopen", return_value=resp):
+                with self.assertRaises(U.UpdateError):
+                    U.download(rel, U.UpdateConfig(repo="o/r"), dest_dir=pathlib.Path(self.tmp.name))
+            self.assertFalse(dest.exists())
 
     def test_missing_installer_asset(self):
         rj = release_json()
@@ -204,6 +337,12 @@ def make_tree(base: pathlib.Path, version="1.4.0", extra=b"x = 1\n"):
     (base / "taxapp" / "__pycache__" / "x.pyc").write_bytes(b"junk")
 
 
+class ManifestContractTests(unittest.TestCase):
+    def test_publisher_and_installer_agree_on_code_dirs(self):
+        # una carpeta publicada que el actualizador no conoce se descarta en _safe_rel
+        self.assertEqual(GEN.CODE_DIRS, U.CODE_DIRS)
+
+
 class CodeUpdateTests(Base):
     def setUp(self):
         super().setUp()
@@ -268,6 +407,14 @@ class CodeUpdateTests(Base):
                 U.apply_code(upd, U.UpdateConfig(repo="o/r"))
         self.assertFalse((U.code_store() / "1.4.1").exists())
 
+    def test_failed_file_download_removes_partial_folder(self):
+        with mock.patch.object(U, "_fetch", side_effect=self.fake_fetch([])):
+            upd = U.check_code(U.UpdateConfig(repo="o/r"))
+        with mock.patch.object(U, "_raw_file", side_effect=U.UpdateError("sin red")):
+            with self.assertRaises(U.UpdateError):
+                U.apply_code(upd, U.UpdateConfig(repo="o/r"))
+        self.assertFalse((U.code_store() / "1.4.1.tmp").exists())
+
     def test_unsafe_paths_ignored(self):
         self.man["files"]["../../evil.py"] = {"sha256": "1" * 64, "size": 1}
         self.man["files"]["C:/x.py"] = {"sha256": "1" * 64, "size": 1}
@@ -296,6 +443,13 @@ class CodeUpdateTests(Base):
         U.save_state({"bad": ["1.4.1"]})
         with mock.patch.object(U, "_fetch", side_effect=self.fake_fetch([])):
             self.assertIsNone(U.check_code(U.UpdateConfig(repo="o/r")))
+
+    def test_state_is_flushed_to_disk_before_replace(self):
+        # estado.json vacío tras un corte de luz perdía la lista "bad" y se volvía a instalar una versión mala
+        with mock.patch("os.fsync") as fsync:
+            U.save_state({"bad": ["1.4.1"]})
+        self.assertTrue(fsync.called)
+        self.assertEqual(U.load_state(), {"bad": ["1.4.1"]})
 
 
 class BootstrapTests(Base):

@@ -2,13 +2,35 @@
 barras de progreso, boton de usuario). Todos leen los colores del tema activo (widgets.COLORS)."""
 from __future__ import annotations
 
+import logging
+import os
+import sys
 import tkinter as tk
+import webbrowser
 from datetime import date, timedelta
-from tkinter import ttk
+from pathlib import Path
 
 from ..i18n import _, tr, N_
 from .theme import icon, icon_font, mix
 from .widgets import COLORS, font, Tooltip
+
+logger = logging.getLogger(__name__)
+
+
+def open_path(p, verb=None) -> bool:
+    """Abre un archivo o carpeta con el programa de Windows que corresponda (verb="print" para imprimir)."""
+    try:
+        if sys.platform.startswith("win"):
+            if verb:
+                os.startfile(str(p), verb)  # type: ignore[attr-defined]
+            else:
+                os.startfile(str(p))  # type: ignore[attr-defined]
+        else:
+            webbrowser.open(Path(p).resolve().as_uri())
+    except (OSError, webbrowser.Error) as e:
+        logger.warning("No se pudo abrir %s: %s", p, e)
+        return False
+    return True
 
 
 def C(key):
@@ -255,8 +277,11 @@ def fmt_date(d: date) -> str:
     return tr("{d} {m} {y}", d=d.day, m=_(MONTHS[d.month - 1]), y=d.year)
 
 
+KEY_DATES_WINDOW_DAYS = 400
+
+
 def key_dates(today: date = None):
-    """Fechas proximas del IRS: [(fecha, texto, es_vencimiento_de_declaracion)] ordenadas (12 meses)."""
+    """Fechas proximas del IRS: [(fecha, texto, es_vencimiento_de_declaracion)] ordenadas (próximos KEY_DATES_WINDOW_DAYS días)."""
     today = today or date.today()
     out = []
     for y in (today.year, today.year + 1):
@@ -267,12 +292,12 @@ def key_dates(today: date = None):
             (_weekday_roll(date(y, 9, 15)), tr("3.er pago estimado de {y}", y=y), False),
             (_weekday_roll(date(y, 10, 15)), tr("Límite con prórroga (Formulario 4868) para {y}", y=y - 1), False),
         ]
-    return sorted([x for x in out if x[0] >= today and (x[0] - today).days <= 400])
+    return sorted([x for x in out if x[0] >= today and (x[0] - today).days <= KEY_DATES_WINDOW_DAYS])
 
 
 def next_filing_deadline(today: date = None):
     today = today or date.today()
-    for d, txt, main in key_dates(today):
+    for d, _txt, main in key_dates(today):
         if main:
             return d, d.year - 1, (d - today).days
     d = _weekday_roll(date(today.year + 1, 4, 15))

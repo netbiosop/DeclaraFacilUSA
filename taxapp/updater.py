@@ -14,14 +14,18 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
+import os
 import re
+import shutil
 import ssl
 import subprocess
 import sys
 import tempfile
 import urllib.error
+import urllib.parse
 import urllib.request
-from dataclasses import dataclass, asdict, field
+from dataclasses import dataclass, asdict
 from datetime import datetime
 from pathlib import Path
 from typing import Callable, Optional
@@ -29,9 +33,13 @@ from typing import Callable, Optional
 from . import __version__, data_loader
 from .i18n import _, tr
 
+logger = logging.getLogger(__name__)
+
 ASSET_RE = re.compile(r"^Instalar_DeclaraFacilUSA_.*\.exe$", re.I)
 API = "https://api.github.com"
 TIMEOUT = 20
+DOWNLOAD_TIMEOUT = 30
+CHUNK_SIZE = 256 * 1024
 
 
 class UpdateError(Exception):
@@ -53,7 +61,8 @@ class UpdateConfig:
         from .assistant import unprotect
         try:
             return unprotect(self.token)
-        except Exception:  # noqa: BLE001
+        except (OSError, ValueError, AttributeError) as e:
+            logger.warning("No se pudo descifrar el token de GitHub guardado: %s", e)
             return ""
 
     def set_token(self, tok: str):
@@ -65,21 +74,27 @@ def _user_file() -> Path:
     return data_loader.user_dir() / "actualizaciones.json"
 
 
-def load_config() -> UpdateConfig:
-    cfg = UpdateConfig()
-    for p in (data_loader.data_dir() / "actualizaciones.json", _user_file()):
-        try:
-            d = json.loads(p.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            continue
-        for k, v in d.items():
-            if k in UpdateConfig.__dataclass_fields__:
-                setattr(cfg, k, v)
+def _published_file() -> Path:
+    return data_loader.data_dir() / "actualizaciones.json"
+
+
+def _overlay(cfg: UpdateConfig, path: Path) -> UpdateConfig:
+    for k, v in data_loader.read_json(path, {}).items():
+        if k in UpdateConfig.__dataclass_fields__:
+            setattr(cfg, k, v)
     return cfg
 
 
+def load_config() -> UpdateConfig:
+    return _overlay(_overlay(UpdateConfig(), _published_file()), _user_file())
+
+
 def save_config(cfg: UpdateConfig):
-    _user_file().write_text(json.dumps(asdict(cfg), indent=1), encoding="utf-8")
+    """Guarda en la PC solo lo que difiere de data/actualizaciones.json: así un repositorio nuevo
+    publicado en data/ llega a todas las PC que no eligieron otro."""
+    published = asdict(_overlay(UpdateConfig(), _published_file()))
+    own = {k: v for k, v in asdict(cfg).items() if v != published[k]}
+    data_loader.write_atomic(_user_file(), json.dumps(own, indent=1))
 
 
 # ---------------------------------------------------------------------------- versiones
@@ -110,7 +125,6 @@ class Release:
     asset_download_url: str = ""
     size: int = 0
     sha256: str = ""
-    extra: dict = field(default_factory=dict)
 
 
 # ---------------------------------------------------------------------------- HTTP
@@ -127,8 +141,7 @@ def _open(req, timeout=TIMEOUT):
 
 def _get_json(url: str, token: str = "") -> dict:
     try:
-        with _open(urllib.request.Request(url, headers=_headers(token))) as r:
-            return json.loads(r.read().decode("utf-8"))
+        return json.loads(_read(_resolve(url, _headers(token))).decode("utf-8"))
     except urllib.error.HTTPError as e:
         if e.code == 404:
             raise UpdateError(_("No se encontró el repositorio o todavía no tiene versiones publicadas. "
@@ -143,36 +156,32 @@ def _get_json(url: str, token: str = "") -> dict:
         raise UpdateError(tr("Sin conexión con GitHub: {e}", e=e)) from e
 
 
-def _get_text(url: str, token: str = "", accept="application/octet-stream") -> str:
-    data = _download_bytes(url, token, accept)
-    return data.decode("utf-8", "replace")
-
-
 class _NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         return None
 
 
-def _resolve(url: str, token: str, accept: str):
-    """Para repositorios privados: pide el archivo con la clave sin seguir la redireccion; la descarga real
+def _resolve(url: str, headers: dict, timeout=TIMEOUT, hops: int = 5):
+    """Con clave (encabezado Authorization): pide el archivo sin seguir la redireccion; la descarga real
     (servidor de GitHub) se hace sin la clave."""
-    if not token:
-        return urllib.request.Request(url, headers=_headers("", accept))
+    if "Authorization" not in headers:
+        return urllib.request.Request(url, headers=headers)
     opener = urllib.request.build_opener(_NoRedirect, urllib.request.HTTPSHandler(context=ssl.create_default_context()))
     try:
-        r = opener.open(urllib.request.Request(url, headers=_headers(token, accept)), timeout=TIMEOUT)
+        r = opener.open(urllib.request.Request(url, headers=headers), timeout=timeout)
         return r          # sin redireccion: el contenido viene directo
     except urllib.error.HTTPError as e:
         if e.code in (301, 302, 303, 307, 308) and e.headers.get("Location"):
-            return urllib.request.Request(e.headers["Location"], headers={"User-Agent": f"DeclaraFacilUSA/{__version__}"})
+            target = urllib.parse.urljoin(url, e.headers["Location"])
+            if hops and urllib.parse.urlsplit(target).netloc == urllib.parse.urlsplit(url).netloc:
+                return _resolve(target, headers, timeout, hops - 1)  # p. ej. repositorio renombrado: sigue en la API
+            return urllib.request.Request(target, headers={"User-Agent": f"DeclaraFacilUSA/{__version__}"})
         raise
 
 
-def _download_bytes(url, token="", accept="application/octet-stream") -> bytes:
-    target = _resolve(url, token, accept)
+def _read(target, timeout=TIMEOUT) -> bytes:
     if isinstance(target, urllib.request.Request):
-        with _open(target) as r:
-            return r.read()
+        target = _open(target, timeout=timeout)
     with target as r:
         return r.read()
 
@@ -197,11 +206,13 @@ def latest_release(cfg: UpdateConfig) -> Release:
             sha_asset = a
     if sha_asset:
         try:
-            txt = _get_text(sha_asset["url"] if tok else sha_asset["browser_download_url"], tok)
+            sha_url = sha_asset["url"] if tok else sha_asset["browser_download_url"]
+            txt = _read(_resolve(sha_url, _headers(tok, "application/octet-stream"))).decode("utf-8", "replace")
             m = re.search(r"\b[0-9a-fA-F]{64}\b", txt)
             rel.sha256 = m.group(0).lower() if m else ""
-        except (UpdateError, urllib.error.URLError, OSError):
-            rel.sha256 = ""
+        except (UpdateError, urllib.error.URLError, OSError) as e:
+            logger.warning("No se pudo leer la huella SHA-256 de %s; la descarga no se verificará: %s",
+                           rel.asset_name, e)
     return rel
 
 
@@ -213,8 +224,8 @@ def check(cfg: UpdateConfig = None, save=True) -> Optional[Release]:
     if save:
         try:
             save_config(cfg)
-        except OSError:
-            pass
+        except OSError as e:
+            logger.warning("No se pudo guardar la configuración de actualizaciones: %s", e)
     return rel if is_newer(rel.version) else None
 
 
@@ -228,14 +239,14 @@ def download(rel: Release, cfg: UpdateConfig = None, progress: Callable[[int, in
     dest = dest_dir / rel.asset_name
     url = rel.asset_api_url if tok else rel.asset_download_url
     try:
-        target = _resolve(url, tok, "application/octet-stream")
+        target = _resolve(url, _headers(tok, "application/octet-stream"))
         resp = _open(target, timeout=60) if isinstance(target, urllib.request.Request) else target
         total = int(resp.headers.get("Content-Length") or rel.size or 0)
         h = hashlib.sha256()
         got = 0
         with resp, open(dest, "wb") as fh:
             while True:
-                chunk = resp.read(256 * 1024)
+                chunk = resp.read(CHUNK_SIZE)
                 if not chunk:
                     break
                 fh.write(chunk)
@@ -244,10 +255,13 @@ def download(rel: Release, cfg: UpdateConfig = None, progress: Callable[[int, in
                 if progress:
                     progress(got, total)
     except urllib.error.URLError as e:
+        dest.unlink(missing_ok=True)
         raise UpdateError(tr("No se pudo descargar la actualización: {e}", e=getattr(e, "reason", e))) from e
     except OSError as e:
+        dest.unlink(missing_ok=True)
         raise UpdateError(tr("No se pudo descargar la actualización: {e}", e=e)) from e
     if rel.size and got != rel.size:
+        dest.unlink(missing_ok=True)
         raise UpdateError(_("La descarga está incompleta. Intente de nuevo."))
     if rel.sha256 and h.hexdigest().lower() != rel.sha256:
         dest.unlink(missing_ok=True)
@@ -277,8 +291,6 @@ def notes_text(rel: Release, limit=4000) -> str:
 # El repositorio de GitHub contiene el codigo y un manifiesto (actualizacion.json) con la huella SHA-256 de cada
 # archivo de taxapp/, data/, docs/ y assets/. La app compara y descarga solo lo que cambio, en una carpeta nueva
 # (%LOCALAPPDATA%\DeclaraFacilUSA\codigo\<version>); main.py la usa al reiniciar y vuelve a la anterior si falla.
-import os  # noqa: E402
-import shutil  # noqa: E402
 
 BRANCH = "main"
 MANIFEST = "actualizacion.json"
@@ -309,14 +321,11 @@ def _state_path() -> Path:
 
 
 def load_state() -> dict:
-    try:
-        return json.loads(_state_path().read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return {}
+    return data_loader.read_json(_state_path(), {})
 
 
 def save_state(st: dict):
-    _state_path().write_text(json.dumps(st, indent=1), encoding="utf-8")
+    data_loader.write_atomic(_state_path(), json.dumps(st, indent=1))
 
 
 def current_root() -> Path:
@@ -334,7 +343,7 @@ def rolled_back_version() -> str:
 def sha256_file(p: Path) -> str:
     h = hashlib.sha256()
     with open(p, "rb") as f:
-        for chunk in iter(lambda: f.read(256 * 1024), b""):
+        for chunk in iter(lambda: f.read(CHUNK_SIZE), b""):
             h.update(chunk)
     return h.hexdigest()
 
@@ -350,8 +359,7 @@ def _fetch(url: str, token: str = "", accept: str = "*/*") -> bytes:
     if token:
         h["Authorization"] = f"token {token}"
     try:
-        with _open(urllib.request.Request(url, headers=h), timeout=30) as r:
-            return r.read()
+        return _read(_resolve(url, h, timeout=DOWNLOAD_TIMEOUT), timeout=DOWNLOAD_TIMEOUT)
     except urllib.error.HTTPError as e:
         if e.code == 404:
             raise UpdateError(_("No se encontró el repositorio o todavía no tiene versiones publicadas. "
@@ -422,7 +430,11 @@ def apply_code(upd: CodeUpdate, cfg: UpdateConfig = None, progress: Callable[[in
         if rel not in upd.changed and local.is_file():
             shutil.copyfile(local, target)
         else:
-            data = _raw_file(cfg.repo, upd.commit, rel, tok)
+            try:
+                data = _raw_file(cfg.repo, upd.commit, rel, tok)
+            except UpdateError:
+                shutil.rmtree(tmp, ignore_errors=True)
+                raise
             if hashlib.sha256(data).hexdigest() != info["sha256"]:
                 shutil.rmtree(tmp, ignore_errors=True)
                 raise UpdateError(tr("El archivo {f} no coincide con su huella SHA-256; actualización cancelada.", f=rel))
@@ -453,8 +465,8 @@ def confirm_code_ok():
         if st.get("trial"):
             st.update(trial=False, attempts=0)
             save_state(st)
-    except OSError:
-        pass
+    except OSError as e:
+        logger.warning("No se pudo confirmar que la versión actual arrancó bien: %s", e)
 
 
 def restart():
@@ -475,7 +487,8 @@ def check_any(cfg: UpdateConfig = None):
         return "code", cu
     try:
         rel = check(cfg)
-    except UpdateError:
+    except UpdateError as e:
+        logger.warning("No se pudo buscar el instalador nuevo: %s", e)
         rel = None
     if rel:
         return "installer", rel

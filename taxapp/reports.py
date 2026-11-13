@@ -28,7 +28,8 @@ LINE_LABELS = [
     ("19", N_("Credito por hijos y otros dependientes")), ("20", N_("Creditos no reembolsables (Anexo 3, linea 8)")),
     ("21", N_("Total de creditos")), ("22", N_("Impuesto menos creditos")),
     ("23", N_("Otros impuestos, incl. trabajo independiente (Anexo 2, linea 21)")), ("24", N_("IMPUESTO TOTAL")),
-    ("25a", N_("Retencion federal - W-2")), ("25b", N_("Retencion federal - 1099 y otros")), ("25d", N_("Total retenido")),
+    ("25a", N_("Retencion federal - W-2")), ("25b", N_("Retencion federal - 1099 y otros")),
+    ("25c", N_("Retencion de Medicare adicional (Form 8959)")), ("25d", N_("Total retenido")),
     ("26", N_("Pagos estimados y con la prorroga")), ("27", N_("Credito por ingreso del trabajo (EIC)")),
     ("28", N_("Credito tributario adicional por hijos (ACTC)")), ("29", N_("Credito de oportunidad americana (reembolsable)")),
     ("31", N_("Otros pagos (Anexo 3, linea 15)")), ("32", N_("Total de otros pagos y creditos reembolsables")),
@@ -184,6 +185,7 @@ def to_pdf(ret: TaxReturn, res: dict, findings: List[dict], path: str) -> str:
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.units import inch
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, KeepTogether
+    from .forms.pdf import _cp1252
 
     styles = getSampleStyleSheet()
     green = colors.HexColor("#0b5d3b")
@@ -204,7 +206,7 @@ def to_pdf(ret: TaxReturn, res: dict, findings: List[dict], path: str) -> str:
     for t_, rows in build_sections(ret, res, findings):
         data = [[Paragraph(f"<b>{html.escape(t_)}</b>", head), ""]]
         for k, v in rows:
-            data.append([Paragraph(html.escape(str(k)), cell), Paragraph(html.escape(str(v)), cell_r)])
+            data.append([Paragraph(html.escape(_cp1252(str(k))), cell), Paragraph(html.escape(_cp1252(str(v))), cell_r)])
         t = Table(data, colWidths=[4.9 * inch, 2.4 * inch], repeatRows=1)
         t.setStyle(TableStyle([
             ("BACKGROUND", (0, 0), (-1, 0), green), ("SPAN", (0, 0), (-1, 0)),
@@ -214,7 +216,7 @@ def to_pdf(ret: TaxReturn, res: dict, findings: List[dict], path: str) -> str:
             ("TOPPADDING", (0, 0), (-1, -1), 3), ("BOTTOMPADDING", (0, 0), (-1, -1), 3)]))
         story += [KeepTogether([t]) if len(rows) < 25 else t, Spacer(1, 10)]
 
-    foot_left = tr("{app} - borrador no oficial - {n}", app=APP_NAME, n=ret.taxpayer.full_name())
+    foot_left = _cp1252(tr("{app} - borrador no oficial - {n}", app=APP_NAME, n=ret.taxpayer.full_name()))
 
     def footer(canvas, d):
         canvas.saveState()

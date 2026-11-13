@@ -19,6 +19,14 @@ from .models import TaxReturn
 
 INF = float("inf")
 
+# Tasas y edades de la ley que no cambian por año (los montos en dólares están en data/federal_<año>.json)
+CAPGAIN_RATE_15, CAPGAIN_RATE_20 = 0.15, 0.20      # ganancias de capital y dividendos calificados
+AMT_RATE_26, AMT_RATE_28 = 0.26, 0.28              # Formulario 6251
+CHARITY_CASH_AGI_PCT, CHARITY_NONCASH_AGI_PCT = 0.6, 0.3
+ITEMIZED_LIMIT_FACTOR = 2.0 / 37.0                 # tope de deducciones detalladas para el tramo del 37 %
+HSA_CATCHUP_AGE = 55
+EITC_NO_CHILD_AGES = (25, 65)                      # sin hijos: al menos uno de 25 a 64 años
+
 
 # ---------------------------------------------------------------------------- utilidades
 def sk(status: str) -> str:
@@ -30,8 +38,6 @@ def pick(d: dict, status: str):
     s = sk(status)
     if s in d:
         return d[s]
-    if s == "mfj" and "mfj" in d:
-        return d["mfj"]
     return d.get("other", d.get("single"))
 
 
@@ -92,7 +98,7 @@ def qdcg_tax(ti: float, pref_income: float, status: str, fed: dict) -> Dict[str,
     g = max(0.0, min(ti, f) - (ordinary + zero_amt))
     fifteen_amt = min(c, g)
     twenty_amt = max(0.0, pref - zero_amt - fifteen_amt)
-    tax = bracket_tax(ordinary, brackets) + 0.15 * fifteen_amt + 0.20 * twenty_amt
+    tax = bracket_tax(ordinary, brackets) + CAPGAIN_RATE_15 * fifteen_amt + CAPGAIN_RATE_20 * twenty_amt
     regular = bracket_tax(ti, brackets)
     return {"tax": min(tax, regular), "ordinary": ordinary, "zero": zero_amt, "fifteen": fifteen_amt, "twenty": twenty_amt}
 
@@ -127,7 +133,7 @@ def compute_federal(ret: TaxReturn) -> dict:
     profit = inc.schedule_c_profit()
 
     # Ganancias de capital (Schedule D simplificado)
-    st_net = inc.short_term_gain + inc.sales_gain("short") - inc.capital_loss_carryover
+    st_net = inc.short_term_gain + inc.sales_gain("short") - abs(inc.capital_loss_carryover)  # se escribe a veces como "(3,000)"
     lt_net = inc.long_term_gain + inc.sales_gain("long") + inc.capital_gain_distributions
     net_cap = st_net + lt_net
     loss_limit = fed["capital_loss_limit"]["mfs" if st == "mfs" else "other"]
@@ -139,7 +145,7 @@ def compute_federal(ret: TaxReturn) -> dict:
 
     # ---------------- Schedule SE
     se = fed["se"]
-    se_net = profit * se["net_factor"] if profit * se["net_factor"] >= 400 else 0.0
+    se_net = profit * se["net_factor"] if profit * se["net_factor"] >= se["min_net"] else 0.0
     ss_room = max(0.0, se["ss_wage_base"] - ss_wages_by_owner["contribuyente"])
     se_ss = min(se_net, ss_room) * se["ss_rate"]
     se_med = se_net * se["medicare_rate"]
@@ -154,7 +160,7 @@ def compute_federal(ret: TaxReturn) -> dict:
     hsa = ded.hsa_deduction
     if ded.hsa_coverage in ("self", "family") and fed.get("hsa"):
         h = fed["hsa"]
-        hsa_limit = h[ded.hsa_coverage] + (h["catchup"] if tp_age is not None and tp_age >= 55 else 0)
+        hsa_limit = h[ded.hsa_coverage] + (h["catchup"] if tp_age is not None and tp_age >= HSA_CATCHUP_AGE else 0)
         hsa = min(ded.hsa_deduction, max(0.0, hsa_limit - ded.hsa_employer))
         if hsa < ded.hsa_deduction:
             notes.append(tr("Deducción HSA limitada a ${a} (tope anual menos aportes del empleador).", a=f"{hsa:,.0f}"))
@@ -239,7 +245,8 @@ def compute_federal(ret: TaxReturn) -> dict:
 
     # ---------------- Deduccion estandar
     std = fed["standard_deduction"][st]
-    earned_income = wages + max(0.0, profit - half_se)
+    # Una pérdida del Anexo C se resta del resto del ingreso del trabajo (Pub. 596, instrucciones del 2441)
+    earned_income = max(0.0, wages + profit - half_se)
     if ret.taxpayer.can_be_claimed:
         dep = fed["dependent_std"]
         std = min(std, max(dep["min"], earned_income + dep["earned_plus"]))
@@ -257,7 +264,9 @@ def compute_federal(ret: TaxReturn) -> dict:
     std_total = std + boxes * add_amt
 
     # ---------------- Itemizadas (Schedule A)
-    medical = max(0.0, ded.medical - fed["medical_floor"] * agi)
+    # Con AGI negativo el piso médico y los topes por % del AGI son 0, no negativos.
+    agi_pct_base = max(0.0, agi)
+    medical = max(0.0, ded.medical - fed["medical_floor"] * agi_pct_base)
     state_local_income = (sum(w.box17_state_withheld + w.box19_local_withheld for w in ret.w2s)
                           + ded.state_income_tax_paid_extra + ret.payments.state_estimated + ret.payments.local_estimated)
     salt_first = ded.sales_tax_paid if ded.salt_use_sales_tax else state_local_income
@@ -269,15 +278,16 @@ def compute_federal(ret: TaxReturn) -> dict:
     salt_cap = max(floor, cap - sl["phaseout_rate"] * max(0.0, magi - start))
     salt = min(salt_raw, salt_cap)
     interest = ded.mortgage_interest + ded.mortgage_points + ded.investment_interest
-    charity = min(ded.charity_cash, 0.6 * agi) + min(ded.charity_noncash, 0.3 * agi)
+    charity = (min(ded.charity_cash, CHARITY_CASH_AGI_PCT * agi_pct_base)
+               + min(ded.charity_noncash, CHARITY_NONCASH_AGI_PCT * agi_pct_base))
     if fed["charitable_floor_pct"]:
-        charity = max(0.0, charity - fed["charitable_floor_pct"] * agi)
+        charity = max(0.0, charity - fed["charitable_floor_pct"] * agi_pct_base)
     itemized = medical + salt + interest + charity + ded.casualty_loss + ded.other_itemized
     itemized_limit_red = 0.0
     if fed.get("itemized_37_limit") and itemized > 0:
         top_start = fed["brackets"][s][-1][0]
         base_ti = agi - sched1a_total
-        itemized_limit_red = (2.0 / 37.0) * min(itemized, max(0.0, base_ti - top_start))
+        itemized_limit_red = ITEMIZED_LIMIT_FACTOR * min(itemized, max(0.0, base_ti - top_start))
     itemized_net = itemized - itemized_limit_red
 
     nonitem_charity = 0.0
@@ -334,10 +344,10 @@ def compute_federal(ret: TaxReturn) -> dict:
         ord_amt = amt_base - pref_amt
 
         def tmt_ord(x):
-            return 0.26 * x if x <= thr28 else 0.26 * thr28 + 0.28 * (x - thr28)
+            return AMT_RATE_26 * x if x <= thr28 else AMT_RATE_26 * thr28 + AMT_RATE_28 * (x - thr28)
 
         qa = qdcg_tax(amt_base, pref_amt, st, fed)
-        tmt = tmt_ord(ord_amt) + 0.15 * qa["fifteen"] + 0.20 * qa["twenty"]
+        tmt = tmt_ord(ord_amt) + CAPGAIN_RATE_15 * qa["fifteen"] + CAPGAIN_RATE_20 * qa["twenty"]
         tmt = min(tmt, tmt_ord(amt_base))
         amt = max(0.0, tmt - tax)
         if amt > 0:
@@ -368,7 +378,7 @@ def compute_federal(ret: TaxReturn) -> dict:
             c = fed["cdcc"]
             limit = c["expense_limit_one"] if n_care == 1 else c["expense_limit_two"]
             exp = max(0.0, min(cr.care_expenses, limit) - cr.dependent_care_benefits)
-            earned_tp = wages_tp + max(0.0, profit - half_se)
+            earned_tp = max(0.0, wages_tp + profit - half_se)
             earned_lowest = min(earned_tp, wages_sp) if ret.is_joint() else earned_tp
             exp = min(exp, earned_lowest)
             rate = max(c["first_floor"], c["max_rate"] - 0.01 * math.ceil(max(0.0, agi - c["first_start"]) / c["first_step"]))
@@ -393,9 +403,9 @@ def compute_federal(ret: TaxReturn) -> dict:
         factor = round(phase_factor(magi, pick(ao["phaseout"], st)), 3)
         aotc_factor = factor
         for stu in cr.students:
-            if stu.credit.upper() == "AOTC":
+            if stu.aotc_eligible():  # si no, build.py avisa y sugiere LLC
                 e = stu.expenses
-                aotc_total += min(e, 2000) + 0.25 * max(0.0, min(e, 4000) - 2000)
+                aotc_total += min(e, ao["full_expenses"]) + ao["excess_rate"] * max(0.0, min(e, ao["max_expenses"]) - ao["full_expenses"])
         aotc_gross = aotc_total
         aotc_total *= factor
         lc = fed["llc"]
@@ -432,14 +442,13 @@ def compute_federal(ret: TaxReturn) -> dict:
     # Credito tributario por hijos y otros dependientes
     ctc_data = fed["ctc"]
     n_ctc = sum(1 for d in deps if d.qualifies_ctc(year))
-    n_odc = len(deps) - n_ctc
-    ctc_allowed = ret.taxpayer.valid_ssn_for_work or (ret.is_joint() and ret.spouse.valid_ssn_for_work)
-    if n_ctc and not ctc_allowed:
+    n_odc = sum(1 for d in deps if d.born_by(year)) - n_ctc
+    if n_ctc and not has_ssn:
         notes.append(_("CTC requiere que al menos un contribuyente tenga SSN valido (OBBBA); se aplica solo ODC."))
         n_odc += n_ctc
         n_ctc = 0
     ctc_gross = n_ctc * ctc_data["per_child"] + n_odc * ctc_data["odc"]
-    ctc_red = 50.0 * math.ceil(max(0.0, magi - pick(ctc_data["phaseout_start"], st)) / 1000.0)
+    ctc_red = ctc_data["reduce_per_1000"] * math.ceil(max(0.0, magi - pick(ctc_data["phaseout_start"], st)) / 1000.0)
     ctc_after = max(0.0, ctc_gross - ctc_red)
     ctc_limit = remaining
     ctc_nonref = min(remaining, ctc_after)
@@ -470,7 +479,7 @@ def compute_federal(ret: TaxReturn) -> dict:
     e = fed["eitc"]
     n_eic = min(3, sum(1 for d in deps if d.qualifies_eitc(year)))
     eitc_ok = cr.claim_eitc and st != "mfs" and not ret.taxpayer.can_be_claimed
-    if eitc_ok and not ret.taxpayer.valid_ssn_for_work:
+    if eitc_ok and not (ret.taxpayer.valid_ssn_for_work and (not ret.is_joint() or ret.spouse.valid_ssn_for_work)):
         eitc_ok = False
         notes.append(_("EITC requiere SSN valido para trabajar."))
     inv_income = inc.taxable_interest + inc.tax_exempt_interest + inc.ordinary_dividends + max(0.0, cap_line7)
@@ -479,7 +488,7 @@ def compute_federal(ret: TaxReturn) -> dict:
         notes.append(tr("EITC no disponible: ingresos de inversion mayores a ${n}.", n=f"{e['investment_limit']:,}"))
     if eitc_ok and n_eic == 0:
         ages = [x for x in (tp_age, sp_age) if x is not None]
-        if not any(25 <= x < 65 for x in ages):
+        if not any(EITC_NO_CHILD_AGES[0] <= x < EITC_NO_CHILD_AGES[1] for x in ages):
             eitc_ok = False
     if eitc_ok and earned_income > 0:
         p = e[str(n_eic)]
@@ -488,12 +497,13 @@ def compute_federal(ret: TaxReturn) -> dict:
         income_for_phase = max(agi, earned_income)
         eitc = max(0.0, min(credit, p["max"] - p["phaseout_rate"] * max(0.0, income_for_phase - start)))
 
+    excess_ss = _excess_ss(ret, se)
     # Anexo 8812 Parte II-B (3 o más hijos): el ACTC puede basarse en los impuestos de Seguro Social y Medicare pagados
     actc_part2b = None
     if n_ctc >= 3 and actc_l20 < actc_l17:
         l21 = sum(w.box4_ss_withheld + w.box6_medicare_withheld for w in ret.w2s)
         l22 = half_se  # Anexo 1 línea 15 (+ Anexo 2 líneas 5, 6 y 13, no modeladas)
-        l24 = eitc + _excess_ss(ret, se)
+        l24 = eitc + excess_ss
         l25 = max(0.0, l21 + l22 - l24)
         actc_part2b = {"21": l21, "22": l22, "23": l21 + l22, "24": l24, "25": l25, "26": max(actc_l20, l25)}
         actc = min(actc_l17, max(actc_l20, l25))
@@ -503,8 +513,8 @@ def compute_federal(ret: TaxReturn) -> dict:
     other_withheld = (inc.investment_withheld + inc.pension_withheld + inc.ira_withheld + inc.ss_withheld
                       + inc.unemployment_withheld + inc.business_withheld)
     withholding = w2_withheld + other_withheld
-    excess_ss = _excess_ss(ret, se)
-    addl_med_withheld = max(0.0, medicare_withheld - 0.0145 * medicare_wages)
+    # el empleado paga la mitad de la tasa de Medicare; lo retenido de más es Medicare adicional (Form 8959)
+    addl_med_withheld = max(0.0, medicare_withheld - se["medicare_rate"] / 2 * medicare_wages)
     estimated = ret.payments.federal_estimated + ret.payments.federal_prior_overpayment
     refundable = eitc + actc + aotc_refundable + cr.other_refundable
     total_payments = (withholding + estimated + ret.payments.federal_extension + excess_ss + addl_med_withheld
@@ -585,7 +595,7 @@ def compute_federal(ret: TaxReturn) -> dict:
 
 def _excess_ss(ret: TaxReturn, se: dict) -> float:
     """Exceso de Seguro Social retenido (más de un empleador), por persona."""
-    ss_max = se["ss_wage_base"] * 0.062
+    ss_max = se["ss_wage_base"] * se["ss_rate"] / 2   # parte del empleado
     total = 0.0
     for owner in ("contribuyente", "conyuge"):
         ws = [w for w in ret.w2s if ("conyuge" if w.owner == "conyuge" else "contribuyente") == owner]
