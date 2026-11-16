@@ -572,7 +572,7 @@ EN = {
     "Retencion federal - 1099 y otros": "Federal withholding - 1099 and other",
     "Retencion de Medicare adicional (Form 8959)": "Additional Medicare tax withheld (Form 8959)",
     "Total retenido": "Total withheld",
-    "Pagos estimados y con la prorroga": "Estimated and extension payments",
+    "Pagos estimados y reembolso del año anterior aplicado": "Estimated payments and prior-year overpayment applied",
     "Credito por ingreso del trabajo (EIC)": "Earned income credit (EIC)",
     "Credito tributario adicional por hijos (ACTC)": "Additional child tax credit (ACTC)",
     "Credito de oportunidad americana (reembolsable)": "American opportunity credit (refundable)",

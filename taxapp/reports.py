@@ -30,7 +30,7 @@ LINE_LABELS = [
     ("23", N_("Otros impuestos, incl. trabajo independiente (Anexo 2, linea 21)")), ("24", N_("IMPUESTO TOTAL")),
     ("25a", N_("Retencion federal - W-2")), ("25b", N_("Retencion federal - 1099 y otros")),
     ("25c", N_("Retencion de Medicare adicional (Form 8959)")), ("25d", N_("Total retenido")),
-    ("26", N_("Pagos estimados y con la prorroga")), ("27", N_("Credito por ingreso del trabajo (EIC)")),
+    ("26", N_("Pagos estimados y reembolso del año anterior aplicado")), ("27", N_("Credito por ingreso del trabajo (EIC)")),
     ("28", N_("Credito tributario adicional por hijos (ACTC)")), ("29", N_("Credito de oportunidad americana (reembolsable)")),
     ("31", N_("Otros pagos (Anexo 3, linea 15)")), ("32", N_("Total de otros pagos y creditos reembolsables")),
     ("33", N_("PAGOS TOTALES")), ("34", N_("PAGO EN EXCESO (REEMBOLSO)")), ("37", N_("CANTIDAD ADEUDADA")),
