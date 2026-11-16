@@ -55,8 +55,27 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
   fila se borró con el diálogo abierto (el "?" de la IA suelta el grab), Aceptar la vuelve a agregar en vez de perderla.
 - Texto de los PDF: `pdf._cp1252` quita el acento a las letras que no están en Windows-1252 (Ễ→E, Đ→D); las que no tienen
   forma sin acento (chino, emoji) siguen saliendo "?". El logger `pypdf` queda en ERROR porque sus avisos citan nombres.
+- Quien puede ser reclamado como dependiente (`can_be_claimed`) no deduce interés estudiantil ni HSA (§221(c),
+  §223(b)(6)); el crédito del ahorrador cuenta solo aportes de quien tiene 18 años (`SAVERS_MIN_AGE`, día anterior como
+  las demás edades; sin fecha de nacimiento no se descarta). `savers_contribs` del resultado es lo que imprime el 8880.
 
 ## Pendientes
+- Encontrados el 2026-11-16:
+  - Crédito del ahorrador: falta la exclusión de estudiantes de tiempo completo (§25B(c)(2)); no hay campo en el modelo.
+  - Interfaz (no se prueba en la nube sin Xvfb): `forms_view.py:125` `_plan()` con rama `recalc_now()` inalcanzable
+    (`refresh()` ya sale sin resultado); `login.py:173` `ChangePasswordDialog(forced, on_done)` solo se usa con
+    `forced=True`; `app.py:102` `login_ok` relee `usuarios.json` para `must_change` que ya trae `user`;
+    `settings.py:798` `UserDialog.ok` escribe `must_change` con `accounts.load()/save()` aparte (sin registro y no
+    atómico) → parámetro `must_change` en `accounts.create_user` en vez de `db` (que nadie pasa); `ui.py:173`
+    `IconButton(size, padx, pady, border)` y la clase `Clickable` sin otros usos; `settings.py` maneja registros con el
+    hash (¿`accounts.list_users()` con `public()`?).
+  - Limpieza (resultados iguales): `updater.download()` repite `dest.unlink` 4 veces y `apply_code()` `rmtree(tmp)` 3
+    (un `except BaseException: limpiar; raise`); dos `_fmt_ssn` con contratos distintos (`build.py:924`, `pdf.py:46`) y
+    dígitos a mano en `forms/__init__.py:165`; `f"{v:,.0f}"` en `review.py`, `assistant.py`, `home.py`, `tools.py`,
+    `federal.py` (¿`fmt_money(v, cents=False)`?).
+  - Estructura: encabezado y filas del menú lateral copiados en `home.py`/`workspace.py`/`settings.py`; cambiar de
+    cliente de 3 formas (`new_return`, `open_file`, `logout` en `app.py`); `SECTIONS` de `workspace.py` repite
+    `SCREENS`; cambio de contraseña escrito dos veces (`settings.py:348`, `login.py:170`) y "no coinciden" 5 veces.
 - `taxapp/state.py` `_ss_subtraction`: umbrales estatales de Seguro Social (CT, MN, NM, RI, VT, WV) escritos en código e
   iguales para 2025 y 2026; MN y RI se ajustan cada año. Moverlos a `states_<año>.json` con valores 2026 verificados y
   pruebas por estado.
@@ -236,6 +255,15 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
     carga en 3.12); corre con `python3 -m pytest`.
 
 ## Historial
+### 2026-11-16 — revisión nocturna (PR #2, rama `revision-nocturna`)
+- `federal.py:159,192`: quien puede ser reclamado como dependiente deducía interés estudiantil y HSA (2025, W-2 $30k,
+  interés $2,500, HSA $3,000: AGI $24,500 en vez de $30,000) → se anulan con nota.
+- `federal.py:425`: crédito del ahorrador sin el requisito de 18 años (17 años, W-2 $22k, IRA $2k: $625 en vez de $0) →
+  `SAVERS_MIN_AGE`; el 8880 imprime `savers_contribs`. Comparado en 3.000 casos: solo cambian dependientes o <18.
+- `reports.py:33`: la línea 26 del borrador decía "y con la prórroga" (ese pago va en la línea 31) → rótulo corregido.
+- `tests/test_updater.py:149`: solo aislaba USERPROFILE; en Linux/macOS con `~/.declarafacilusa/usuarios.json`
+  escribía `actualizaciones.json` real → también HOME.
+- Pruebas: 169 → 173 pasan (18 omitidas por Tkinter). Pendientes nuevos de interfaz, limpieza y estructura (arriba).
 ### 2026-11-13 — revisión nocturna (PR #2, rama `revision-nocturna`; `main` sin cambios)
 - `gui/screens.py:381,603`, `gui/lists.py:160`: los diálogos de edición guardaban el índice; con el "?" de la IA (suelta el
   grab, `gui/app.py:705`) se podía borrar otra fila y Aceptar pisaba la equivocada o daba IndexError → `replace_row` por
