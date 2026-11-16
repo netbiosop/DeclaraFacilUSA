@@ -148,7 +148,7 @@ def fake_urlopen(rel):
 class Base(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.env = mock.patch.dict(os.environ, {"USERPROFILE": self.tmp.name})
+        self.env = mock.patch.dict(os.environ, {"USERPROFILE": self.tmp.name, "HOME": self.tmp.name})
         self.env.start()
 
     def tearDown(self):
