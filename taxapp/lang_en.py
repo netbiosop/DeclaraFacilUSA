@@ -11,6 +11,8 @@ EN = {
     "EITC requiere SSN valido para trabajar.": "The EITC requires an SSN valid for employment.",
     "EITC no disponible: ingresos de inversion mayores a ${n}.": "EITC not available: investment income above ${n}.",
     "El interes de prestamos estudiantiles no se permite al declarar casado por separado.": "Student loan interest is not allowed when married filing separately.",
+    "Quien puede ser declarado como dependiente de otra persona no deduce interes de prestamos estudiantiles.": "Someone who can be claimed as another person's dependent cannot deduct student loan interest.",
+    "Quien puede ser declarado como dependiente de otra persona no deduce aportes a la HSA.": "Someone who can be claimed as another person's dependent cannot deduct HSA contributions.",
     "Deduccion por propinas: los casados deben declarar en conjunto para reclamarla.": "Tips deduction: married taxpayers must file jointly to claim it.",
     "Deduccion por horas extra: los casados deben declarar en conjunto para reclamarla.": "Overtime deduction: married taxpayers must file jointly to claim it.",
     "Deduccion para mayores de 65: los casados deben declarar en conjunto.": "Senior (65+) deduction: married taxpayers must file jointly.",

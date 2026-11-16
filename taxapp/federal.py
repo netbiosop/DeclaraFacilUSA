@@ -25,10 +25,16 @@ AMT_RATE_26, AMT_RATE_28 = 0.26, 0.28              # Formulario 6251
 CHARITY_CASH_AGI_PCT, CHARITY_NONCASH_AGI_PCT = 0.6, 0.3
 ITEMIZED_LIMIT_FACTOR = 2.0 / 37.0                 # tope de deducciones detalladas para el tramo del 37 %
 HSA_CATCHUP_AGE = 55
+SAVERS_MIN_AGE = 18                                # §25B(c)(1)
 EITC_NO_CHILD_AGES = (25, 65)                      # sin hijos: al menos uno de 25 a 64 años
 
 
 # ---------------------------------------------------------------------------- utilidades
+def savers_age_ok(age) -> bool:
+    """Sin fecha de nacimiento no se descarta el crédito del ahorrador."""
+    return age is None or age >= SAVERS_MIN_AGE
+
+
 def sk(status: str) -> str:
     """Clave de tabla: el conyuge sobreviviente usa las tablas de casados en conjunto."""
     return "mfj" if status in ("mfj", "qss") else status
@@ -158,7 +164,10 @@ def compute_federal(ret: TaxReturn) -> dict:
     # HSA (Formulario 8889): si se indicó la cobertura, se limita al tope anual menos los aportes del empleador
     hsa_limit = None
     hsa = ded.hsa_deduction
-    if ded.hsa_coverage in ("self", "family") and fed.get("hsa"):
+    if ret.taxpayer.can_be_claimed and hsa > 0:
+        hsa = 0.0
+        notes.append(_("Quien puede ser declarado como dependiente de otra persona no deduce aportes a la HSA."))
+    elif ded.hsa_coverage in ("self", "family") and fed.get("hsa"):
         h = fed["hsa"]
         hsa_limit = h[ded.hsa_coverage] + (h["catchup"] if tp_age is not None and tp_age >= HSA_CATCHUP_AGE else 0)
         hsa = min(ded.hsa_deduction, max(0.0, hsa_limit - ded.hsa_employer))
@@ -193,6 +202,8 @@ def compute_federal(ret: TaxReturn) -> dict:
     if ded.student_loan_interest > 0:
         if st == "mfs":
             notes.append(_("El interes de prestamos estudiantiles no se permite al declarar casado por separado."))
+        elif ret.taxpayer.can_be_claimed:
+            notes.append(_("Quien puede ser declarado como dependiente de otra persona no deduce interes de prestamos estudiantiles."))
         else:
             magi = total_income - adj_wo_sli
             sli = min(ded.student_loan_interest, fed["student_loan"]["max"]) * phase_factor(magi, pick(fed["student_loan"]["phaseout"], st))
@@ -430,7 +441,8 @@ def compute_federal(ret: TaxReturn) -> dict:
                 rate = r
                 break
         mx = fed["savers"]["contrib_max"]
-        contrib = min(cr.retirement_contrib_taxpayer, mx) + (min(cr.retirement_contrib_spouse, mx) if ret.is_joint() else 0)
+        contrib = (min(cr.retirement_contrib_taxpayer, mx) if savers_age_ok(tp_age) else 0) \
+            + (min(cr.retirement_contrib_spouse, mx) if ret.is_joint() and savers_age_ok(sp_age) else 0)
         savers_rate = rate
         savers = min(remaining, contrib * rate)
     remaining -= savers

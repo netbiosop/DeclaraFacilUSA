@@ -108,6 +108,34 @@ class FederalTests(unittest.TestCase):
         self.assertAlmostEqual(f["deduction"], 60000)
 
 
+class ClaimableDependentTests(unittest.TestCase):
+    def test_claimable_dependent_gets_no_student_loan_or_hsa_deduction(self):
+        # §221(c) y §223(b)(6): quien puede ser reclamado por otro no deduce interés estudiantil ni aportes a la HSA
+        r = make(2025, wages=30000)
+        r.taxpayer.can_be_claimed = True
+        r.deductions.student_loan_interest = 2500
+        r.deductions.hsa_coverage = "self"
+        r.deductions.hsa_deduction = 3000
+        f = compute_all(r)["federal"]
+        self.assertEqual(f["student_loan"], 0)
+        self.assertEqual(f["hsa"], 0)
+        self.assertAlmostEqual(f["agi"], 30000)
+
+    def test_savers_credit_requires_age_18(self):
+        # §25B(c)(1): el crédito del ahorrador exige 18 años al cierre del año
+        r = make(2025, wages=22000, dob="2008-06-01")
+        r.credits.retirement_contrib_taxpayer = 2000
+        self.assertEqual(compute_all(r)["federal"]["credits"]["savers"], 0)
+        r.taxpayer.dob = "2007-06-01"
+        self.assertGreater(compute_all(r)["federal"]["credits"]["savers"], 0)
+
+    def test_savers_credit_ignores_contribution_of_spouse_under_18(self):
+        r = make(2025, "mfj", wages=50000)
+        r.spouse.dob = "2009-01-01"
+        r.credits.retirement_contrib_spouse = 2000
+        self.assertEqual(compute_all(r)["federal"]["credits"]["savers"], 0)
+
+
 class StatutoryAmountsTests(unittest.TestCase):
     """Montos de la ley: umbral del Anexo SE, escalones del AOTC y reducción del CTC."""
 
