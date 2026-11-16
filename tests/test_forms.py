@@ -134,6 +134,19 @@ class BuilderTests(unittest.TestCase):
     def vals(self, plan, fid, n=0):
         return [i for i in plan.instances if i.form == fid][n].values
 
+    def test_8880_leaves_out_contribution_of_spouse_under_18(self):
+        r = TaxReturn(tax_year=2025, filing_status="mfj")
+        r.taxpayer = Person(first_name="Ana", last_name="Perez", ssn="123-45-6789", dob="1985-06-01")
+        r.spouse = Person(first_name="Luis", last_name="Perez", ssn="123-45-6788", dob="2009-01-01")
+        r.w2s.append(W2(employer="ACME", box1_wages=50000))
+        r.credits.retirement_contrib_taxpayer = 1000
+        r.credits.retirement_contrib_spouse = 2000
+        res, plan = self.plan(r)
+        v = self.vals(plan, "8880")
+        self.assertEqual(v["L6b"], m(0, True))
+        self.assertEqual(v["L6a"], m(1000, True))
+        self.assertEqual(v["L12"], m(res["federal"]["credits"]["savers"], True))
+
     def test_refund_lines_34_35a_36_add_up(self):
         def lines(next_year):
             r = TaxReturn(tax_year=2025, filing_status="single")

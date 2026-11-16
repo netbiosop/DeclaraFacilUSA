@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 from .. import data_loader
-from ..federal import pick, savers_age_ok
+from ..federal import pick
 from ..i18n import _, tr
 from ..models import TaxReturn
 
@@ -818,7 +818,7 @@ class Builder:
 
     # ------------------------------------------------------------------ Formulario 8880
     def f8880(self):
-        r, d, cr = self.ret, self.d, self.ret.credits
+        r, d = self.ret, self.d
         v = self.header()
 
         def split(contrib, owner):
@@ -826,9 +826,10 @@ class Builder:
             l2 = min(contrib, elective)
             return contrib - l2, l2
 
-        cols = [("a", cr.retirement_contrib_taxpayer if savers_age_ok(r.taxpayer_age()) else 0, "contribuyente")]
+        tp_contrib, sp_contrib = d["savers_contribs"]
+        cols = [("a", tp_contrib, "contribuyente")]
         if r.is_joint():
-            cols.append(("b", cr.retirement_contrib_spouse if savers_age_ok(r.spouse_age()) else 0, "conyuge"))
+            cols.append(("b", sp_contrib, "conyuge"))
         l7 = 0.0
         for col, contrib, owner in cols:
             l1, l2 = split(contrib, owner)

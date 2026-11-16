@@ -30,11 +30,6 @@ EITC_NO_CHILD_AGES = (25, 65)                      # sin hijos: al menos uno de 
 
 
 # ---------------------------------------------------------------------------- utilidades
-def savers_age_ok(age) -> bool:
-    """Sin fecha de nacimiento no se descarta el crédito del ahorrador."""
-    return age is None or age >= SAVERS_MIN_AGE
-
-
 def sk(status: str) -> str:
     """Clave de tabla: el conyuge sobreviviente usa las tablas de casados en conjunto."""
     return "mfj" if status in ("mfj", "qss") else status
@@ -433,6 +428,9 @@ def compute_federal(ret: TaxReturn) -> dict:
     savers = 0.0
     savers_rate = 0.0
     savers_limit = remaining
+    # aportes que cuentan (contribuyente, cónyuge); sin fecha de nacimiento no se descartan. El 8880 imprime estos mismos
+    savers_contribs = tuple(c if age is None or age >= SAVERS_MIN_AGE else 0.0 for c, age in
+                            ((cr.retirement_contrib_taxpayer, tp_age), (cr.retirement_contrib_spouse if ret.is_joint() else 0.0, sp_age)))
     if (cr.retirement_contrib_taxpayer or cr.retirement_contrib_spouse) and not ret.taxpayer.can_be_claimed:
         tiers = pick(fed["savers"]["tiers"], st if st in ("mfj", "hoh") else "other")
         rate = 0.0
@@ -441,8 +439,7 @@ def compute_federal(ret: TaxReturn) -> dict:
                 rate = r
                 break
         mx = fed["savers"]["contrib_max"]
-        contrib = (min(cr.retirement_contrib_taxpayer, mx) if savers_age_ok(tp_age) else 0) \
-            + (min(cr.retirement_contrib_spouse, mx) if ret.is_joint() and savers_age_ok(sp_age) else 0)
+        contrib = sum(min(c, mx) for c in savers_contribs)
         savers_rate = rate
         savers = min(remaining, contrib * rate)
     remaining -= savers
@@ -594,7 +591,7 @@ def compute_federal(ret: TaxReturn) -> dict:
             "amti": amti, "amt_exemption": exemption, "amt_base": amt_base, "tmt": tmt,
             "cdcc_rate": cdcc_rate, "cdcc_exp": cdcc_exp, "cdcc_limit": cdcc_limit, "cdcc_before_limit": cdcc_before_limit,
             "aotc_gross": aotc_gross, "aotc_factor": aotc_factor, "llc_factor": llc_factor, "edu_limit": edu_limit,
-            "savers_rate": savers_rate, "savers_limit": savers_limit,
+            "savers_rate": savers_rate, "savers_limit": savers_limit, "savers_contribs": savers_contribs,
             "ctc_gross": ctc_gross, "ctc_red": ctc_red, "ctc_after": ctc_after, "ctc_limit": ctc_limit,
             "actc_l17": actc_l17, "actc_l20": actc_l20, "actc_part2b": actc_part2b,
             "qbi_income": qbi, "ti_before_qbi": ti_before_qbi, "pref_income": pref_income,
