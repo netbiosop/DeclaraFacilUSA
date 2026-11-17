@@ -11,7 +11,7 @@ sys.path.insert(0, str(ROOT))
 from taxapp import forms  # noqa: E402
 from taxapp.engine import compute_all  # noqa: E402
 from taxapp.forms import catalog, mailing, pdf, questions  # noqa: E402
-from taxapp.forms.build import m, whole  # noqa: E402
+from taxapp.forms.build import build, m, whole  # noqa: E402
 from taxapp.models import (Address, CareProvider, Credits, Dependent, FilingInfo, OtherExpense, Payer,  # noqa: E402
                            Person, Sale, Student, TaxReturn, W2)
 
@@ -307,6 +307,28 @@ class QuestionTests(unittest.TestCase):
         q = [q for q in questions.questions(ret, compute_all(ret)) if q.key == "dep_ssn1"][0]
         del ret.dependents[0]
         self.assertEqual(q.obj(ret).first_name, "Beto")
+
+    def test_form_questions_only_for_forms_that_are_printed(self):
+        # Un dependiente no deduce la HSA (sin 8889) y con $400k no hay crédito educativo (sin 8863):
+        # pedir esos datos bloqueaba los formularios finales por formularios que no se imprimen.
+        ret = TaxReturn(tax_year=2025, filing_status="single")
+        ret.taxpayer = Person(first_name="Ana", last_name="Perez", ssn="123-45-6789", dob="1985-06-01",
+                              can_be_claimed=True)
+        ret.w2s.append(W2(employer="ACME", box1_wages=30000))
+        ret.deductions.hsa_deduction = 3000
+        res = compute_all(ret)
+        printed = {i.form for i in build(ret, res).instances}
+        self.assertNotIn("8889", printed)
+        self.assertNotIn("hsa_cov", [q.key for q in questions.questions(ret, res)])
+
+        ret = TaxReturn(tax_year=2025, filing_status="single")
+        ret.taxpayer = Person(first_name="Ana", last_name="Perez", ssn="123-45-6789", dob="1985-06-01")
+        ret.w2s.append(W2(employer="ACME", box1_wages=400000))
+        ret.credits.students = [Student(name="Ana", expenses=4000)]
+        res = compute_all(ret)
+        printed = {i.form for i in build(ret, res).instances}
+        self.assertNotIn("8863", printed)
+        self.assertNotIn("students", [q.key for q in questions.questions(ret, res)])
 
     def test_conditional_questions(self):
         ret = business()

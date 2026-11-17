@@ -69,6 +69,36 @@ class Plan:
         return out
 
 
+def needs_sched_d(inc) -> bool:
+    return bool(inc.sales or inc.short_term_gain or inc.long_term_gain or inc.capital_loss_carryover)
+
+
+def needed_forms(ret: TaxReturn, fed: dict) -> Dict[str, bool]:
+    """Qué anexos y formularios se imprimen; las preguntas de cada formulario usan este mismo plan."""
+    L, inc = fed["lines"], ret.income
+    return {
+        "s1": abs(L.get("8", 0)) >= 0.5 or L.get("10", 0) >= 0.5,
+        "s1a": fed["sched1a"]["total"] >= 0.5,
+        "s2": fed["amt"] >= 0.5 or fed["other_taxes"]["total"] >= 0.5,
+        "sa": fed["itemize"],
+        "sb": inc.taxable_interest > 1500 or inc.ordinary_dividends > 1500 or ret.filing.foreign_account
+              or ret.filing.foreign_trust,
+        "sc": bool(inc.business_gross or inc.schedule_c_expenses()),
+        "sd": needs_sched_d(inc),
+        "sse": fed["se_tax"] >= 0.5,
+        "2441": fed["credits"]["cdcc"] >= 0.5 or ret.credits.dependent_care_benefits > 0,
+        "6251": fed["amt"] >= 0.5,
+        "sei": fed["credits"]["eitc"] >= 0.5 and fed["credits"]["n_eitc"] > 0,
+        "s8812": (fed["credits"]["ctc_nonref"] + fed["credits"]["actc"]) >= 0.5,
+        "8863": (fed["credits"]["education_nonref"] + fed["credits"]["aotc_refundable"]) >= 0.5,
+        "8889": fed.get("hsa", 0) >= 0.5 or ret.deductions.hsa_employer > 0,
+        "8880": fed["credits"]["savers"] >= 0.5,
+        "8995": fed["qbi"] >= 0.5,
+        "8959": fed["other_taxes"]["addl_medicare"] >= 0.5 or fed["payments"]["addl_medicare_withheld"] >= 1,
+        "8960": fed["other_taxes"]["niit"] >= 0.5,
+    }
+
+
 class Builder:
     def __init__(self, ret: TaxReturn, res: dict, preparer: Optional[dict] = None, use_sr: Optional[bool] = None,
                  lang: str = "en"):
@@ -135,28 +165,7 @@ class Builder:
 
     # ------------------------------------------------------------------ qué formularios hacen falta
     def build(self) -> Plan:
-        f, ret, inc = self.fed, self.ret, self.ret.income
-        need = {
-            "s1": abs(self.L.get("8", 0)) >= 0.5 or self.L.get("10", 0) >= 0.5,
-            "s1a": f["sched1a"]["total"] >= 0.5,
-            "s2": f["amt"] >= 0.5 or f["other_taxes"]["total"] >= 0.5,
-            "sa": f["itemize"],
-            "sb": inc.taxable_interest > 1500 or inc.ordinary_dividends > 1500 or ret.filing.foreign_account
-                  or ret.filing.foreign_trust,
-            "sc": bool(inc.business_gross or inc.schedule_c_expenses()),
-            "sd": self._needs_sched_d(),
-            "sse": f["se_tax"] >= 0.5,
-            "2441": f["credits"]["cdcc"] >= 0.5 or ret.credits.dependent_care_benefits > 0,
-            "6251": f["amt"] >= 0.5,
-            "sei": f["credits"]["eitc"] >= 0.5 and f["credits"]["n_eitc"] > 0,
-            "s8812": (f["credits"]["ctc_nonref"] + f["credits"]["actc"]) >= 0.5,
-            "8863": (f["credits"]["education_nonref"] + f["credits"]["aotc_refundable"]) >= 0.5,
-            "8889": f.get("hsa", 0) >= 0.5 or ret.deductions.hsa_employer > 0,
-            "8880": f["credits"]["savers"] >= 0.5,
-            "8995": f["qbi"] >= 0.5,
-            "8959": f["other_taxes"]["addl_medicare"] >= 0.5 or f["payments"]["addl_medicare_withheld"] >= 1,
-            "8960": f["other_taxes"]["niit"] >= 0.5,
-        }
+        need = needed_forms(self.ret, self.fed)
         sched3 = (self.L.get("20", 0) >= 0.5 or self.L.get("31", 0) >= 0.5)
         self.form_1040()
         builders = [("s1", self.s1), ("s1a", self.s1a), ("s2", self.s2), ("s3", self.s3), ("sa", self.sa),
@@ -173,11 +182,6 @@ class Builder:
         if self.L.get("37", 0) >= 1:
             self.f1040v()
         return self.plan
-
-    def _needs_sched_d(self) -> bool:
-        inc = self.ret.income
-        detail = bool(inc.sales) or inc.short_term_gain or inc.long_term_gain or inc.capital_loss_carryover
-        return bool(detail)
 
     # ------------------------------------------------------------------ 1040 / 1040-SR
     def form_1040(self):
@@ -224,7 +228,7 @@ class Builder:
                   "L6a": m(L["6a"]), "L6b": m(L["6b"]), "L7a": m(L["7"]), "L8": m(L["8"]), "L9": m(L["9"], True),
                   "L10": m(L["10"]), "L11a": m(L["11"], True), "L11b": m(L["11"], True)})
         inc = r.income
-        if inc.capital_gain_distributions and not self._needs_sched_d():
+        if inc.capital_gain_distributions and not needs_sched_d(inc):
             v["L7b_nosd"] = True
         # Deducción
         v.update({"L12a_you": tp.can_be_claimed, "L12d_you65": self.tp65, "L12d_youblind": tp.blind})

@@ -14,6 +14,7 @@ from .. import data_loader
 from ..i18n import N_
 from ..models import TaxReturn
 from ..review import SSN_RE, ZIP_RE
+from .build import needed_forms
 
 
 @dataclass
@@ -72,7 +73,8 @@ def questions(ret: TaxReturn, res: dict) -> List[Question]:
     """Lista de preguntas que aplican a esta declaración (en orden)."""
     fed = res["federal"]
     L = fed["lines"]
-    inc, ded, cr, fi = ret.income, ret.deductions, ret.credits, ret.filing
+    need = needed_forms(ret, fed)
+    inc, ded, fi = ret.income, ret.deductions, ret.filing
     Q: List[Question] = []
     G1 = N_("Identificación")
     tp = lambda r: r.taxpayer  # noqa: E731
@@ -238,7 +240,7 @@ def questions(ret: TaxReturn, res: dict) -> List[Question]:
                                   "precio de venta y el costo; al agregar las ventas, ponga en 0 la ganancia neta para "
                                   "no contarla dos veces.")))
     # ----- 2441
-    if fed["credits"]["cdcc"] >= 0.5 or cr.dependent_care_benefits:
+    if need["2441"]:
         Q.append(Question("providers", N_("Formulario 2441 — cuidado de dependientes"),
                           N_("Proveedores de cuidado: nombre, dirección, SSN o EIN y monto pagado"), "list",
                           list_kind="care_providers",
@@ -248,14 +250,14 @@ def questions(ret: TaxReturn, res: dict) -> List[Question]:
                           help=N_("Pida al proveedor el formulario W-10 o su identificación fiscal. Sin estos datos "
                                   "el IRS puede negar el crédito.")))
     # ----- 8863
-    if cr.students:
+    if need["8863"]:
         Q.append(Question("students", N_("Formulario 8863 — educación"),
                           N_("Datos de cada estudiante: SSN, institución, dirección y EIN (del 1098-T)"), "list",
                           list_kind="students", required=True,
                           check=lambda r: all(_ssn_ok(s.ssn) and s.school and s.school_address
                                               for s in r.credits.students)))
     # ----- 8889
-    if ded.hsa_deduction or ded.hsa_employer:
+    if need["8889"]:
         Q.append(Question("hsa_cov", N_("Formulario 8889 — cuenta HSA"),
                           N_("Tipo de cobertura de su seguro médico con deducible alto (HDHP)"), "choice",
                           lambda r: r.deductions, "hsa_coverage", required=True,
