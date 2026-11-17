@@ -60,6 +60,19 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
   las demás edades; sin fecha de nacimiento no se descarta). `savers_contribs` del resultado es lo que imprime el 8880.
 
 ## Pendientes
+- Encontrados el 2026-11-17:
+  - AOTC (ley, decide el dueño): la parte reembolsable se da a menores de 18 y a estudiantes de 18-23 que otro puede
+    reclamar (§25A(i)(6), casilla de la línea 7 del 8863); caso 2006-03-01, dependiente, W-2 $8k, AOTC $4k → $1,000
+    reembolsables. Negarla cambia montos y necesita un campo de manutención.
+  - `local.py`: con retención local (casilla 19) y ninguna jurisdicción elegida ahora sale una nota, pero lo retenido sigue
+    sumándose como "Reembolso local" en el total. ¿Debe dejar de sumarse? (en PA todo residente paga EIT).
+  - Interfaz (Tk, no se prueba aquí): `widgets.py:26,189` aceptan montos negativos en todos los campos de dinero
+    (aporte de jubilación −2000 → crédito del ahorrador −$200 e impuesto +$200; casilla 2 negativa sube el saldo a
+    pagar) → `Form.money(allow_negative=False)` salvo ganancias/pérdidas y `other_income`; `updates.py:95-153`
+    `UpdateDialog` se puede cerrar con la X durante la descarga y `_ready` lanza `TclError` (no reinicia ni instala)
+    → `protocol("WM_DELETE_WINDOW", lambda: None)` mientras descarga.
+  - `questions.py`: el VIN del Anexo 1-A es obligatorio aunque no haya deducción de interés de auto (p. ej. MFS).
+  - `gui/layout.py:36,43`: el parámetro `font_scale` de `factor()`/`px()` solo lo usa `tests/test_layout.py:85`.
 - Encontrados el 2026-11-16:
   - Crédito del ahorrador: falta la exclusión de estudiantes de tiempo completo (§25B(c)(2)); no hay campo en el modelo.
   - Interfaz (no se prueba en la nube sin Xvfb): `forms_view.py:125` `_plan()` con rama `recalc_now()` inalcanzable
@@ -110,7 +123,8 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
   por SB 5813?) en `states_2025/2026.json`; mínimo QBI 2026 de $400 sin exigir participación material y antes del
   tope (`federal.py:~319`); edad <13 del 2441 por aniversario (verificar Pub. 503).
 - Anexo B: el límite de $1,500 está 5 veces (`questions.py:142-151`, `build.py:146`) y `build.py` también lo genera por
-  `foreign_trust`, pero entonces la pregunta desaparece. Decidir la condición y una sola `needs_schedule_b()`.
+  `foreign_trust`, pero entonces la pregunta desaparece. Decidir la condición; el plan ya vive en
+  `build.needed_forms()["sb"]` (desde el 2026-11-17 las preguntas de 2441/8863/8889 lo usan), falta que `questions.py` lo use.
 - `earned_tp` (2441) se calcula igual en `federal.py:~378` y `build.py:~613`: devolverlo en el resultado.
 - Cálculos que cambian montos, encontrados el 2026-11-02 (verificar con la ley/Pub. antes de tocar):
   recién nacido/fallecido en el año con `months_lived` ≤ 6 pierde CTC/EITC (Pub. 501: cuenta todo el año; ¿regla en
@@ -222,7 +236,7 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
   - `casualty_loss` en negativo resta de las itemizadas (mismo patrón que la pérdida arrastrada; `federal.py:285`, `build.py:385`).
   - Aviso de IRA (`review.py:132`) con la edad al 31-dic: quien cumple 59 en el año no recibe el aviso de 59½.
   - La pregunta del estado rechaza "tx" con el mensaje genérico en vez de pasarlo a mayúsculas (`forms_view.py:438`).
-  - Limpieza: `except Exception` amplio en `counties.py:361` y `gui/app.py:569` (sin `from` ni traceback); `catalog.py` repite
+  - Limpieza: `except Exception` amplio en `counties.py:94` y `gui/app.py:569` (sin `from` ni traceback); `catalog.py` repite
     `ORDER`/`SHORT`/`FILE_NAMES` que ya están en el JSON (`"seq"` sin lector); "Recargar tablas" (`gui/settings.py:603`) no limpia
     `catalog._load` ni `counties._all` (→ `data_loader.reload()`); `tests/test_sesion.py` repite la preparación 8 veces sin
     parchear `ITERATIONS`; fechas 15-abr/15-oct en `gui/ui.py:283` además de `deadline` en `federal_<año>.json`.
@@ -255,6 +269,15 @@ Lo lee y lo actualiza la revisión nocturna antes de revisar. Cada revisión agr
     carga en 3.12); corre con `python3 -m pytest`.
 
 ## Historial
+### 2026-11-17 — revisión nocturna (PR #2, rama `revision-nocturna`; `main` sin cambios)
+- `forms/questions.py:241,251,258`: las preguntas de 2441/8863/8889 usaban otras condiciones que `Builder.build()`
+  (dependiente con HSA, o $400k con estudiante: pregunta obligatoria de un formulario que no se imprime y finales
+  bloqueados) → el plan pasa a `build.needed_forms(ret, fed)` y lo usan los dos. Mismo resultado de `build()`.
+- `local.py:131`: retención local sin jurisdicción elegida (PA, casilla 19 $1,200) salía como reembolso sin aviso → nota
+  (solo en estados con datos locales); los montos no cambian (pendiente arriba).
+- `i18n.py:101`: `tr` volvía al español sin rastro si una traducción tenía marcadores rotos → `logger.warning`.
+- `gui/theme.py:127-130`: `ensure_contrast(..., 4.5)` repetía el valor por defecto.
+- Pruebas: 173 → 177 pasan (18 omitidas por Tkinter; aquí no hay `python3-tk`). Pendientes nuevos arriba.
 ### 2026-11-16 — revisión nocturna (PR #2, rama `revision-nocturna`)
 - `federal.py:159,192`: quien puede ser reclamado como dependiente deducía interés estudiantil y HSA (2025, W-2 $30k,
   interés $2,500, HSA $3,000: AGI $24,500 en vez de $30,000) → se anulan con nota.
