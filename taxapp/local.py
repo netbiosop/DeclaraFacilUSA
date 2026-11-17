@@ -132,7 +132,7 @@ def compute_local(ret: TaxReturn, fedres: dict, stres: dict) -> dict:
     withheld = sum(w.box19_local_withheld for w in ret.w2s) + sum(c.withheld for c in ex.custom_local)
     payments = withheld + ret.payments.local_estimated
     balance = payments - total
-    if withheld > 0 and not items:
+    if withheld > 0 and not items and sdata:
         notes.append(_("Hay impuesto local retenido (W-2 casilla 19) pero no se calculó ningún impuesto local: elija "
                        "su jurisdicción en 'Dirección y residencia'. Sin ella, lo retenido se muestra como reembolso."))
     if not items and not sdata:

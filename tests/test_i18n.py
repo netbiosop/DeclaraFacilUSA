@@ -6,6 +6,7 @@ import pathlib
 import string
 import sys
 import unittest
+from unittest import mock
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -100,7 +101,6 @@ class EnglishOutputTests(unittest.TestCase):
 
     def test_broken_translation_falls_back_to_spanish_and_is_logged(self):
         # Un {n} mal escrito en una traducción (p. ej. llegada en una actualización de datos) no debe pasar en silencio
-        from unittest import mock
         with mock.patch.object(i18n, "_lang", "en"), \
                 mock.patch.object(i18n, "_load_catalog", return_value={"Hay {n} filas": "There are {count} rows"}), \
                 self.assertLogs("taxapp.i18n", level="WARNING"):
