@@ -182,6 +182,14 @@ class StateLocalTests(unittest.TestCase):
         self.assertEqual(loc["total"], 0)
         self.assertEqual(loc["refund"], 0)
 
+    def test_local_withholding_without_local_tax_gets_a_note(self):
+        # Casilla 19 sin jurisdicción elegida: se mostraba como "Reembolso local" sin ningún aviso
+        r = make(2025, wages=50000, state="PA")
+        r.w2s[0].box19_local_withheld = 1200
+        loc = compute_all(r)["local"]
+        self.assertEqual(loc["items"], [])
+        self.assertTrue(any("casilla 19" in n for n in loc["notes"]))
+
     def test_itemized_on_negative_agi_has_no_negative_floor_or_charity_cap(self):
         r = make(2025, wages=20000, state="CO", business_gross=10000, exp_supplies=40000)
         r.deductions.mode = "itemized"

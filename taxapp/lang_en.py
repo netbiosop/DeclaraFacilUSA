@@ -523,6 +523,7 @@ EN = {
     "Sin impuesto de condado sobre la renta.": "No county income tax.",
     "Seleccione el condado para ver su tasa.": "Select the county to see its rate.",
     "{c}: {r}% sobre el ingreso tributable estatal.": "{c}: {r}% of state taxable income.",
+    "Hay impuesto local retenido (W-2 casilla 19) pero no se calculó ningún impuesto local: elija su jurisdicción en 'Dirección y residencia'. Sin ella, lo retenido se muestra como reembolso.": "Local tax was withheld (W-2 box 19) but no local tax was calculated: choose your jurisdiction under 'Address, state and county'. Without it, the withholding shows as a refund.",
     "Su estado no tiene impuestos locales sobre la renta incluidos. Los condados cobran impuesto a la propiedad y a las ventas, que no se declaran en esta declaracion.": "Your state has no local income taxes included. Counties levy property and sales taxes, which are not reported on this return.",
     "{r}% (segun rango)": "{r}% (by income range)",
     "{label}: seleccione un condado valido de {code} en 'Direccion y residencia' para calcularlo.": "{label}: select a valid {code} county under 'Address, state and county' to calculate it.",
