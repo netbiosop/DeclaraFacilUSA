@@ -88,14 +88,6 @@ def _num(v) -> int:
         return 0
 
 
-def _right_pad(info) -> int:
-    pad = str(info.get("padx", 0)).split()
-    try:
-        return int(float(pad[-1])) if pad else 0
-    except ValueError:
-        return 0
-
-
 def _eligible(lbl, parent) -> bool:
     """Solo las etiquetas que ocupan el ancho del contenedor (no las que están al lado de un campo)."""
     try:
@@ -172,7 +164,7 @@ def _reflow(parent):
         try:
             mgr = lbl.winfo_manager()
             info = lbl.pack_info() if mgr == "pack" else lbl.grid_info() if mgr == "grid" else {}
-            room = width - lbl.winfo_x() - _right_pad(info) - lbl.winfo_reqwidth()
+            room = width - lbl.winfo_x() - _num(info.get("padx", 0)) - lbl.winfo_reqwidth()
             wl = _num(lbl.cget("wraplength"))
             if room < -1:                       # el texto se sale: se acorta la línea lo justo
                 new = max(80, wl + room - 2)

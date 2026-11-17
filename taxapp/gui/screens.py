@@ -11,7 +11,7 @@ from ..engine import fmt_money, balance_text
 from ..i18n import _, N_, tr, reverse
 from ..local import localities_for_state, county_tax_info
 from ..models import (FILING_STATUSES, Dependent, W2, CustomLocalTax, age_at_year_end)
-from .lists import ListEditor
+from .lists import ListEditor, replace_row
 from .widgets import (COLORS, Form, ScrollFrame, Dialog, make_tree, font)
 
 NONE_LOC = N_("(ninguna)")
@@ -207,7 +207,7 @@ class AddressScreen(Screen):
         f.text(_("Apartamento / unidad"), "apt", width=12)
         f.text(_("Ciudad"), "city", width=28)
         labels = [data_loader.state_label(c) for c in data_loader.state_codes_sorted()]
-        self.state_cb = f.combo(_("Estado"), "state", labels, width=32,
+        f.combo(_("Estado"), "state", labels, width=32,
                                 to_model=data_loader.code_from_label,
                                 from_model=lambda c: data_loader.state_label(c) if c else "",
                                 on_select=self._state_selected)
@@ -370,16 +370,18 @@ class DependentsScreen(Screen):
         self._dialog(Dependent(last_name=self.ret.taxpayer.last_name), ok)
 
     def edit(self):
+        if self.app.readonly:  # el doble clic sigue enlazado aunque los botones estén desactivados
+            return
         sel = self.tree.selection()
         if not sel:
             return
-        i = int(sel[0])
+        orig = self.ret.dependents[int(sel[0])]
 
         def ok(d):
-            self.ret.dependents[i] = d
+            replace_row(self.ret.dependents, orig, d)
             self.refresh()
             self.changed()
-        self._dialog(copy.deepcopy(self.ret.dependents[i]), ok)
+        self._dialog(copy.deepcopy(orig), ok)
 
     def remove(self):
         sel = self.tree.selection()
@@ -397,7 +399,6 @@ class IncomeScreen(Screen):
     def build(self):
         nb = ttk.Notebook(self.body)
         nb.pack(fill="both", expand=True, padx=16, pady=10)
-        self.nb = nb
         self._w2_tab(nb)
         inc = lambda: self.ret.income  # noqa: E731
 
@@ -591,16 +592,18 @@ class IncomeScreen(Screen):
         self._w2_dialog(W2(state=self.ret.address.state), ok)
 
     def edit_w2(self):
+        if self.app.readonly:
+            return
         sel = self.w2tree.selection()
         if not sel:
             return
-        i = int(sel[0])
+        orig = self.ret.w2s[int(sel[0])]
 
         def ok(w):
-            self.ret.w2s[i] = w
+            replace_row(self.ret.w2s, orig, w)
             self.refresh_w2()
             self.changed()
-        self._w2_dialog(copy.deepcopy(self.ret.w2s[i]), ok)
+        self._w2_dialog(copy.deepcopy(orig), ok)
 
     def remove_w2(self):
         sel = self.w2tree.selection()
@@ -947,7 +950,8 @@ class ReviewScreen(Screen):
                       style="CardMuted.TLabel").pack(side="left", padx=6)
 
     def on_show(self):
-        self.on_result(self.app.result)
+        if self.app.result:
+            self.on_result(self.app.result)
 
     def on_result(self, res):
         if not res:

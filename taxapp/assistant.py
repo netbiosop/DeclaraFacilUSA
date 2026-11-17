@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import base64
 import json
+import logging
 import os
 import ssl
 import sys
@@ -20,7 +21,9 @@ from typing import Dict, List, Optional, Tuple
 
 from . import data_loader
 from .i18n import _, N_, tr, get_language
-from .models import TaxReturn
+from .models import TaxReturn, nonzero_amounts
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------- proveedores
 PROVIDERS: Dict[str, dict] = {
@@ -43,6 +46,7 @@ PROVIDERS: Dict[str, dict] = {
 }
 ANTHROPIC_VERSION = "2023-06-01"
 TIMEOUT = 90
+OLLAMA_TIMEOUT = 180
 
 
 class AIError(Exception):
@@ -72,7 +76,8 @@ class AIConfig:
         if enc:
             try:
                 return unprotect(enc)
-            except Exception:  # noqa: BLE001
+            except (OSError, ValueError, AttributeError) as e:  # DPAPI de otro usuario/PC o dato dañado
+                logger.warning("No se pudo descifrar la clave guardada de %s: %s", p, e)
                 return ""
         env = PROVIDERS.get(p, {}).get("env")
         return os.environ.get(env, "") if env else ""
@@ -100,18 +105,15 @@ def _config_path():
 
 
 def load_config() -> AIConfig:
-    try:
-        d = json.loads(_config_path().read_text(encoding="utf-8"))
-        cfg = AIConfig(**{k: v for k, v in d.items() if k in AIConfig.__dataclass_fields__})
-        if cfg.provider not in PROVIDERS:
-            cfg.provider = "anthropic"
-        return cfg
-    except (OSError, ValueError, TypeError):
-        return AIConfig()
+    d = data_loader.read_json(_config_path(), {})
+    cfg = AIConfig(**{k: v for k, v in d.items() if k in AIConfig.__dataclass_fields__})
+    if not isinstance(cfg.provider, str) or cfg.provider not in PROVIDERS:
+        cfg.provider = "anthropic"
+    return cfg
 
 
 def save_config(cfg: AIConfig):
-    _config_path().write_text(json.dumps(asdict(cfg), indent=1), encoding="utf-8")
+    data_loader.write_atomic(_config_path(), json.dumps(asdict(cfg), indent=1))
 
 
 # DPAPI (Windows) — cifra con la cuenta del usuario; fuera de Windows se usa base64 (solo ofuscacion).
@@ -138,8 +140,8 @@ def protect(secret: str) -> str:
     if sys.platform.startswith("win"):
         try:
             return "dpapi:" + base64.b64encode(_dpapi(secret.encode("utf-8"), True)).decode()
-        except Exception:  # noqa: BLE001
-            pass
+        except (OSError, AttributeError) as e:
+            logger.warning("DPAPI no disponible; la clave se guarda solo codificada en base64: %s", e)
     return "b64:" + base64.b64encode(secret.encode("utf-8")).decode()
 
 
@@ -191,20 +193,20 @@ def build_context(ret: Optional[TaxReturn], res: Optional[dict], section: str = 
                  f"{_m(w.box2_fed_withheld)}, box12 401k {_m(w.box12_401k)}, state {w.state}, box17 {_m(w.box17_state_withheld)},"
                  f" box19 {_m(w.box19_local_withheld)}.")
     inc = ret.income
-    nz = {k: v for k, v in vars(inc).items() if isinstance(v, (int, float)) and v}
+    nz = nonzero_amounts(inc)
     if nz:
         L.append("Other income fields (non-zero): " + ", ".join(f"{k}={_m(v)}" for k, v in nz.items()) + ".")
-    dd = {k: v for k, v in vars(ret.deductions).items() if isinstance(v, (int, float)) and not isinstance(v, bool) and v}
+    dd = nonzero_amounts(ret.deductions)
     L.append(f"Deduction mode: {ret.deductions.mode}." + (" Deduction inputs: " + ", ".join(f"{k}={_m(v)}" for k, v in dd.items()) + "." if dd else ""))
     cr = ret.credits
-    cnz = {k: v for k, v in vars(cr).items() if isinstance(v, (int, float)) and not isinstance(v, bool) and v}
+    cnz = nonzero_amounts(cr)
     if cnz or cr.students:
         L.append("Credit inputs: " + ", ".join(f"{k}={v}" for k, v in cnz.items())
                  + (f"; students: {[(s.credit, _m(s.expenses)) for s in cr.students]}" if cr.students else "") + ".")
-    pnz = {k: v for k, v in vars(ret.payments).items() if v}
+    pnz = nonzero_amounts(ret.payments)
     if pnz:
         L.append("Payments: " + ", ".join(f"{k}={_m(v)}" for k, v in pnz.items()) + ".")
-    se = {k: v for k, v in vars(ret.state_extras).items() if isinstance(v, (int, float)) and v}
+    se = nonzero_amounts(ret.state_extras)
     if se:
         L.append("State adjustments: " + ", ".join(f"{k}={_m(v)}" for k, v in se.items()) + ".")
     if res:
@@ -312,7 +314,7 @@ def _post(url: str, payload: dict, headers: dict, timeout=TIMEOUT) -> dict:
             body = e.read().decode("utf-8", "replace")
             msg = json.loads(body).get("error", {})
             msg = msg.get("message", msg) if isinstance(msg, dict) else msg
-        except Exception:  # noqa: BLE001
+        except (OSError, ValueError, AttributeError):  # cuerpo ilegible, no es JSON o no trae {"error": ...}
             msg = body[:300]
         if e.code in (401, 403):
             raise AIError(tr("Clave API inválida o sin permiso ({c}). Revise la configuración de IA.", c=e.code)) from e
@@ -398,7 +400,7 @@ def ask(cfg: AIConfig, system: str, messages: List[dict], web: bool = False) -> 
     headers = {"Authorization": f"Bearer {key}"} if key else {}
     payload = {"model": model, "max_tokens": cfg.max_tokens,
                "messages": [{"role": "system", "content": system}] + messages}
-    d = _post(f"{base}/chat/completions", payload, headers, timeout=180 if p == "ollama" else TIMEOUT)
+    d = _post(f"{base}/chat/completions", payload, headers, timeout=OLLAMA_TIMEOUT if p == "ollama" else TIMEOUT)
     try:
         return (d["choices"][0]["message"]["content"] or "").strip(), []
     except (KeyError, IndexError) as e:
@@ -406,9 +408,10 @@ def ask(cfg: AIConfig, system: str, messages: List[dict], web: bool = False) -> 
 
 
 def _dedupe(sources):
+    # Solo enlaces web: la interfaz abre estas URL con webbrowser.open, que en Windows ejecuta rutas locales o UNC
     seen, out = set(), []
     for t, u in sources:
-        if u and u not in seen:
+        if u and u not in seen and u.lower().startswith(("http://", "https://")):
             seen.add(u)
             out.append((t, u))
     return out[:8]

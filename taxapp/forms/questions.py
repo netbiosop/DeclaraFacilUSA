@@ -10,10 +10,11 @@ import re
 from dataclasses import dataclass, field
 from typing import Callable, List, Optional, Tuple
 
-from ..i18n import N_, tr
+from .. import data_loader
+from ..i18n import N_
 from ..models import TaxReturn
-
-SSN_RE = re.compile(r"^\d{3}-?\d{2}-?\d{4}$")
+from ..review import SSN_RE, ZIP_RE
+from .build import needed_forms
 
 
 @dataclass
@@ -56,15 +57,24 @@ def _ssn_ok(v) -> bool:
 
 
 def _digits(v, n) -> bool:
-    d = "".join(ch for ch in (v or "") if ch.isdigit())
+    d = "".join(ch for ch in (v or "") if ch.isdecimal())
     return len(d) == n
+
+
+def _routing_ok(v) -> bool:
+    """9 dígitos con el dígito de control ABA (pesos 3-7-1): atrapa un dígito mal tipeado."""
+    if not _digits(v, 9):
+        return False
+    d = [int(ch) for ch in v if ch.isdecimal()]
+    return sum(x * w for x, w in zip(d, (3, 7, 1) * 3)) % 10 == 0
 
 
 def questions(ret: TaxReturn, res: dict) -> List[Question]:
     """Lista de preguntas que aplican a esta declaración (en orden)."""
     fed = res["federal"]
     L = fed["lines"]
-    inc, ded, cr, fi = ret.income, ret.deductions, ret.credits, ret.filing
+    need = needed_forms(ret, fed)
+    inc, ded, fi = ret.income, ret.deductions, ret.filing
     Q: List[Question] = []
     G1 = N_("Identificación")
     tp = lambda r: r.taxpayer  # noqa: E731
@@ -81,17 +91,17 @@ def questions(ret: TaxReturn, res: dict) -> List[Question]:
     if ret.is_joint():
         Q.append(Question("sp_occ", G1, N_("Ocupación de su cónyuge"), "text", sp, "occupation"))
     for i, d in enumerate(ret.dependents):
-        Q.append(Question(f"dep_ssn{i}", G1, N_("SSN del dependiente {n}"), "text", lambda r, i=i: r.dependents[i],
+        Q.append(Question(f"dep_ssn{i}", G1, N_("SSN del dependiente {n}"), "text", lambda r, d=d: d,
                           "ssn", required=True, check=_ssn_ok, width=16, params={"n": d.full_name() or i + 1}))
     a = lambda r: r.address  # noqa: E731
     G2 = N_("Dirección postal")
     Q.append(Question("street", G2, N_("Calle y número (o apartado postal)"), "text", a, "street", required=True, width=40))
     Q.append(Question("city", G2, N_("Ciudad"), "text", a, "city", required=True, width=28))
     Q.append(Question("zip", G2, N_("Código postal (ZIP)"), "text", a, "zip", required=True, width=12,
-                      check=lambda v: bool(re.match(r"^\d{5}(-\d{4})?$", (v or "").strip()))))
-    if not ret.address.state:
+                      check=lambda v: bool(ZIP_RE.match((v or "").strip()))))
+    if ret.address.state not in data_loader.states_info():
         Q.append(Question("state", G2, N_("Estado (2 letras, p. ej. TX)"), "text", a, "state", required=True, width=6,
-                          check=lambda v: bool(re.match(r"^[A-Za-z]{2}$", (v or "").strip()))))
+                          check=lambda v: (v or "").strip() in data_loader.states_info()))
     G3 = N_("Preguntas del Formulario 1040")
     f = lambda r: r.filing  # noqa: E731
     Q.append(Question("digital", G3, N_("En el año, ¿recibió, vendió, intercambió o transfirió activos digitales "
@@ -122,8 +132,9 @@ def questions(ret: TaxReturn, res: dict) -> List[Question]:
                           help=N_("Es la forma más rápida. Si responde No, el IRS envía un cheque por correo.")))
         if fi.direct_deposit:
             Q.append(Question("routing", G4, N_("Número de ruta bancaria (9 dígitos)"), "text", f, "routing",
-                              required=True, width=14, check=lambda v: _digits(v, 9),
-                              help=N_("Aparece en la parte inferior izquierda de sus cheques.")))
+                              required=True, width=14, check=_routing_ok,
+                              help=N_("Aparece en la parte inferior izquierda de sus cheques. Si no se acepta, "
+                                      "revise los 9 dígitos: uno está mal.")))
             Q.append(Question("account", G4, N_("Número de cuenta"), "text", f, "account", required=True, width=22,
                               check=lambda v: 4 <= len("".join(ch for ch in (v or "") if ch.isalnum())) <= 17))
             Q.append(Question("acct_type", G4, N_("Tipo de cuenta"), "choice", f, "account_type",
@@ -229,7 +240,7 @@ def questions(ret: TaxReturn, res: dict) -> List[Question]:
                                   "precio de venta y el costo; al agregar las ventas, ponga en 0 la ganancia neta para "
                                   "no contarla dos veces.")))
     # ----- 2441
-    if fed["credits"]["cdcc"] >= 0.5 or cr.dependent_care_benefits:
+    if need["2441"]:
         Q.append(Question("providers", N_("Formulario 2441 — cuidado de dependientes"),
                           N_("Proveedores de cuidado: nombre, dirección, SSN o EIN y monto pagado"), "list",
                           list_kind="care_providers",
@@ -239,14 +250,14 @@ def questions(ret: TaxReturn, res: dict) -> List[Question]:
                           help=N_("Pida al proveedor el formulario W-10 o su identificación fiscal. Sin estos datos "
                                   "el IRS puede negar el crédito.")))
     # ----- 8863
-    if cr.students:
+    if need["8863"]:
         Q.append(Question("students", N_("Formulario 8863 — educación"),
                           N_("Datos de cada estudiante: SSN, institución, dirección y EIN (del 1098-T)"), "list",
                           list_kind="students", required=True,
                           check=lambda r: all(_ssn_ok(s.ssn) and s.school and s.school_address
                                               for s in r.credits.students)))
     # ----- 8889
-    if ded.hsa_deduction or ded.hsa_employer:
+    if need["8889"]:
         Q.append(Question("hsa_cov", N_("Formulario 8889 — cuenta HSA"),
                           N_("Tipo de cobertura de su seguro médico con deducible alto (HDHP)"), "choice",
                           lambda r: r.deductions, "hsa_coverage", required=True,
@@ -266,9 +277,3 @@ def questions(ret: TaxReturn, res: dict) -> List[Question]:
 
 def missing(ret: TaxReturn, res: dict, required_only: bool = False) -> List[Question]:
     return [q for q in questions(ret, res) if q.is_missing(ret) and (q.required or not required_only)]
-
-
-def blocking(ret: TaxReturn, res: dict) -> List[str]:
-    """Datos obligatorios que faltan para generar los formularios finales (textos ya traducidos)."""
-    from ..i18n import _
-    return [tr(q.text, **q.params) if q.params else _(q.text) for q in missing(ret, res, required_only=True)]

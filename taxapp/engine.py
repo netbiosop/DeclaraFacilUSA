@@ -27,13 +27,11 @@ def compute_all(ret: TaxReturn) -> dict:
     }
 
 
-def fmt_money(v: float, signed: bool = False) -> str:
+def fmt_money(v: float) -> str:
     if v is None:
         return "$0"
     s = f"${abs(v):,.2f}"
-    if v < 0:
-        return f"-{s}"
-    return f"+{s}" if signed and v > 0 else s
+    return f"-{s}" if v < 0 else s
 
 
 def balance_text(balance: float) -> str:

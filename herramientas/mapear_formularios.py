@@ -55,10 +55,6 @@ SPANISH = {"1040": "f1040sp.pdf", "1040sr": "f1040srs.pdf", "s1": "f1040s1s.pdf"
            "sei": "f1040sep.pdf", "sse": "f1040ssp.pdf"}
 
 
-def _seq(prefix, first, n, step=1, width=2):
-    return [f"{prefix}{str(first + i * step).zfill(width)}" for i in range(n)]
-
-
 def spec_1040():
     s = {
         "first": "P1.f1_14", "last": "P1.f1_15", "ssn": "P1.f1_16",

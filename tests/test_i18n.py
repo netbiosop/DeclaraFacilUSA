@@ -2,11 +2,11 @@
 every user-facing note in data/*.json is translated, and the engine produces English output."""
 import ast
 import json
-import os
 import pathlib
 import string
 import sys
 import unittest
+from unittest import mock
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -98,6 +98,13 @@ class EnglishOutputTests(unittest.TestCase):
         self.assertIn('lang="en"', html)
         self.assertIn("TOTAL INCOME", html)
         self.assertNotIn("INGRESO TOTAL", html)
+
+    def test_broken_translation_falls_back_to_spanish_and_is_logged(self):
+        # Un {n} mal escrito en una traducción (p. ej. llegada en una actualización de datos) no debe pasar en silencio
+        with mock.patch.object(i18n, "_lang", "en"), \
+                mock.patch.object(i18n, "_load_catalog", return_value={"Hay {n} filas": "There are {count} rows"}), \
+                self.assertLogs("taxapp.i18n", level="WARNING"):
+            self.assertEqual(i18n.tr("Hay {n} filas", n=3), "Hay 3 filas")
 
     def test_reverse_lookup(self):
         self.assertEqual(i18n.reverse("Stepchild", ["Hijo(a)", "Hijastro(a)"]), "Hijastro(a)")

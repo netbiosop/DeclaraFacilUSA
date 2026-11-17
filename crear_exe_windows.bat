@@ -48,7 +48,7 @@ for /d /r "%SRC%taxapp" %%d in (__pycache__) do if exist "%%d" rmdir /s /q "%%d"
   --add-data "%SRC%taxapp;taxapp" ^
   --paths "%SRC%." --collect-submodules taxapp --collect-submodules pypdf ^
   --collect-submodules tkinter --collect-submodules json --collect-submodules email --collect-submodules xml ^
-  --collect-submodules urllib --collect-submodules http --collect-submodules importlib ^
+  --collect-submodules urllib --collect-submodules http --collect-submodules importlib --collect-submodules logging ^
   --hidden-import csv --hidden-import decimal --hidden-import fractions --hidden-import statistics ^
   --hidden-import sqlite3 --hidden-import uuid --hidden-import calendar --hidden-import difflib ^
   --hidden-import textwrap --hidden-import secrets --hidden-import gzip --hidden-import html ^

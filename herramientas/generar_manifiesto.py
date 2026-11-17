@@ -19,7 +19,8 @@ SKIP_SUFFIX = {".pyc", ".pyo", ".tmp"}
 def build(root: Path = ROOT) -> dict:
     init = (root / "taxapp" / "__init__.py").read_text(encoding="utf-8")
     version = re.search(r'__version__\s*=\s*"([^"]+)"', init).group(1)
-    base = (re.search(r'__base__\s*=\s*"([^"]+)"', init) or re.search(r'__version__\s*=\s*"([^"]+)"', init)).group(1)
+    base_match = re.search(r'__base__\s*=\s*"([^"]+)"', init)
+    base = base_match.group(1) if base_match else version
     notes_file = root / "instalador" / "NOTAS_VERSION.md"
     notes = notes_file.read_text(encoding="utf-8") if notes_file.exists() else ""
     files = {}
@@ -34,6 +35,7 @@ def build(root: Path = ROOT) -> dict:
 
 def published_version(root: Path):
     """Version publicada en GitHub (actualizacion.json de la rama main), o None si no se puede consultar."""
+    import http.client
     import urllib.request
     try:
         repo = json.loads((root / "data" / "actualizaciones.json").read_text(encoding="utf-8")).get("repo", "")
@@ -46,7 +48,9 @@ def published_version(root: Path):
     try:
         with urllib.request.urlopen(req, timeout=20) as r:
             return json.loads(r.read().decode("utf-8")).get("version")
-    except Exception:  # noqa: BLE001 - sin conexion: no se bloquea la publicacion
+    except (OSError, ValueError, AttributeError, http.client.HTTPException) as e:  # sin conexion: no se bloquea la publicacion, pero se avisa
+        print(f"AVISO: no se pudo consultar la version publicada en GitHub ({e}); no se comprobo si ya existe.",
+              file=sys.stderr)
         return None
 
 

@@ -4,6 +4,7 @@ estilos ttk; luego la App reconstruye la interfaz.
 """
 from __future__ import annotations
 
+import logging
 import re
 import sys
 import tkinter as tk
@@ -15,6 +16,8 @@ from .. import data_loader
 from ..i18n import N_
 from . import widgets
 from . import layout
+
+logger = logging.getLogger(__name__)
 
 THEMES = {
     "A": {"name": N_("A · Verde moderno"), "desc": N_("Claro, con tarjetas"), "dark": False, "accent": "#0F7B5C",
@@ -54,10 +57,10 @@ ICONS = {
     "back": ("", "←"), "home": ("", "⌂"), "map": ("", "◉"), "calc": ("", "▦"),
     "book": ("", "▥"), "ai": ("", "✦"), "download": ("", "↓"), "globe": ("", "◍"),
     "settings": ("", "⚙"), "user": ("", "●"), "users": ("", "●"), "calendar": ("", "▣"),
-    "check": ("", "✓"), "lock": ("", "■"), "logout": ("", "⏻"), "search": ("", "⌕"),
-    "save": ("", "▾"), "doc": ("", "▯"), "info": ("", "i"), "help": ("", "?"),
+    "check": ("", "✓"), "lock": ("", "■"), "logout": ("", "⏻"),
+    "doc": ("", "▯"), "info": ("", "i"),
     "shield": ("", "◆"), "history": ("", "↺"), "palette": ("", "◐"), "send": ("", "➤"),
-    "refresh": ("", "↻"), "close": ("", "✕"), "more": ("", "⋯"), "money": ("", "$"),
+    "refresh": ("", "↻"), "money": ("", "$"),
     "exit": ("", "✕"), "edit": ("", "✎"), "table": ("", "▦"),
 }
 
@@ -121,19 +124,17 @@ def palette(theme: str = "A", accent: str = "") -> dict:
         "accent_dark": mix(acc, "#FFFFFF" if dark else "#000000", 0.18),
         "on_accent": on_accent,
         "tint": tint,
-        "tint_fg": ensure_contrast(acc, tint, 4.5),
-        "primary": ensure_contrast(acc, t["card"], 4.5),
+        "tint_fg": ensure_contrast(acc, tint),
+        "primary": ensure_contrast(acc, t["card"]),
         "sidebar_sel": tint,
-        "sidebar_sel_fg": ensure_contrast(acc, tint, 4.5),
+        "sidebar_sel_fg": ensure_contrast(acc, tint),
         "hover": mix(t["card"], t["text"], 0.06),
         "tooltip": "#FFFDE7" if not dark else "#22304A",
         "tooltip_fg": "#333333" if not dark else "#E8ECF4",
         "disabled": mix(t["card"], t["muted"], 0.35),
         "dark": "1" if dark else "",
     })
-    # nombres antiguos usados por pantallas existentes
-    p["primary_dark"] = p["accent_dark"]
-    p["accent_light"] = tint
+    p["accent_light"] = tint  # nombre antiguo que usan varias pantallas
     return p
 
 
@@ -183,8 +184,8 @@ def register_fonts():
         for f in fonts_dir().glob("*.ttf"):
             if ctypes.windll.gdi32.AddFontResourceExW(str(f), 0x10, 0):
                 n += 1
-    except Exception:  # noqa: BLE001
-        pass
+    except (OSError, AttributeError) as e:
+        logger.warning("No se pudieron registrar las fuentes incluidas: %s", e)
     reset_font_cache()
     return n
 
@@ -262,9 +263,7 @@ def style_ttk(root):
     st.configure("Surface.TFrame", background=c["surface"])
     st.configure("TLabel", background=c["bg"], foreground=c["text"])
     st.configure("Card.TLabel", background=c["card"], foreground=c["text"])
-    st.configure("Muted.TLabel", foreground=c["muted"])
     st.configure("CardMuted.TLabel", background=c["card"], foreground=c["muted"])
-    st.configure("Title.TLabel", font=f(20, "bold"), foreground=c["text"])
     st.configure("CardTitle.TLabel", font=f(18, "bold"), foreground=c["text"], background=c["card"])
     st.configure("Section.TLabel", font=f(11, "bold"), foreground=c["primary"], background=c["card"])
     st.configure("Big.TLabel", font=f(13, "bold"), background=c["card"], foreground=c["text"])

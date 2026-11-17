@@ -48,4 +48,4 @@ def irs_address(state: str, with_payment: bool) -> List[str]:
 
 def mailing_info(state: str, owed: float) -> Dict[str, object]:
     pay = owed >= 1  # el IRS no cobra saldos menores de $1
-    return {"group": group_for(state), "with_payment": pay, "address": irs_address(state, pay), "url": WHERE_TO_FILE_URL}
+    return {"with_payment": pay, "address": irs_address(state, pay), "url": WHERE_TO_FILE_URL}

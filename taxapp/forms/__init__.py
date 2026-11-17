@@ -104,7 +104,8 @@ def generate(ret: TaxReturn, res: dict, folder: Path, *, draft: bool, editable: 
     for inst in insts:
         var = catalog.variant(year, inst.form, lang)
         if var["lang"] == "es":
-            out.spanish.append(inst.form) if inst.form not in out.spanish else None
+            if inst.form not in out.spanish:
+                out.spanish.append(inst.form)
         pages = inst.pages
         if inst.form == "1040sr" and var.get("pages"):
             pages = list(range(var["pages"] - 1))   # la última página es la tabla de deducción estándar
@@ -113,7 +114,7 @@ def generate(ret: TaxReturn, res: dict, folder: Path, *, draft: bool, editable: 
         live = pdf.fill(*args, flatten=False, pages=pages) if editable else None
         per_form.setdefault(inst.form, []).append((flat, live))
     seq = 1
-    for fid in sorted(per_form, key=lambda f: order.get(f, 99)):
+    for fid in per_form:
         datas = per_form[fid]
         flat = finish(datas[0][0] if len(datas) == 1 else pdf.merge([d[0] for d in datas]))
         # El archivo individual queda editable solo si hay una copia (varias copias comparten nombres de campo).

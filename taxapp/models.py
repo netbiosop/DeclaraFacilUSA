@@ -4,6 +4,8 @@ Todas las clases son dataclasses serializables a JSON con to_dict()/from_dict().
 """
 from __future__ import annotations
 
+import math
+import re
 from dataclasses import dataclass, field, asdict, fields
 from datetime import date
 from typing import List, Optional
@@ -20,13 +22,30 @@ FILING_STATUSES = {
 }
 
 
+# "1500,50" o "12,5": coma decimal (1 o 2 cifras después de la coma y sin punto). "1,500" sigue siendo miles.
+_DECIMAL_COMMA = re.compile(r"^[^.]*\d,\d{1,2}\)?$")
+
+
+def clean_money_text(text: str) -> str:
+    """Quita $, espacios y separadores de miles; convierte la coma decimal en punto."""
+    t = str(text).strip().replace("$", "").replace(" ", "")
+    return t.replace(",", ".") if _DECIMAL_COMMA.match(t) else t.replace(",", "")
+
+
 def _num(v) -> float:
     try:
         if v in (None, ""):
             return 0.0
-        return float(str(v).replace(",", "").replace("$", "").strip() or 0)
+        n = float(clean_money_text(v) or 0)
+        return n if math.isfinite(n) else 0.0
     except (TypeError, ValueError):
         return 0.0
+
+
+def nonzero_amounts(section) -> dict:
+    """Montos distintos de cero de una sección; las casillas sí/no (bool) no son montos."""
+    return {k: v for k, v in vars(section).items()
+            if isinstance(v, (int, float)) and not isinstance(v, bool) and v}
 
 
 def _from_dict(cls, data: dict):
@@ -41,8 +60,7 @@ def _from_dict(cls, data: dict):
     return cls(**kwargs)
 
 
-def age_at_year_end(dob: str, year: int) -> Optional[int]:
-    """Edad al 31 de diciembre del ano fiscal. dob en formato AAAA-MM-DD."""
+def _age_on(dob: str, ref: date) -> Optional[int]:
     if not dob:
         return None
     try:
@@ -50,10 +68,14 @@ def age_at_year_end(dob: str, year: int) -> Optional[int]:
         born = date(y, m, d)
     except (ValueError, TypeError):
         return None
-    # El IRS considera que una persona cumple anos el dia ANTERIOR a su cumpleanos, por eso se mide al 1 de enero
-    # del ano siguiente (ej.: nacido el 1-ene-1961 cuenta como 65 anos al cierre de 2025).
-    ref = date(year + 1, 1, 1)
     return ref.year - born.year - ((ref.month, ref.day) < (born.month, born.day))
+
+
+def age_at_year_end(dob: str, year: int) -> Optional[int]:
+    """Edad del contribuyente o cónyuge al cierre del año fiscal. dob en formato AAAA-MM-DD."""
+    # Para los 65 años (y los 55 de la HSA) el IRS considera que se cumplen el día ANTERIOR al cumpleaños, por eso se
+    # mide al 1 de enero del año siguiente (nacido el 1-ene-1961 cuenta como 65 años al cierre de 2025).
+    return _age_on(dob, date(year + 1, 1, 1))
 
 
 @dataclass
@@ -73,6 +95,12 @@ class Person:
         return f"{self.first_name} {self.last_name}".strip()
 
 
+_CHILD_RELATION_RE = re.compile(
+    r"hij[oa]|niet[oa]|herman|sobrin|crianza|acogid"
+    r"|\b(?:step|grand|half[- ]?)?(?:child(?:ren)?|sons?|daughters?|brothers?|sisters?|siblings?)\b|\b(?:foster|niece|nephew)",
+    re.IGNORECASE)
+
+
 @dataclass
 class Dependent:
     first_name: str = ""
@@ -90,26 +118,34 @@ class Dependent:
         return f"{self.first_name} {self.last_name}".strip()
 
     def age(self, year: int) -> Optional[int]:
-        return age_at_year_end(self.dob, year)
+        # Para el CTC, el EITC y el cuidado de dependientes la edad se cumple el día del cumpleaños (Rev. Rul. 2003-72):
+        # nacido el 1-ene-2009 tiene 16 años al cierre de 2025.
+        return _age_on(self.dob, date(year, 12, 31))
+
+    def born_by(self, year: int) -> bool:
+        """False si la fecha de nacimiento es posterior al año (review.py lo marca como error)."""
+        a = self.age(year)
+        return a is None or a >= 0
 
     def is_child_relation(self) -> bool:
-        r = (self.relationship or "").lower()
-        return any(k in r for k in ("hijo", "hija", "hijastr", "nieto", "nieta", "herman", "sobrin", "crianza", "acogid",
-                                    "child", "son", "daughter", "foster", "brother", "sister", "sibling", "niece", "nephew"))
+        # Palabras completas: "son" por subcadena aceptaba "Otra persona del hogar" como hijo
+        return bool(_CHILD_RELATION_RE.search(self.relationship or ""))
 
     def qualifies_ctc(self, year: int) -> bool:
         a = self.age(year)
-        return self.has_ssn and a is not None and a < 17 and self.months_lived > 6 and self.is_child_relation()
+        return self.has_ssn and a is not None and 0 <= a < 17 and self.months_lived > 6 and self.is_child_relation()
 
     def qualifies_eitc(self, year: int) -> bool:
         a = self.age(year)
-        if a is None or self.months_lived <= 6 or not self.is_child_relation() or not self.has_ssn:
+        # §32(c)(3)(C): el hijo del EITC tiene que haber vivido con usted en EE. UU.
+        if a is None or a < 0 or self.months_lived <= 6 or not self.is_child_relation() or not self.has_ssn \
+                or not self.lived_in_us:
             return False
         return a < 19 or (a < 24 and self.full_time_student) or self.disabled
 
     def qualifies_care(self, year: int) -> bool:
         a = self.age(year)
-        return (a is not None and a < 13) or self.disabled
+        return (a is not None and 0 <= a < 13) or self.disabled
 
 
 @dataclass
@@ -346,6 +382,10 @@ class Student:
     half_time: bool = True    # matriculado al menos medio tiempo (requisito del AOTC)
     first_four_years: bool = True  # no había completado 4 años de estudios superiores antes del año
 
+    def aotc_eligible(self) -> bool:
+        """8863 líneas 24-25: sin medio tiempo o con 4 años ya completados no hay AOTC."""
+        return self.credit.upper() == "AOTC" and self.half_time and self.first_four_years
+
     def __post_init__(self):
         self.expenses = _num(self.expenses)
 
@@ -524,6 +564,7 @@ class TaxReturn:
         r.taxpayer = _from_dict(Person, d.get("taxpayer"))
         r.spouse = _from_dict(Person, d.get("spouse"))
         r.address = _from_dict(Address, d.get("address"))
+        r.address.state = (r.address.state or "").strip().upper()  # archivos viejos guardaban "tx"
         r.dependents = [_from_dict(Dependent, x) for x in d.get("dependents", [])]
         r.w2s = [_from_dict(W2, x) for x in d.get("w2s", [])]
         r.income = _from_dict(Income, d.get("income"))
