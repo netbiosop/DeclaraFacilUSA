@@ -99,6 +99,7 @@ def tr(text: str, **kw) -> str:
     try:
         return s.format(**kw)
     except (KeyError, IndexError, ValueError):
+        logger.warning("Traducción con marcadores distintos del original, se usa el español: %r", s)
         return text.format(**kw)
 
 
